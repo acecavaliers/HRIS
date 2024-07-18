@@ -391,11 +391,12 @@
                             <h1>Name: <b>{{ emp_Sched.full_name }}</b></h1>
 
 
-                            {{ periodDates.length }}
+                            {{ periodDates.length }} <br>
+                            {{ employeeIds }}
                                 <!-- mid -->
                                 <label class="flex justify-start cursor-pointer mt-2 w-full space-x-1 p-2 text-sm border rounded-t-md hover:bg-gray-100">
                                     <input id="cbx-restDay" type="checkbox" @change="setToAll('shift',$event)" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-lg">
-                                    <span>Set for entire period</span>
+                                    <span>Set for the rest of days period</span>
                                 </label>
 
 
@@ -617,7 +618,7 @@ export default {
                 }
 
             }else{
-                const employees = this.employees;
+                const employees = this.employees; // Assuming 'employees' is defined in your data or computed properties
                 if (employees.length > 0) {
                     this.employeeIds = this.employees.map(employee => employee.id);
                     const topEmployeeId = employees[0].id;
@@ -625,6 +626,7 @@ export default {
                 this.modalOpen('shifts', topEmployeeId);
                 this.ews.work_shift_id == 0;
                 }
+                console.log('Show me Edits',this.employeeIds);
             }
 
         },
@@ -677,6 +679,7 @@ export default {
         },
 
         saveworkshift() {
+            console.log("this.periodDates.length",this.periodDates.length);
             if(this.setType === 'Edit'){
 
                 axios.patch(route('employeeworkschedule.update', this.updateID),
@@ -724,7 +727,7 @@ export default {
                 }
                 });
             }
-            // this.employeeIds = [];
+            this.periodDates = [];
 
         },
 
