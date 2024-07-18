@@ -256,10 +256,15 @@ class EmployeeWorkScheduleController extends Controller
                 }
                 else{
                     if($setby < 1){
-                        $shift['employee_workshift_id'] = $existingWorkshift->id;
-                        $shift['work_shift_id'] = $arr['work_shift_id'];
-                        $shift['created_by'] = Auth::user()->name;
-                        EmployeeWorkshiftsDetail::create($shift);
+                        $existingDetail = EmployeeWorkshiftsDetail::where('employee_workshift_id', $existingWorkshift->id)
+                        ->where('schedule_date', $shift['schedule_date'])
+                        ->first();
+                        if(!$existingDetail){
+                            $shift['employee_workshift_id'] = $existingWorkshift->id;
+                            $shift['work_shift_id'] = $arr['work_shift_id'];
+                            $shift['created_by'] = Auth::user()->name;
+                            EmployeeWorkshiftsDetail::create($shift);
+                        }
 
                     }else{
 
