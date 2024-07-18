@@ -268,8 +268,8 @@
                             </MenuItems>
                         </transition>
                     </Menu>
-                    <button type="button" @click="previousPayrollPeriod" class="p-2 bg-blue-600 text-white text-sm rounded-md mx-1">Previos Payroll</button>
-                    <button type="button" @click="nextPayrollPeriod" class="p-2 bg-blue-600 text-white text-sm rounded-md mx-1">Next Payroll</button>
+                    <!-- <button type="button" @click="previousPayrollPeriod" class="p-2 bg-blue-600 text-white text-sm rounded-md mx-1">Previos Payroll</button>
+                    <button type="button" @click="nextPayrollPeriod" class="p-2 bg-blue-600 text-white text-sm rounded-md mx-1">Next Payroll</button> -->
                 </div>
             </div>
 
@@ -278,9 +278,9 @@
                     Payroll Period  From : {{dateToWords( ews.period_from) }} - {{ dateToWords(ews.period_to) }},  {{ ews.period_to.substring(0,4) }}
                 </h1>
                 <span class="text-gray-800 text-xs font-bold ">
-                    <span class="border-gray-300 border bg-yellow-200 px-2 py-1.5 rounded-l-md">OC: On-Call</span>
-                    <span class="border-gray-300 border bg-red-300 px-2 py-1.5 ">OFF: Day Off</span>
-                    <span class="border-gray-300 border bg-green-200 px-2 py-1.5 rounded-r-md">Time: On-duty</span>
+                    <span class="border-gray-300 bg-yellow-200 px-2 py-1.5 rounded-l-md">On-Call</span>
+                    <span class="border-gray-300 bg-red-300 px-2 py-1.5 ">Day Off</span>
+                    <span class="border-gray-300 bg-green-200 px-2 py-1.5 rounded-r-md">On-duty</span>
                 </span>
             </div>
 
@@ -340,7 +340,7 @@
                             </td>
 
                             <td v-for="(ds, index) in employee.selectedShift" :key="index" class="w-16 px-0.5 py-2 " >
-                                <div  v-if="ds.schedule_day !== 'n/a'"  @click="setEmpSched('edit', employee, ds.schedule_date, index)" class="relative text-xs cursor-pointer w-full h-14 rounded border border-gray-300"
+                                <div  v-if="ds.schedule_day !== 'n/a'"  @click="setEmpSched('edit', employee, ds.schedule_date, index)" class="relative text-xs cursor-pointer w-full h-14 rounded border border-gray-300 hover:border-blue-500 hover:shadow-lg hover:border-2"
                                 :class="{'font-bold bg-red-200':ds.day_off == 1,'bg-yellow-100':ds.oc == 1,'bg-green-100':ds.oc != 1 && ds.day_off != 1 }">
                                     <div class=" flex items-center justify-center text-xs w-full h-full">
                                         <h1 v-if="ds.day_off == 1">
@@ -354,7 +354,7 @@
                                         </h1>
                                     </div>
                                 </div>
-                                <div v-else @click="setEmpSched('shifts', employee, ds.schedule_date, index)" class="relative text-gray-400 text-xs cursor-pointer w-full h-14 rounded border border-gray-300 bg-white hover:text-blue-500">
+                                <div v-else @click="setEmpSched('shifts', employee, ds.schedule_date, index)" class="relative text-gray-400 text-xs cursor-pointer w-full h-14 rounded border border-gray-300 bg-white hover:text-blue-500 hover:border-blue-500 hover:shadow-lg hover:border-2">
                                     <div class="flex items-center justify-center w-full h-full">
                                         <PlusCircleIcon class=" w-5 h-5"/>
                                     </div>
@@ -574,21 +574,22 @@ export default {
                 this.setType = 'Edit';
             }else{
                 this.setType = 'Set';
-            }
-            if (employee) {
+                if (employee) {
+                    this.emp_Shift = this.days.map(day => ({
+                    schedule_date: this.formatDate(day.date),
+                    schedule_day: day.dayofweek,
+                    day_off:false,
+                    oc:false,
+                    }));
+                }
 
-                this.emp_Shift = this.days.map(day => ({
-                schedule_date: this.formatDate(day.date),
-                schedule_day: day.dayofweek,
-                day_off:false,
-                oc:false,
-                }));
+                this.selectedDate = index;
+                this.saveShifts = this.emp_Shift[index];
+                this.emp_Sched = employee;
+                this.emp_Sched.day = date;
+                this.modalOpen(type, employee.id)
             }
-            this.selectedDate = index;
-            this.saveShifts = this.emp_Shift[index];
-            this.emp_Sched = employee;
-            this.emp_Sched.day = date;
-            this.modalOpen(type, employee.id)
+
 
 
         },
@@ -810,6 +811,7 @@ export default {
                 this.isVisible=false
                 this.employeeIds = [];
             }
+            this.periodDates = [];
 
         },
 
