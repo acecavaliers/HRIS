@@ -391,8 +391,7 @@
                             <h1>Name: <b>{{ emp_Sched.full_name }}</b></h1>
 
 
-                            {{ periodDates.length }} <br>
-                            {{ employeeIds }}
+                            {{ ewsUpdate }}
                                 <!-- mid -->
                                 <label class="flex justify-start cursor-pointer mt-2 w-full space-x-1 p-2 text-sm border rounded-t-md hover:bg-gray-100">
                                     <input id="cbx-restDay" type="checkbox" @change="setToAll('shift',$event)" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-lg">
@@ -400,7 +399,7 @@
                                 </label>
 
 
-                                 <div v-for="dates in emp_Shift" :key="dates.schedule_date">
+                                 <div v-if="setType !== 'Edit'" v-for="dates in emp_Shift" :key="dates.schedule_date">
                                     <!--   v-if="dates.schedule_date ===  emp_Sched.day"   -->
                                     <div v-if="dates.schedule_date ===  emp_Sched.day" class="pt-2">
                                         <h1 class="w-1/2 text-sm uppercase font-medium bg-gray-600 border-gray-600 border text-white px-1 py-1.5 rounded-t-md">{{ fullDateToWords(dates.schedule_date)}} - ({{ dates.schedule_day.substring(0,3) }})</h1>
@@ -449,12 +448,12 @@
 
                                                 <div class="w-full flex items-center justify-between space-x-1.5">
                                                     <label :class="{'bg-gray-100 text-gray-400' :workShifts.length<1,'bg-white border border-gray-200 text-gray-900 hover:bg-blue-400' :workShifts.length>0,}" class="flex justify-start cursor-pointer rounded-md w-full space-x-1 px-2 py-2 text-sm">
-                                                        <input @change="toggleRestDay($event,setType, dates, 0)"  :checked="isOnCall(dates, setType)" :disabled="workShifts.length<1" id="cbx-restDay" type="checkbox" class="mt-0.5 mr-1.5 w-4 h-4 bg-gray-100 border-gray-300 rounded-lg text-red-500 focus:ring-red-500">
+                                                        <input @change="toggleRestDay($event,setType, dates, 0)"   :disabled="workShifts.length<1" id="cbx-restDay" type="checkbox" class="mt-0.5 mr-1.5 w-4 h-4 bg-gray-100 border-gray-300 rounded-lg text-red-500 focus:ring-red-500">
                                                         <span>Day-Off</span>
                                                     </label>
 
                                                     <label :class="{'bg-gray-100 text-gray-400' :workShifts.length<1,'bg-white border border-gray-200 text-gray-900 hover:bg-blue-400' :workShifts.length>0,}" class="flex justify-start cursor-pointer rounded-md w-full space-x-1 px-2 py-2 text-sm">
-                                                        <input @change="toggleRestDay($event,setType, dates, 1)"  :checked="isOnCall(dates, setType)" :disabled="workShifts.length<1" id="cbx-oncall" type="checkbox" class="mt-0.5 mr-1.5 w-4 h-4 bg-gray-100 border-gray-300 rounded-lg text-yellow-300  focus:ring-yellow-300">
+                                                        <input @change="toggleRestDay($event,setType, dates, 1)"   :disabled="workShifts.length<1" id="cbx-oncall" type="checkbox" class="mt-0.5 mr-1.5 w-4 h-4 bg-gray-100 border-gray-300 rounded-lg text-yellow-300  focus:ring-yellow-300">
                                                         <span>On-Call</span>
                                                     </label>
                                                 </div>
@@ -462,6 +461,69 @@
                                         </div>
                                     </div>
                                 </div>
+                                <div v-else>
+                                    <h1 class="w-1/2 text-sm uppercase font-medium bg-gray-600 border-gray-600 border text-white px-1 py-1.5 rounded-t-md">{{ fullDateToWords(ewsUpdate.schedule_date)}} - ({{ ewsUpdate.schedule_day.substring(0,3) }})</h1>
+                                    <div class="bg-white px-2 py-2 rounded-tr-md border-t border-x">
+                                            <div class="w-full py-2 space-y-1">
+                                                <Menu as="div" class="relative -mt-0.5">
+                                                    <MenuButton
+                                                        type="button"
+                                                        class="flex items-center justify-between gap-x-1.5 w-full rounded-md px-3 py-2 text-sm font-semibold" :disabled="workShifts.length<1" :class="{'bg-gray-100 text-gray-400' :workShifts.length<1,'bg-white text-gray-600  ring-1 ring-inset ring-gray-200 hover:bg-gray-50' :workShifts.length>0,}"
+                                                    >
+                                                        {{ set.shifts }}
+                                                        <ChevronDownIcon
+                                                            class="-mr-1 h-5 w-5 text-gray-400"
+                                                            aria-hidden="true"
+                                                        />
+                                                    </MenuButton>
+
+                                                    <transition
+                                                        enter-active-class="transition ease-out duration-100"
+                                                        enter-from-class="transform opacity-0 scale-95"
+                                                        enter-to-class="transform opacity-100 scale-100"
+                                                        leave-active-class="transition ease-in duration-75"
+                                                        leave-from-class="transform opacity-100 scale-100"
+                                                        leave-to-class="transform opacity-0 scale-95"
+                                                    >
+                                                        <MenuItems
+                                                            class="absolute right-0 z-10 mt-2 w-full origin-top-right overflow-hidden rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                                        >
+                                                            <div v-for="(shifts, index) in workShifts" :key="index" class="py-1" >
+                                                                <MenuItem v-slot="{ active }">
+                                                                    <a
+                                                                        @click="selectedShift(shifts)"
+                                                                        :class="[
+                                                                            active
+                                                                                ? 'bg-gray-100 text-gray-900'
+                                                                                : 'text-gray-700',
+                                                                            'block px-4 py-2 text-sm',
+                                                                        ]"
+                                                                        >{{ shifts.shift_name }} ({{ shifts.time_from }}-{{ shifts.time_to }})</a
+                                                                    >
+                                                                </MenuItem>
+                                                            </div>
+                                                        </MenuItems>
+                                                    </transition>
+                                                </Menu>
+
+                                                <div class="w-full flex items-center justify-between space-x-1.5">
+                                                    <label :class="{'bg-gray-100 text-gray-400' :workShifts.length<1,'bg-white border border-gray-200 text-gray-900 hover:bg-blue-400' :workShifts.length>0,}" class="flex justify-start cursor-pointer rounded-md w-full space-x-1 px-2 py-2 text-sm">
+                                                        <input v-model="ewsUpdate.day_off"  :disabled="workShifts.length<1" id="cbx-restDay" type="checkbox" class="mt-0.5 mr-1.5 w-4 h-4 bg-gray-100 border-gray-300 rounded-lg text-red-500 focus:ring-red-500">
+                                                        <span>Day-Off</span>
+                                                    </label>
+
+                                                    <label :class="{'bg-gray-100 text-gray-400' :workShifts.length<1,'bg-white border border-gray-200 text-gray-900 hover:bg-blue-400' :workShifts.length>0,}" class="flex justify-start cursor-pointer rounded-md w-full space-x-1 px-2 py-2 text-sm">
+                                                        <input v-model="ewsUpdate.oc"  :disabled="workShifts.length<1" id="cbx-oncall" type="checkbox" class="mt-0.5 mr-1.5 w-4 h-4 bg-gray-100 border-gray-300 rounded-lg text-yellow-300  focus:ring-yellow-300">
+                                                        <span>On-Call</span>
+                                                    </label>
+
+
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                </div>
+
                             <div class="border rounded-b-lg px-2">
                                 <label class="w-full inline-flex items-center cursor-pointer mt-2">
                                     <input
@@ -528,6 +590,7 @@ export default {
 
             ],
             ews:{},
+            ewsUpdate:{},
             divisions: [],
             departments: [],
             subDepartments: [],
@@ -566,12 +629,37 @@ export default {
     methods: {
         selectedShift(shift){
             this.ews.work_shift_id = shift.id;
+            this.ewsUpdate.work_shift_id = shift.id;
             this.set.shifts = `${shift.time_from} - ${shift.time_to}`;
         },
         setEmpSched(type, employeeData, date, index){
             const employee = this.employees.find(emp => emp.id === employeeData.id);
             if (type !== 'shifts'){
                 this.setType = 'Edit';
+                this.ewsUpdate = {};
+                this.emp_Shift = [];
+                const matchingShift = employee.selectedShift.find(shift => shift.schedule_date === date);
+                if (matchingShift) {
+                    console.log('Show WWWWWWWWW:', matchingShift);
+                    console.log('Show matchingShift:', matchingShift.work_shift_id);
+                    console.log('Show IDDD:', matchingShift.employee_workshift_id);
+                    console.log('Show time_from:', matchingShift.time_from);
+                    console.log('Show day_off:', matchingShift.day_off);
+                    console.log('Show oc:', matchingShift.oc);
+
+                    this.ewsUpdate.work_shift_id = matchingShift.work_shift_id;
+                    this.ewsUpdate.employee_workshift_id = matchingShift.employee_workshift_id;
+                    this.ewsUpdate.schedule_date = matchingShift.schedule_date;
+                    this.ewsUpdate.schedule_day = matchingShift.schedule_day;
+                    this.ewsUpdate.day_off = (matchingShift.day_off === '1') ? true : false ;
+                    this.ewsUpdate.oc = (matchingShift.oc === '1') ? true : false ;
+                    this.set.shifts = matchingShift.time_from + ' - ' + matchingShift.time_to;
+
+                }
+                console.log('Show emp_Shift:', this.emp_Shift);
+                this.emp_Sched = employee;
+                this.modalOpen(type, employee.id)
+
             }else{
                 this.setType = 'Set';
                 if (employee) {
@@ -598,12 +686,11 @@ export default {
             if(name === 'shifts'){
                 this.currentShift= '';
                 this.isVisible=true;
-                this.ews.employee_id =id;
+                this.ews.employee_id = id;
             }
             if(name === 'edit'){
-                console.log('Show me Edits');
                 this.isVisible=true;
-                this.ews.employee_id =id;
+                this.ews.employee_id = id;
             }
         },
         setToAll(type, event) {
@@ -648,18 +735,6 @@ export default {
             return `${year}-${month}-${day}`;
         },
 
-        isWeekend(dayOfWeek, type) {
-            if (type === 'Set'){
-                return dayOfWeek.schedule_day === 'Saturday' || dayOfWeek.schedule_day === 'Sunday' ;
-            }else{
-                return dayOfWeek.day_off == 1;
-            }
-        },
-        isOnCall(dayOfWeek, type) {
-            if (type === 'Edit'){
-                return dayOfWeek.oc == 1 ;
-            }
-        },
         toggleRestDay(event,setType, shift, type) {
 
             if (setType === 'Set'){
@@ -671,9 +746,9 @@ export default {
             }else{
 
                 if (type === 0) {
-                    shift.day_off = event.target.checked;
+                    this.ewsUpdate.day_off = event.target.checked;
                 } else {
-                    shift.oc = event.target.checked;
+                    this.ewsUpdate.oc = event.target.checked;
                 }
 
             }
@@ -683,9 +758,9 @@ export default {
             console.log("this.periodDates.length",this.periodDates.length);
             if(this.setType === 'Edit'){
 
-                axios.patch(route('employeeworkschedule.update', this.updateID),
+                axios.patch(route('employeeworkschedule.update', this.ewsUpdate.employee_workshift_id),
                 {
-                    formdata:this.emp_Sched,
+                    formdata:this.ewsUpdate,
                 }
                 )
                 .then(response => {

@@ -89,7 +89,7 @@ class EmployeeWorkScheduleController extends Controller
                 }
             }
 
-            return 'success';
+            return $workshiftDetails;
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to update workshift detail.'], 500);
         }
@@ -146,8 +146,6 @@ class EmployeeWorkScheduleController extends Controller
                                 EmployeeWorkshiftsDetail::create($shifts);
                             }
                         }
-
-
                     }
                 }
                 else{
