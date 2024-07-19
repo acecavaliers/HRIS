@@ -763,8 +763,8 @@ export default {
                 if (response.data === 'success') {
                     this.getEmployee(this.search.currentType, this.search.currentID);
                     this.isVisible=false;
-                }
-                if (response.data !== 'success'){
+                }else {
+                    this.getEmployee(this.search.currentType, this.search.currentID);
                     this.isVisible=false;
                 }
                 })
@@ -790,6 +790,12 @@ export default {
                     this.getEmployee(this.search.currentType, this.search.currentID);
                     this.isVisible=false;
                     this.this.setPeriod=0;
+                }else {
+                    {
+                    this.getEmployee(this.search.currentType, this.search.currentID);
+                    this.isVisible=false;
+                    this.this.setPeriod=0;
+                }
                 }
                 })
                 .catch(err => {
