@@ -182,12 +182,12 @@ class EmployeeWorkScheduleController extends Controller
 
                 }
             }
-            // if ($insertedCount >0){
-            //     return 'success';
-            // }else{
-            //     return 'existed';
-            // }
-            return 'success';
+            if ($insertedCount >0){
+                return 'success';
+            }else{
+                return 'existed';
+            }
+            // return 'success';
 
         }else{
 

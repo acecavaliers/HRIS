@@ -641,11 +641,6 @@ export default {
                 const matchingShift = employee.selectedShift.find(shift => shift.schedule_date === date);
                 if (matchingShift) {
                     console.log('Show WWWWWWWWW:', matchingShift);
-                    console.log('Show matchingShift:', matchingShift.work_shift_id);
-                    console.log('Show IDDD:', matchingShift.employee_workshift_id);
-                    console.log('Show time_from:', matchingShift.time_from);
-                    console.log('Show day_off:', matchingShift.day_off);
-                    console.log('Show oc:', matchingShift.oc);
 
                     this.ewsUpdate.work_shift_id = matchingShift.work_shift_id;
                     this.ewsUpdate.employee_workshift_id = matchingShift.employee_workshift_id;
@@ -978,7 +973,9 @@ export default {
                     }
                 }).then(response => {
                     this.employees = response.data;
-                console.log('FFFF',this.employees)
+                    this.populateAndSyncSelectedShifts();
+                    console.log('DATES EQUAL',this.employees);
+                    console.log('DATES EQUAL',this.days);
                 })
             }
             if (src_type === 'subdepartment'){
@@ -992,7 +989,9 @@ export default {
                     }
                 }).then(response => {
                     this.employees = response.data;
-                console.log('FFFF',this.employees)
+                    this.populateAndSyncSelectedShifts();
+                    console.log('DATES EQUAL',this.employees);
+                    console.log('DATES EQUAL',this.days);
                 })
             }
             if (src_type === 'subdepartmentunit'){
@@ -1006,7 +1005,9 @@ export default {
                     }
                 }).then(response => {
                     this.employees = response.data;
-                    console.log('FFFF',this.employees)
+                    this.populateAndSyncSelectedShifts();
+                    console.log('DATES EQUAL',this.employees);
+                    console.log('DATES EQUAL',this.days);
                 })
             }
 
