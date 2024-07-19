@@ -274,8 +274,8 @@
             </div>
 
             <div class="flex items-center justify-between bg-gray-200 mt-2 border-t border-x rounded-t-md px-2 py-2">
-                <h1 class="text-gray-800 text-sm font-bold">
-                    Payroll Period  From : {{dateToWords( ews.period_from) }} - {{ dateToWords(ews.period_to) }},  {{ ews.period_to.substring(0,4) }}
+                <h1 class="text-gray-800 text-sm font-medium">
+                    Workshift Period: <b>{{dateToWords( ews.period_from) }} </b> - <b>{{ dateToWords(ews.period_to) }},  {{ ews.period_to.substring(0,4) }}</b>
                 </h1>
                 <span class="text-gray-800 text-xs font-bold ">
                     <span class="border-gray-300 bg-yellow-200 px-2 py-1.5 rounded-l-md">On-Call</span>
