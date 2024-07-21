@@ -377,8 +377,8 @@ class ComposerStaticInit484bb429eb3a64eb177fa2e82e5d8219
         ),
         'Psr\\Http\\Message\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/http-message/src',
-            1 => __DIR__ . '/..' . '/psr/http-factory/src',
+            0 => __DIR__ . '/..' . '/psr/http-factory/src',
+            1 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
         'Psr\\Http\\Client\\' => 
         array (
@@ -607,6 +607,7 @@ class ComposerStaticInit484bb429eb3a64eb177fa2e82e5d8219
         'App\\Http\\Controllers\\Company\\EmployeeHandbookHrController' => __DIR__ . '/../..' . '/app/Http/Controllers/Company/EmployeeHandbookHrController.php',
         'App\\Http\\Controllers\\Controller' => __DIR__ . '/../..' . '/app/Http/Controllers/Controller.php',
         'App\\Http\\Controllers\\DisciplinaryActionController' => __DIR__ . '/../..' . '/app/Http/Controllers/DisciplinaryActionController.php',
+        'App\\Http\\Controllers\\EmployeeWorkScheduleController' => __DIR__ . '/../..' . '/app/Http/Controllers/EmployeeWorkScheduleController.php',
         'App\\Http\\Controllers\\Employee\\EmployeeController' => __DIR__ . '/../..' . '/app/Http/Controllers/Employee/EmployeeController.php',
         'App\\Http\\Controllers\\Employee\\EmployeeDependentController' => __DIR__ . '/../..' . '/app/Http/Controllers/Employee/EmployeeDependentController.php',
         'App\\Http\\Controllers\\Employee\\EmployeeDisciplinaryActionController' => __DIR__ . '/../..' . '/app/Http/Controllers/Employee/EmployeeDisciplinaryActionController.php',
@@ -741,8 +742,10 @@ class ComposerStaticInit484bb429eb3a64eb177fa2e82e5d8219
         'App\\Models\\DatatypeFormtype' => __DIR__ . '/../..' . '/app/Models/DatatypeFormtype.php',
         'App\\Models\\DayShift' => __DIR__ . '/../..' . '/app/Models/DayShift.php',
         'App\\Models\\Department' => __DIR__ . '/../..' . '/app/Models/Department.php',
+        'App\\Models\\DepartmentShift' => __DIR__ . '/../..' . '/app/Models/DepartmentShift.php',
         'App\\Models\\DisciplinaryAction' => __DIR__ . '/../..' . '/app/Models/DisciplinaryAction.php',
         'App\\Models\\Division' => __DIR__ . '/../..' . '/app/Models/Division.php',
+        'App\\Models\\DivisionShift' => __DIR__ . '/../..' . '/app/Models/DivisionShift.php',
         'App\\Models\\Doctor' => __DIR__ . '/../..' . '/app/Models/Doctor.php',
         'App\\Models\\DoctorCategory' => __DIR__ . '/../..' . '/app/Models/DoctorCategory.php',
         'App\\Models\\Earning' => __DIR__ . '/../..' . '/app/Models/Earning.php',
@@ -761,6 +764,8 @@ class ComposerStaticInit484bb429eb3a64eb177fa2e82e5d8219
         'App\\Models\\EmployeeStatus' => __DIR__ . '/../..' . '/app/Models/EmployeeStatus.php',
         'App\\Models\\EmployeeType' => __DIR__ . '/../..' . '/app/Models/EmployeeType.php',
         'App\\Models\\EmployeeWorkAssignment' => __DIR__ . '/../..' . '/app/Models/EmployeeWorkAssignment.php',
+        'App\\Models\\EmployeeWorkshift' => __DIR__ . '/../..' . '/app/Models/EmployeeWorkshift.php',
+        'App\\Models\\EmployeeWorkshiftsDetail' => __DIR__ . '/../..' . '/app/Models/EmployeeWorkshiftsDetail.php',
         'App\\Models\\EmploymentType' => __DIR__ . '/../..' . '/app/Models/EmploymentType.php',
         'App\\Models\\EventType' => __DIR__ . '/../..' . '/app/Models/EventType.php',
         'App\\Models\\FormType' => __DIR__ . '/../..' . '/app/Models/FormType.php',
@@ -810,7 +815,9 @@ class ComposerStaticInit484bb429eb3a64eb177fa2e82e5d8219
         'App\\Models\\Skill' => __DIR__ . '/../..' . '/app/Models/Skill.php',
         'App\\Models\\Specialization' => __DIR__ . '/../..' . '/app/Models/Specialization.php',
         'App\\Models\\SubDepartment' => __DIR__ . '/../..' . '/app/Models/SubDepartment.php',
+        'App\\Models\\SubDepartmentShift' => __DIR__ . '/../..' . '/app/Models/SubDepartmentShift.php',
         'App\\Models\\SubDepartmentUnit' => __DIR__ . '/../..' . '/app/Models/SubDepartmentUnit.php',
+        'App\\Models\\SubDepartmentUnitShift' => __DIR__ . '/../..' . '/app/Models/SubDepartmentUnitShift.php',
         'App\\Models\\SubSpecialization' => __DIR__ . '/../..' . '/app/Models/SubSpecialization.php',
         'App\\Models\\Submodule' => __DIR__ . '/../..' . '/app/Models/Submodule.php',
         'App\\Models\\Suffix' => __DIR__ . '/../..' . '/app/Models/Suffix.php',
