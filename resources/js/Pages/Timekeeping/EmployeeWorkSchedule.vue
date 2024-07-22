@@ -211,10 +211,10 @@
         </div>
         <hr>
         <div class="p-4">
-            <div class="flex justify-between">
-                <div >
+            <div class="flex justify-end">
+                <!-- <div >
                     <button v-if="employees.length>0" type="button" @click="setToAll('emp','')" class="p-2 bg-blue-600 text-white text-sm rounded-md">Assign to All</button>
-                </div>
+                </div> -->
                 <div class="flex justify-end">
                     <Menu as="div" class="relative">
                         <MenuButton
@@ -389,15 +389,9 @@
 
                         <div class="px-4 mt-2">
                             <h1>Name: <b>{{ emp_Sched.full_name }}</b></h1>
-
+                            <p v-if="employeeIds.length>0" class="text-xs">and {{ employeeIds.length -1  }} other employees</p>
 
                                 <!-- mid -->
-                                <label v-if="setType !== 'Edit'"  class="flex justify-start cursor-pointer mt-2 w-full space-x-1 p-2 text-sm border rounded-t-md hover:bg-gray-100">
-                                    <input id="cbx-restDay" type="checkbox" @change="setToAll('shift',$event)" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-lg">
-                                    <span>Set for the rest of days period</span>
-                                </label>
-
-
                                  <div v-if="setType !== 'Edit'" v-for="dates in emp_Shift" :key="dates.schedule_date">
                                     <!--   v-if="dates.schedule_date ===  emp_Sched.day"   -->
                                     <div v-if="dates.schedule_date ===  emp_Sched.day" class="pt-2">
@@ -523,8 +517,8 @@
                                         </div>
                                 </div>
 
-                            <div class="border rounded-b-lg px-2">
-                                <label class="w-full inline-flex items-center cursor-pointer mt-2">
+                            <div class="border rounded-b-lg divide-y">
+                                <label class="w-full inline-flex items-center cursor-pointer pt-2 pl-2">
                                     <input
                                     v-model="ews.is_active"
                                     type="checkbox"
@@ -535,15 +529,50 @@
                                     <div class="relative w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                                     <span class="ms-3 text-sm font-medium text-gray-700">Active</span>
                                 </label>
+                                <label v-if="setType !== 'Edit'" class="w-full inline-flex items-center cursor-pointer pt-2 pl-2 border-t">
+                                    <input
+
+                                    type="checkbox" @change="setToAll('shift',$event)"
+                                    class="sr-only peer"
+                                    :checked="setType === 'Edit'"
+
+                                    />
+                                    <div class="relative w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                    <span class="ms-3 text-sm font-medium text-gray-700">Set for the remaining unassigned days in the period</span>
+                                </label>
+                                <label v-if="setType !== 'Edit'" class="w-full inline-flex items-center cursor-pointer pt-2 pl-2 border-t">
+                                    <input
+
+                                    type="checkbox" @change="setToAll('emp',$event)"
+                                    class="sr-only peer"
+                                    :checked="setType === 'Edit'"
+
+                                    />
+                                    <div class="relative w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                    <span class="ms-3 text-sm font-medium text-gray-700">Assign to all Employee</span>
+                                </label>
                             </div>
+                            <!-- <div  v-if="setType !== 'Edit'" >
+                                    <label class="flex justify-start cursor-pointer w-full space-x-1 p-2 text-sm border rounded-t-md hover:bg-gray-100">
+                                        <input id="cbx-restDay" type="checkbox" @change="setToAll('emp','')" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-lg">
+                                        <span>Assign to all Employee</span>
+                                    </label>
+
+                                    <label class="flex justify-start cursor-pointer w-full space-x-1 p-2 text-sm border rounded-b-md hover:bg-gray-100">
+                                        <input id="cbx-restDay" type="checkbox" @change="setToAll('shift',$event)" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-lg">
+                                        <span>Set for the rest of days period</span>
+                                    </label>
+
+                                 </div> -->
                         </div>
+
 
                         <div class="px-4 space-x-2 py-2 mt-3 border-t border-gray-200 bg-gray-50 sm:px-6 flex justify-end">
                             <button @click="modalClose('shifts','','')" class="text-gray-400 px-4 py-1.5 rounded-md hover:bg-gray-900">
                                 <span class="">Close</span>
                             </button>
-                            <button @click="closeModal" type="submit" class="bg-blue-500 text-white px-4 py-1.5 rounded-md hover:bg-blue-600"
-                            :disabled="setType === 'Edits'">
+                            <button @click="closeModal" type="submit" class=" px-4 py-1.5 rounded-md "
+                            :class="{'bg-gray-300 text-white': set.shifts === 'Select Shift','bg-blue-500 text-white hover:bg-blue-600': set.shifts !== 'Select Shift'}"   :disabled="set.shifts === 'Select Shift' ">
                                 <span v-if="setType === 'Set'">Save</span>
                                 <span v-else>Update</span>
                             </button>
@@ -700,15 +729,19 @@ export default {
                 }
 
             }else{
-                const employees = this.employees; // Assuming 'employees' is defined in your data or computed properties
-                if (employees.length > 0) {
-                    this.employeeIds = this.employees.map(employee => employee.id);
-                    const topEmployeeId = employees[0].id;
-                    this.setType = 'Set';
-                this.modalOpen('shifts', topEmployeeId);
-                this.ews.work_shift_id == 0;
-                }
-                console.log('Show me Edits',this.employeeIds);
+                if(event.target.checked){
+                    const employees = this.employees; // Assuming 'employees' is defined in your data or computed properties
+                    if (employees.length > 0) {
+                        this.employeeIds = this.employees.map(employee => employee.id);
+                        const topEmployeeId = employees[0].id;
+                        this.setType = 'Set';
+                    // this.modalOpen('shifts', topEmployeeId);
+                    this.ews.work_shift_id == 0;
+                    }
+                }else{
+                        this.employeeIds = [];
+                    }
+
             }
 
         },
@@ -809,6 +842,7 @@ export default {
                 });
             }
             this.periodDates = [];
+            this.employeeIds = [];
 
         },
 
