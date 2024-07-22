@@ -69,27 +69,44 @@ class EmployeeWorkScheduleController extends Controller
     {
         try {
             $arr = $request->formdata;
+            $arr['day_off'] = $arr['day_off'] ? 1 : 0;
+            $arr['oc'] = $arr['oc'] ? 1 : 0;
 
-            $workshiftDetails = EmployeeWorkshiftsDetail::where('employee_workshift_id', $id)->get();
+            $workshiftDetails = EmployeeWorkshiftsDetail::where('employee_workshift_id', $id)
+                        ->where('schedule_date', $arr['schedule_date'])->first();
 
             $rowsUpdated = 0;
 
-            foreach ($workshiftDetails as $workshiftDetail) {
-                // Find the corresponding item in $arr by id
-                $matchingArrItem = collect($arr)->firstWhere('id', $workshiftDetail->id);
-
-                // Compare and update if necessary
-                if ($matchingArrItem && ($workshiftDetail->day_off != $matchingArrItem['day_off'] || $workshiftDetail->oc != $matchingArrItem['oc'])) {
+            if ($workshiftDetails) {
+                if ($workshiftDetails->day_off != $arr['day_off'] ||
+                    $workshiftDetails->oc != $arr['oc'] ||
+                    $workshiftDetails->work_shift_id != $arr['work_shift_id']) {
                     // Update the workshift detail
-                    $workshiftDetail->day_off = $matchingArrItem['day_off'];
-                    $workshiftDetail->oc = $matchingArrItem['oc'];
-                    $workshiftDetail->updated_by =  Auth::user()->name;
-                    $workshiftDetail->save();
+                    $workshiftDetails->day_off = $arr['day_off'];
+                    $workshiftDetails->oc = $arr['oc'];
+                    $workshiftDetails->work_shift_id = $arr['work_shift_id'];
+                    $workshiftDetails->updated_by = Auth::user()->name;
+                    $workshiftDetails->save();
                     $rowsUpdated++;
                 }
             }
 
-            return $workshiftDetails;
+            // foreach ($workshiftDetails as $workshiftDetail) {
+            //     // Find the corresponding item in $arr by id
+            //     $matchingArrItem = collect($arr)->firstWhere('id', $workshiftDetail->id);
+
+            //     // Compare and update if necessary
+            //     if ($matchingArrItem && ($workshiftDetail->day_off != $matchingArrItem['day_off'] || $workshiftDetail->oc != $matchingArrItem['oc'])) {
+            //         // Update the workshift detail
+            //         $workshiftDetail->day_off = $matchingArrItem['day_off'];
+            //         $workshiftDetail->oc = $matchingArrItem['oc'];
+            //         $workshiftDetail->updated_by =  Auth::user()->name;
+            //         $workshiftDetail->save();
+            //         $rowsUpdated++;
+            //     }
+            // }
+
+            return 'success' ;
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to update workshift detail.'], 500);
         }
@@ -99,103 +116,6 @@ class EmployeeWorkScheduleController extends Controller
     {
         //
     }
-
-    // public function store(Request $request)
-    // {
-    //     $arr = $request->formdata;
-    //     $shift = $request->shift_details;
-    //     $empIDs = $request->emp;
-    //     $arr['created_by'] = Auth::user()->name;
-    //     $setby = $request->setby;
-    //     $shiftDates = $request->shiftDates;
-    //     $insertedCount = 0;
-
-    //     if (!empty($empIDs)) {
-    //         foreach ($empIDs as $empID) {
-    //             $arr['employee_id'] = $empID;
-    //             $existingWorkshift = $this->findExistingWorkshift($arr);
-                
-    //             if (!$existingWorkshift) {
-    //                 $que = EmployeeWorkshift::create($arr);
-    //                 $insertedCount++;
-    //                 $this->createWorkshiftDetails($que, $shift, $setby, $shiftDates);
-    //             } else {
-    //                 $this->updateWorkshiftDetails($existingWorkshift, $shift, $setby, $shiftDates);
-    //             }
-    //         }
-    //         return $insertedCount > 0 ? 'success' : 'existed';
-    //     } else {
-    //         $existingWorkshift = $this->findExistingWorkshift($arr);
-            
-    //         if (!$existingWorkshift) {
-    //             $que = EmployeeWorkshift::create($arr);
-    //             $this->createWorkshiftDetails($que, $shift, $setby, $shiftDates);
-    //         } else {
-    //             $this->updateWorkshiftDetails($existingWorkshift, $shift, $setby, $shiftDates);
-    //         }
-    //         return 'success';
-    //     }
-    // }
-
-    // private function findExistingWorkshift($arr)
-    // {
-    //     return EmployeeWorkshift::where('employee_id', $arr['employee_id'])
-    //         ->where(function($query) use ($arr) {
-    //             $query->whereBetween('period_from', [$arr['period_from'], $arr['period_to']])
-    //                 ->orWhereBetween('period_to', [$arr['period_from'], $arr['period_to']]);
-    //         })
-    //         ->first();
-    // }
-
-    // private function createWorkshiftDetails($que, $shift, $setby, $shiftDates)
-    // {
-    //     if ($setby < 1) {
-    //         $shift['employee_workshift_id'] = $que->id;
-    //         $shift['work_shift_id'] = $que->work_shift_id;
-    //         $shift['created_by'] = $que->created_by;
-    //         EmployeeWorkshiftsDetail::create($shift);
-    //     } else {
-    //         foreach ($shiftDates as $shifts) {
-    //             $shifts['employee_workshift_id'] = $que->id;
-    //             $shifts['work_shift_id'] = $que->work_shift_id;
-    //             $shifts['day_off'] = $shift['day_off'];
-    //             $shifts['oc'] = $shift['oc'];
-    //             $shifts['created_by'] = $que->created_by;
-    //             EmployeeWorkshiftsDetail::create($shifts);
-    //         }
-    //     }
-    // }
-
-    // private function updateWorkshiftDetails($existingWorkshift, $shift, $setby, $shiftDates)
-    // {
-    //     if ($setby < 1) {
-    //         $existingDetail = EmployeeWorkshiftsDetail::where('employee_workshift_id', $existingWorkshift->id)
-    //             ->where('schedule_date', $shift['schedule_date'])
-    //             ->first();
-    //         if (!$existingDetail) {
-    //             $shift['employee_workshift_id'] = $existingWorkshift->id;
-    //             $shift['work_shift_id'] = $existingWorkshift->work_shift_id;
-    //             $shift['created_by'] = Auth::user()->name;
-    //             EmployeeWorkshiftsDetail::create($shift);
-    //         }
-    //     } else {
-    //         $filteredShiftDates = array_filter($shiftDates, function($shifts) use ($existingWorkshift) {
-    //             return !EmployeeWorkshiftsDetail::where('employee_workshift_id', $existingWorkshift->id)
-    //                 ->where('schedule_date', $shifts['schedule_date'])
-    //                 ->exists();
-    //         });
-
-    //         foreach ($filteredShiftDates as $shifts) {
-    //             $shifts['employee_workshift_id'] = $existingWorkshift->id;
-    //             $shifts['work_shift_id'] = $existingWorkshift->work_shift_id;
-    //             $shifts['day_off'] = $shift['day_off'];
-    //             $shifts['oc'] = $shift['oc'];
-    //             $shifts['created_by'] = Auth::user()->name;
-    //             EmployeeWorkshiftsDetail::create($shifts);
-    //         }
-    //     }
-    // }
-
 
     public function store(Request $request)
     {
@@ -208,194 +128,291 @@ class EmployeeWorkScheduleController extends Controller
         $insertedCount = 0;
 
         if (!empty($empIDs)) {
-
             foreach ($empIDs as $empID) {
                 $arr['employee_id'] = $empID;
+                $existingWorkshift = $this->findExistingWorkshift($arr);
 
-                // Check if a record already exists with the same employee_id, period_from, and period_to
-                $existingWorkshift = EmployeeWorkshift::where('employee_id', $arr['employee_id'])
-                        ->where(function($query) use ($arr) {
-                            $query->whereBetween('period_from', [$arr['period_from'], $arr['period_to']])
-                                ->orWhereBetween('period_to', [$arr['period_from'], $arr['period_to']]);
-                        })
-                    ->first();
-
-                // Only create a new record if it doesn't already exist
                 if (!$existingWorkshift) {
                     $que = EmployeeWorkshift::create($arr);
                     $insertedCount++;
-
-                    if ($que) {
-                        if($setby < 1){
-                            $shift['employee_workshift_id'] = $que->id;
-                            $shift['work_shift_id'] = $que->work_shift_id;
-                            $shift['created_by'] = $que->created_by;
-                            EmployeeWorkshiftsDetail::create($shift);
-
-                        }else{
-                            foreach ($shiftDates as $shifts) {
-                                $shifts['employee_workshift_id'] = $que->id;
-                                $shifts['work_shift_id'] = $que->work_shift_id;
-                                $shifts['day_off'] = $shift['day_off'];
-                                $shifts['oc'] = $shift['oc'];
-                                $shifts['created_by'] = $que->created_by;
-                                EmployeeWorkshiftsDetail::create($shifts);
-                            }
-                        }
-                    }
-                }
-                else{
-                    if($setby < 1){
-                        $existingDetail = EmployeeWorkshiftsDetail::where('employee_workshift_id', $existingWorkshift->id)
-                        ->where('schedule_date', $shift['schedule_date'])
-                        ->first();
-                        if(!$existingDetail){
-                            $shift['employee_workshift_id'] = $existingWorkshift->id;
-                            $shift['work_shift_id'] = $arr['work_shift_id'];
-                            $shift['created_by'] = Auth::user()->name;
-                            EmployeeWorkshiftsDetail::create($shift);
-                        }
-
-                    }else{
-
-                        $filteredShiftDates = array_filter($shiftDates, function($shifts) use ($existingWorkshift) {
-                            $existingDetail = EmployeeWorkshiftsDetail::where('employee_workshift_id', $existingWorkshift->id)
-                                ->where('schedule_date', $shifts['schedule_date'])
-                                ->first();
-                            return !$existingDetail;
-                        });
-
-                        foreach ($filteredShiftDates as $shifts) {
-                            $shifts['employee_workshift_id'] = $existingWorkshift->id;
-                            $shifts['work_shift_id'] = $existingWorkshift->work_shift_id;
-                            $shifts['day_off'] = $shift['day_off'];
-                            $shifts['oc'] = $shift['oc'];
-                            $shifts['created_by'] = Auth::user()->name;
-
-                            EmployeeWorkshiftsDetail::create($shifts);
-                        }
-                    }
-
+                    $this->createWorkshiftDetails($que, $shift, $setby, $shiftDates);
+                } else {
+                    $this->updateWorkshiftDetails($existingWorkshift, $shift, $setby, $shiftDates, $arr['work_shift_id']);
                 }
             }
-            if ($insertedCount >0){
-                return 'success';
-            }else{
-                return 'existed';
+            return $insertedCount > 0 ? 'success' : 'existed';
+        } else {
+            $existingWorkshift = $this->findExistingWorkshift($arr);
+
+            if (!$existingWorkshift) {
+                $que = EmployeeWorkshift::create($arr);
+                $this->createWorkshiftDetails($que, $shift, $setby, $shiftDates);
+            } else {
+                $this->updateWorkshiftDetails($existingWorkshift, $shift, $setby, $shiftDates, $arr['work_shift_id']);
             }
-            // return 'success';
-
-        }else{
-
-            $existingWorkshift = EmployeeWorkshift::where('employee_id', $arr['employee_id'])
-                        ->where(function($query) use ($arr) {
-                            $query->whereBetween('period_from', [$arr['period_from'], $arr['period_to']])
-                                ->orWhereBetween('period_to', [$arr['period_from'], $arr['period_to']]);
-                        })
-                    ->first();
-
-                // Only create a new record if it doesn't already exist
-                if (!$existingWorkshift) {
-                    $que = EmployeeWorkshift::create($arr);
-
-
-                    if ($que) {
-
-                        if($setby < 1){
-                            $shift['employee_workshift_id'] = $que->id;
-                            $shift['work_shift_id'] = $que->work_shift_id;
-                            $shift['created_by'] = $que->created_by;
-                            EmployeeWorkshiftsDetail::create($shift);
-
-
-                        }else{
-                            foreach ($shiftDates as $shifts) {
-                                $shifts['employee_workshift_id'] = $que->id;
-                                $shifts['work_shift_id'] = $que->work_shift_id;
-                                $shifts['day_off'] = $shift['day_off'];
-                                $shifts['oc'] = $shift['oc'];
-                                $shifts['created_by'] = $que->created_by;
-                                EmployeeWorkshiftsDetail::create($shifts);
-                            }
-                        }
-                    }
-                }else{
-
-                    if($setby < 1){
-                        $shift['employee_workshift_id'] = $existingWorkshift->id;
-                        $shift['work_shift_id'] = $arr['work_shift_id'];
-                        $shift['created_by'] = Auth::user()->name;
-                        EmployeeWorkshiftsDetail::create($shift);
-
-                    }else{
-
-                        $filteredShiftDates = array_filter($shiftDates, function($shifts) use ($existingWorkshift) {
-                            $existingDetail = EmployeeWorkshiftsDetail::where('employee_workshift_id', $existingWorkshift->id)
-                                ->where('schedule_date', $shifts['schedule_date'])
-                                ->first();
-                            return !$existingDetail;
-                        });
-
-                        foreach ($filteredShiftDates as $shifts) {
-                            $shifts['employee_workshift_id'] = $existingWorkshift->id;
-                            $shifts['work_shift_id'] = $existingWorkshift->work_shift_id;
-                            $shifts['day_off'] = $shift['day_off'];
-                            $shifts['oc'] = $shift['oc'];
-                            $shifts['created_by'] = Auth::user()->name;
-
-                            EmployeeWorkshiftsDetail::create($shifts);
-                        }
-                    }
-                }
-            // $que = EmployeeWorkshift::create($arr);
-
-            // if ($que) {
-
-            //     $shift['employee_workshift_id'] = $que->id;
-            //     $shift['work_shift_id'] = $que->work_shift_id;
-            //     $shift['created_by'] = $que->created_by;
-            //     EmployeeWorkshiftsDetail::create($shift);
-
-            //     // if ($shiftLength >1){
-            //     //     $shift['employee_workshift_id'] = $que->id;
-            //     //     $shift['work_shift_id'] = $que->work_shift_id;
-            //     //     $shift['created_by'] = $que->created_by;
-            //     //     EmployeeWorkshiftsDetail::create($shift);
-            //     // }
-            //     // else{
-
-            //     //     foreach ($shift as $shifts) {
-            //     //         $shifts['employee_workshift_id'] = $que->id;
-            //     //         $shifts['work_shift_id'] = $que->work_shift_id;
-            //     //         $shifts['created_by'] = $que->created_by;
-            //     //         EmployeeWorkshiftsDetail::create($shifts);
-            //     //     }
-
-            //     // }
-
-
-            //     // if(is_array($shift)){
-
-            //     //     foreach ($shift as $shifts) {
-            //     //         $shifts['employee_workshift_id'] = $que->id;
-            //     //         $shifts['work_shift_id'] = $que->work_shift_id;
-            //     //         $shifts['created_by'] = $que->created_by;
-            //     //         EmployeeWorkshiftsDetail::create($shifts);
-            //     //     }
-
-            //     // }else{
-            //     //     // $shift['employee_workshift_id'] = $que->id;
-            //     //     // $shift['work_shift_id'] = $que->work_shift_id;
-            //     //     // $shift['created_by'] = $que->created_by;
-            //     //     // EmployeeWorkshiftsDetail::create($shift);
-            //     // }
-            // }
-
             return 'success';
-
         }
-
     }
+
+    private function findExistingWorkshift($arr)
+    {
+        return EmployeeWorkshift::where('employee_id', $arr['employee_id'])
+            ->where(function($query) use ($arr) {
+                $query->whereBetween('period_from', [$arr['period_from'], $arr['period_to']])
+                    ->orWhereBetween('period_to', [$arr['period_from'], $arr['period_to']]);
+            })
+            ->first();
+    }
+
+    private function createWorkshiftDetails($que, $shift, $setby, $shiftDates)
+    {
+        if ($setby < 1) {
+            $shift['employee_workshift_id'] = $que->id;
+            $shift['work_shift_id'] = $que->work_shift_id;
+            $shift['created_by'] = $que->created_by;
+            EmployeeWorkshiftsDetail::create($shift);
+        } else {
+            foreach ($shiftDates as $shifts) {
+                $shifts['employee_workshift_id'] = $que->id;
+                $shifts['work_shift_id'] = $que->work_shift_id;
+                $shifts['day_off'] = $shift['day_off'];
+                $shifts['oc'] = $shift['oc'];
+                $shifts['created_by'] = $que->created_by;
+                EmployeeWorkshiftsDetail::create($shifts);
+            }
+        }
+    }
+
+    private function updateWorkshiftDetails($existingWorkshift, $shift, $setby, $shiftDates, $work_id)
+    {
+        if ($setby < 1) {
+            $existingDetail = EmployeeWorkshiftsDetail::where('employee_workshift_id', $existingWorkshift->id)
+                ->where('schedule_date', $shift['schedule_date'])
+                ->first();
+            if (!$existingDetail) {
+                $shift['employee_workshift_id'] = $existingWorkshift->id;
+                $shift['work_shift_id'] = $work_id;
+                $shift['created_by'] = Auth::user()->name;
+                EmployeeWorkshiftsDetail::create($shift);
+            }
+        } else {
+            $filteredShiftDates = array_filter($shiftDates, function($shifts) use ($existingWorkshift) {
+                return !EmployeeWorkshiftsDetail::where('employee_workshift_id', $existingWorkshift->id)
+                    ->where('schedule_date', $shifts['schedule_date'])
+                    ->exists();
+            });
+
+            foreach ($filteredShiftDates as $shifts) {
+                $shifts['employee_workshift_id'] = $existingWorkshift->id;
+                $shifts['work_shift_id'] = $work_id;
+                $shifts['day_off'] = $shift['day_off'];
+                $shifts['oc'] = $shift['oc'];
+                $shifts['created_by'] = Auth::user()->name;
+                EmployeeWorkshiftsDetail::create($shifts);
+            }
+        }
+    }
+
+
+    // public function store(Request $request)
+    // {
+    //     $arr = $request->formdata;
+    //     $shift = $request->shift_details;
+    //     $empIDs = $request->emp;
+    //     $arr['created_by'] = Auth::user()->name;
+    //     $setby = $request->setby;
+    //     $shiftDates = $request->shiftDates;
+    //     $insertedCount = 0;
+
+    //     if (!empty($empIDs)) {
+
+    //         foreach ($empIDs as $empID) {
+    //             $arr['employee_id'] = $empID;
+
+    //             // Check if a record already exists with the same employee_id, period_from, and period_to
+    //             $existingWorkshift = EmployeeWorkshift::where('employee_id', $arr['employee_id'])
+    //                     ->where(function($query) use ($arr) {
+    //                         $query->whereBetween('period_from', [$arr['period_from'], $arr['period_to']])
+    //                             ->orWhereBetween('period_to', [$arr['period_from'], $arr['period_to']]);
+    //                     })
+    //                 ->first();
+
+    //             // Only create a new record if it doesn't already exist
+    //             if (!$existingWorkshift) {
+    //                 $que = EmployeeWorkshift::create($arr);
+    //                 $insertedCount++;
+
+    //                 if ($que) {
+    //                     if($setby < 1){
+    //                         $shift['employee_workshift_id'] = $que->id;
+    //                         $shift['work_shift_id'] = $que->work_shift_id;
+    //                         $shift['created_by'] = $que->created_by;
+    //                         EmployeeWorkshiftsDetail::create($shift);
+
+    //                     }else{
+    //                         foreach ($shiftDates as $shifts) {
+    //                             $shifts['employee_workshift_id'] = $que->id;
+    //                             $shifts['work_shift_id'] = $que->work_shift_id;
+    //                             $shifts['day_off'] = $shift['day_off'];
+    //                             $shifts['oc'] = $shift['oc'];
+    //                             $shifts['created_by'] = $que->created_by;
+    //                             EmployeeWorkshiftsDetail::create($shifts);
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //             else{
+    //                 if($setby < 1){
+    //                     $existingDetail = EmployeeWorkshiftsDetail::where('employee_workshift_id', $existingWorkshift->id)
+    //                     ->where('schedule_date', $shift['schedule_date'])
+    //                     ->first();
+    //                     if(!$existingDetail){
+    //                         $shift['employee_workshift_id'] = $existingWorkshift->id;
+    //                         $shift['work_shift_id'] = $arr['work_shift_id'];
+    //                         $shift['created_by'] = Auth::user()->name;
+    //                         EmployeeWorkshiftsDetail::create($shift);
+    //                     }
+
+    //                 }else{
+
+    //                     $filteredShiftDates = array_filter($shiftDates, function($shifts) use ($existingWorkshift) {
+    //                         $existingDetail = EmployeeWorkshiftsDetail::where('employee_workshift_id', $existingWorkshift->id)
+    //                             ->where('schedule_date', $shifts['schedule_date'])
+    //                             ->first();
+    //                         return !$existingDetail;
+    //                     });
+
+    //                     foreach ($filteredShiftDates as $shifts) {
+    //                         $shifts['employee_workshift_id'] = $existingWorkshift->id;
+    //                         $shifts['work_shift_id'] = $existingWorkshift->work_shift_id;
+    //                         $shifts['day_off'] = $shift['day_off'];
+    //                         $shifts['oc'] = $shift['oc'];
+    //                         $shifts['created_by'] = Auth::user()->name;
+
+    //                         EmployeeWorkshiftsDetail::create($shifts);
+    //                     }
+    //                 }
+
+    //             }
+    //         }
+    //         if ($insertedCount >0){
+    //             return 'success';
+    //         }else{
+    //             return 'existed';
+    //         }
+    //         // return 'success';
+
+    //     }else{
+
+    //         $existingWorkshift = EmployeeWorkshift::where('employee_id', $arr['employee_id'])
+    //                     ->where(function($query) use ($arr) {
+    //                         $query->whereBetween('period_from', [$arr['period_from'], $arr['period_to']])
+    //                             ->orWhereBetween('period_to', [$arr['period_from'], $arr['period_to']]);
+    //                     })
+    //                 ->first();
+
+    //             // Only create a new record if it doesn't already exist
+    //             if (!$existingWorkshift) {
+    //                 $que = EmployeeWorkshift::create($arr);
+
+
+    //                 if ($que) {
+
+    //                     if($setby < 1){
+    //                         $shift['employee_workshift_id'] = $que->id;
+    //                         $shift['work_shift_id'] = $que->work_shift_id;
+    //                         $shift['created_by'] = $que->created_by;
+    //                         EmployeeWorkshiftsDetail::create($shift);
+
+
+    //                     }else{
+    //                         foreach ($shiftDates as $shifts) {
+    //                             $shifts['employee_workshift_id'] = $que->id;
+    //                             $shifts['work_shift_id'] = $que->work_shift_id;
+    //                             $shifts['day_off'] = $shift['day_off'];
+    //                             $shifts['oc'] = $shift['oc'];
+    //                             $shifts['created_by'] = $que->created_by;
+    //                             EmployeeWorkshiftsDetail::create($shifts);
+    //                         }
+    //                     }
+    //                 }
+    //             }else{
+
+    //                 if($setby < 1){
+    //                     $shift['employee_workshift_id'] = $existingWorkshift->id;
+    //                     $shift['work_shift_id'] = $arr['work_shift_id'];
+    //                     $shift['created_by'] = Auth::user()->name;
+    //                     EmployeeWorkshiftsDetail::create($shift);
+
+    //                 }else{
+
+    //                     $filteredShiftDates = array_filter($shiftDates, function($shifts) use ($existingWorkshift) {
+    //                         $existingDetail = EmployeeWorkshiftsDetail::where('employee_workshift_id', $existingWorkshift->id)
+    //                             ->where('schedule_date', $shifts['schedule_date'])
+    //                             ->first();
+    //                         return !$existingDetail;
+    //                     });
+
+    //                     foreach ($filteredShiftDates as $shifts) {
+    //                         $shifts['employee_workshift_id'] = $existingWorkshift->id;
+    //                         $shifts['work_shift_id'] = $existingWorkshift->work_shift_id;
+    //                         $shifts['day_off'] = $shift['day_off'];
+    //                         $shifts['oc'] = $shift['oc'];
+    //                         $shifts['created_by'] = Auth::user()->name;
+
+    //                         EmployeeWorkshiftsDetail::create($shifts);
+    //                     }
+    //                 }
+    //             }
+    //         // $que = EmployeeWorkshift::create($arr);
+
+    //         // if ($que) {
+
+    //         //     $shift['employee_workshift_id'] = $que->id;
+    //         //     $shift['work_shift_id'] = $que->work_shift_id;
+    //         //     $shift['created_by'] = $que->created_by;
+    //         //     EmployeeWorkshiftsDetail::create($shift);
+
+    //         //     // if ($shiftLength >1){
+    //         //     //     $shift['employee_workshift_id'] = $que->id;
+    //         //     //     $shift['work_shift_id'] = $que->work_shift_id;
+    //         //     //     $shift['created_by'] = $que->created_by;
+    //         //     //     EmployeeWorkshiftsDetail::create($shift);
+    //         //     // }
+    //         //     // else{
+
+    //         //     //     foreach ($shift as $shifts) {
+    //         //     //         $shifts['employee_workshift_id'] = $que->id;
+    //         //     //         $shifts['work_shift_id'] = $que->work_shift_id;
+    //         //     //         $shifts['created_by'] = $que->created_by;
+    //         //     //         EmployeeWorkshiftsDetail::create($shifts);
+    //         //     //     }
+
+    //         //     // }
+
+
+    //         //     // if(is_array($shift)){
+
+    //         //     //     foreach ($shift as $shifts) {
+    //         //     //         $shifts['employee_workshift_id'] = $que->id;
+    //         //     //         $shifts['work_shift_id'] = $que->work_shift_id;
+    //         //     //         $shifts['created_by'] = $que->created_by;
+    //         //     //         EmployeeWorkshiftsDetail::create($shifts);
+    //         //     //     }
+
+    //         //     // }else{
+    //         //     //     // $shift['employee_workshift_id'] = $que->id;
+    //         //     //     // $shift['work_shift_id'] = $que->work_shift_id;
+    //         //     //     // $shift['created_by'] = $que->created_by;
+    //         //     //     // EmployeeWorkshiftsDetail::create($shift);
+    //         //     // }
+    //         // }
+
+    //         return 'success';
+
+    //     }
+
+    // }
 
     public function getlist(Request $request){
 

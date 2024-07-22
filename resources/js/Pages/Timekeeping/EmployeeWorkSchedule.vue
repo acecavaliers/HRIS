@@ -391,7 +391,6 @@
                             <h1>Name: <b>{{ emp_Sched.full_name }}</b></h1>
 
 
-                            {{ ewsUpdate }}
                                 <!-- mid -->
                                 <label class="flex justify-start cursor-pointer mt-2 w-full space-x-1 p-2 text-sm border rounded-t-md hover:bg-gray-100">
                                     <input id="cbx-restDay" type="checkbox" @change="setToAll('shift',$event)" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-lg">
@@ -751,8 +750,9 @@ export default {
 
         saveworkshift() {
             console.log("this.periodDates.length",this.periodDates.length);
+            console.log("this.ewsUpdate",this.ewsUpdate);
             if(this.setType === 'Edit'){
-
+                console.log('EDITTTT', this.ewsUpdate.employee_workshift_id);
                 axios.patch(route('employeeworkschedule.update', this.ewsUpdate.employee_workshift_id),
                 {
                     formdata:this.ewsUpdate,
@@ -763,9 +763,11 @@ export default {
                 if (response.data === 'success') {
                     this.getEmployee(this.search.currentType, this.search.currentID);
                     this.isVisible=false;
+                    this.set.shifts = 'Select Shift'
                 }else {
                     this.getEmployee(this.search.currentType, this.search.currentID);
                     this.isVisible=false;
+                    this.set.shifts = 'Select Shift'
                 }
                 })
                 .catch(err => {
@@ -789,11 +791,13 @@ export default {
                 if (response.data === 'success') {
                     this.getEmployee(this.search.currentType, this.search.currentID);
                     this.isVisible=false;
+                    this.set.shifts = 'Select Shift'
                     this.this.setPeriod=0;
                 }else {
                     {
                     this.getEmployee(this.search.currentType, this.search.currentID);
                     this.isVisible=false;
+                    this.set.shifts = 'Select Shift'
                     this.this.setPeriod=0;
                 }
                 }
@@ -888,6 +892,7 @@ export default {
                 this.employeeIds = [];
             }
             this.periodDates = [];
+            this.set.shifts = 'Select Shift';
 
         },
 
@@ -964,8 +969,8 @@ export default {
                 }).then(response => {
                     this.employees = response.data;
                     this.populateAndSyncSelectedShifts();
-                    console.log('DATES EQUAL',this.employees);
-                    console.log('DATES EQUAL',this.days);
+                    // console.log('DATES EQUAL',this.employees);
+                    // console.log('DATES EQUAL',this.days);
                 })
             }
             if (src_type === 'department'){
@@ -980,8 +985,8 @@ export default {
                 }).then(response => {
                     this.employees = response.data;
                     this.populateAndSyncSelectedShifts();
-                    console.log('DATES EQUAL',this.employees);
-                    console.log('DATES EQUAL',this.days);
+                    // console.log('DATES EQUAL',this.employees);
+                    // console.log('DATES EQUAL',this.days);
                 })
             }
             if (src_type === 'subdepartment'){
@@ -996,8 +1001,8 @@ export default {
                 }).then(response => {
                     this.employees = response.data;
                     this.populateAndSyncSelectedShifts();
-                    console.log('DATES EQUAL',this.employees);
-                    console.log('DATES EQUAL',this.days);
+                    // console.log('DATES EQUAL',this.employees);
+                    // console.log('DATES EQUAL',this.days);
                 })
             }
             if (src_type === 'subdepartmentunit'){
@@ -1012,8 +1017,8 @@ export default {
                 }).then(response => {
                     this.employees = response.data;
                     this.populateAndSyncSelectedShifts();
-                    console.log('DATES EQUAL',this.employees);
-                    console.log('DATES EQUAL',this.days);
+                    // console.log('DATES EQUAL',this.employees);
+                    // console.log('DATES EQUAL',this.days);
                 })
             }
 
