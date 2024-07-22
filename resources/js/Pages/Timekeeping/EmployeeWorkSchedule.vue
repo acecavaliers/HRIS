@@ -1126,7 +1126,7 @@ export default {
         updatePayrollDays() {
             const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-            if (this.cal === 'payrolperiod'){
+            if (this.cal !== 'payrolperiod'){
                 const currentDate = this.currentDate;
                 const currentDay = currentDate.getDate();
                 const currentMonth = currentDate.getMonth() + 1;
