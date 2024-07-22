@@ -322,6 +322,7 @@
                             </th>
                         </tr>
                     </thead>
+                    <!-- {{ sortedEmployees }} -->
                     <tbody>
                         <tr v-for="(employee, index) in sortedEmployees" :key="employee.id" class="bg-white border-b transition duration-100 ease-in-out hover:bg-blue-50">
                             <td class="text-right border-x border-slate-200 text-sm px-1.5 w-2">
@@ -343,6 +344,7 @@
                                 <div  v-if="ds.schedule_day !== 'n/a'"  @click="setEmpSched('edit', employee, ds.schedule_date, index)" class="relative text-xs cursor-pointer w-full h-14 rounded border border-gray-300 hover:border-blue-500 hover:shadow-lg hover:border-2"
                                 :class="{'font-bold bg-red-200':ds.day_off == 1,'bg-yellow-100':ds.oc == 1,'bg-green-100':ds.oc != 1 && ds.day_off != 1 }">
                                     <div class=" flex items-center justify-center text-xs w-full h-full">
+
                                         <h1 v-if="ds.day_off == 1">
                                             OFF
                                             <span v-if="ds.oc==1" class="font-bold text-red-500"><br>OC</span>
@@ -1002,9 +1004,10 @@ export default {
                     }
                 }).then(response => {
                     this.employees = response.data;
+                    console.log('response.data',response.data);
                     this.populateAndSyncSelectedShifts();
-                    // console.log('DATES EQUAL',this.employees);
-                    // console.log('DATES EQUAL',this.days);
+                    console.log('DATES EQUAL',this.employees);
+                    console.log('DATES EQUAL',this.days);
                 })
             }
             if (src_type === 'department'){
@@ -1109,6 +1112,7 @@ export default {
         generatePayrollDays(dd) {
             this.days = [];
             let currentDate;
+            dd = '2024-07-21'
             if (dd === '' || dd === null || dd === undefined) {
                 currentDate = new Date();
             } else {
@@ -1169,7 +1173,7 @@ export default {
                 }
             } else {
                 // Generate days for the next week from current date
-                const currentDate = new Date();
+                const currentDate = this.currentDate;
                 this.days = [];  // Reset days array
 
                 // Calculate the start date of the next week

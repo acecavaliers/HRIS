@@ -73,7 +73,9 @@ class EmployeeWorkScheduleController extends Controller
             $arr['oc'] = $arr['oc'] ? 1 : 0;
 
             $workshiftDetails = EmployeeWorkshiftsDetail::where('employee_workshift_id', $id)
-                        ->where('schedule_date', $arr['schedule_date'])->first();
+                        ->where('schedule_date', $arr['schedule_date'])
+                        ->where('employee_workshifts_details.is_active',1)
+                        ->first();
 
             $rowsUpdated = 0;
 
@@ -158,8 +160,17 @@ class EmployeeWorkScheduleController extends Controller
     {
         return EmployeeWorkshift::where('employee_id', $arr['employee_id'])
             ->where(function($query) use ($arr) {
-                $query->whereBetween('period_from', [$arr['period_from'], $arr['period_to']])
-                    ->orWhereBetween('period_to', [$arr['period_from'], $arr['period_to']]);
+                $query->where(function($subQuery) use ($arr) {
+                    $subQuery->where('period_from', '<=', $arr['period_from'])
+                             ->where('period_to', '>=', $arr['period_from']);
+                })
+                ->orWhere(function($subQuery) use ($arr) {
+                    $subQuery->where('period_from', '<=', $arr['period_to'])
+                             ->where('period_to', '>=', $arr['period_to']);
+                });
+
+                // $query->whereBetween($arr['period_from'], [$arr['period_from'], $arr['period_to']])
+                // ->orWhereBetween('period_to', [$arr['period_from'], $arr['period_to']]);
             })
             ->first();
     }
@@ -188,6 +199,7 @@ class EmployeeWorkScheduleController extends Controller
         if ($setby < 1) {
             $existingDetail = EmployeeWorkshiftsDetail::where('employee_workshift_id', $existingWorkshift->id)
                 ->where('schedule_date', $shift['schedule_date'])
+                ->where('employee_workshifts_details.is_active',1)
                 ->first();
             if (!$existingDetail) {
                 $shift['employee_workshift_id'] = $existingWorkshift->id;
@@ -199,6 +211,7 @@ class EmployeeWorkScheduleController extends Controller
             $filteredShiftDates = array_filter($shiftDates, function($shifts) use ($existingWorkshift) {
                 return !EmployeeWorkshiftsDetail::where('employee_workshift_id', $existingWorkshift->id)
                     ->where('schedule_date', $shifts['schedule_date'])
+                    ->where('employee_workshifts_details.is_active',1)
                     ->exists();
             });
 
@@ -441,15 +454,19 @@ class EmployeeWorkScheduleController extends Controller
             'employee_work_assignments.department_id',
             'employee_work_assignments.sub_department_id',
             'employee_work_assignments.sub_department_unit_id',
-            'employee_workshifts.id as workshift_id',
-            'employee_workshifts.period_from',
-            'employee_workshifts.period_to',
+            // 'employee_workshifts.id as workshift_id',
+            // 'employee_workshifts.period_from',
+            // 'employee_workshifts.period_to',
         ])
         ->join('employee_work_assignments', 'employees.id', '=', 'employee_work_assignments.employee_id')
-        ->leftJoin('employee_workshifts', function($join) {
-            $join->on('employees.id', '=', 'employee_workshifts.employee_id')
-                ->where('employee_workshifts.is_active', '=', 1);
-        })
+        // ->leftJoin('employee_workshifts', function($join) use ($request) {
+        //     $join->on('employees.id', '=', 'employee_workshifts.employee_id')
+        //         ->where('employee_workshifts.is_active', '=', 1)
+        //         ->where(function($query) use ($request) {
+        //             $query->whereBetween('period_from', [$request->dateFrom, $request->dateTo])
+        //                   ->orWhereBetween('period_to', [$request->dateFrom, $request->dateTo]);
+        //         });
+        // })
         ->where('employee_work_assignments.is_active', 1)
         ->where("employee_work_assignments.$column", $request->searchId)
         ->get();
@@ -471,11 +488,16 @@ class EmployeeWorkScheduleController extends Controller
                     'work_shifts.time_from',
                     'work_shifts.time_to',
                 ])
-                ->leftJoin('work_shifts', function($join) {
+                ->join('employee_workshifts', function($join){
+                    $join->on('employee_workshift_id', '=', 'employee_workshifts.id');
+                })
+                ->join('work_shifts', function($join) {
                     $join->on('employee_workshifts_details.work_shift_id', '=', 'work_shifts.id');
                 })
                 ->whereBetween('schedule_date', [$request->dateFrom, $request->dateTo])
-                ->where('employee_workshift_id', $employee->workshift_id)
+                ->where('employee_workshifts.employee_id',$employee->id)
+                ->where('employee_workshifts_details.is_active',1)
+                // ->where('employee_workshift_id', $employee->workshift_id)
                 ->get();
 
             $workshiftDetails->map(function ($shift) {
