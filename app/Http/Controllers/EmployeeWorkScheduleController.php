@@ -413,298 +413,381 @@ class EmployeeWorkScheduleController extends Controller
     //     }
 
     // }
+    public function getlist(Request $request)
+    {
+        $searchTypes = [
+            'division' => 'division_id',
+            'department' => 'department_id',
+            'subdepartment' => 'sub_department_id',
+            'subdepartmentunit' => 'sub_department_unit_id',
+        ];
 
-    public function getlist(Request $request){
-
-        if($request->searchType == 'division' )
-        {
-
-            $query = Employee::select([
-                'employees.id',
-                'employees.first_name',
-                'employees.last_name',
-                'employees.middle_name',
-                'employees.suffix',
-                'employee_work_assignments.job_title_id',
-                'employee_work_assignments.work_location_id',
-                'employee_work_assignments.employment_type_id',
-                'employee_work_assignments.division_id',
-                'employee_work_assignments.department_id',
-                'employee_work_assignments.sub_department_id',
-                'employee_work_assignments.sub_department_unit_id',
-                'employee_workshifts.id as workshift_id',
-                'employee_workshifts.period_from',
-                'employee_workshifts.period_to',
-            ])
-            ->join('employee_work_assignments', 'employees.id', '=', 'employee_work_assignments.employee_id')
-            ->leftJoin('employee_workshifts', function($join) {
-                $join->on('employees.id', '=', 'employee_workshifts.employee_id')
-                     ->where('employee_workshifts.is_active', '=', 1);
-            })
-            ->where('employee_work_assignments.is_active', 1)
-            ->where('employee_work_assignments.division_id', $request->searchId)
-            ->get();
-
-            $query->map(function ($employee) use ($request) {
-                $workshiftDetails = DB::table('employee_workshifts_details')
-                    ->select([
-                        'employee_workshifts_details.id',
-                        'employee_workshifts_details.work_shift_id',
-                        'employee_workshifts_details.employee_workshift_id',
-                        'employee_workshifts_details.schedule_date',
-                        'employee_workshifts_details.schedule_day',
-                        'employee_workshifts_details.division_shift_id',
-                        'employee_workshifts_details.department_shift_id',
-                        'employee_workshifts_details.sub_department_shift_id',
-                        'employee_workshifts_details.sub_department_unit_id',
-                        'employee_workshifts_details.day_off',
-                        'employee_workshifts_details.oc',
-                        'work_shifts.time_from',
-                        'work_shifts.time_to',
-                    ])
-                    ->leftJoin('work_shifts', function($join) {
-                            $join->on('employee_workshifts_details.work_shift_id', '=', 'work_shifts.id');
-                        })
-                    ->whereBetween('schedule_date', [$request->dateFrom, $request->dateTo])
-                    ->where('employee_workshift_id', $employee->workshift_id)
-                    ->get();
-
-                    $workshiftDetails->map(function ($employee) {
-                        if (isset($employee->time_from) || isset($employee->time_to)) {
-                            $employee->time_from = Carbon::parse($employee->time_from)->format('g:i A');
-                            $employee->time_to = Carbon::parse($employee->time_to)->format('g:i A');
-                        } else {
-                            $employee->time_from = null;
-                            $employee->time_to = null;
-                        }
-                        return $employee;
-                    });
-
-                $employee->selectedShift = $workshiftDetails->isNotEmpty() ? $workshiftDetails : null;
-
-                return $employee;
-            });
-
-            return response()->json($query);
-
+        $searchType = $request->searchType;
+        if (!isset($searchTypes[$searchType])) {
+            return response()->json(['error' => 'Invalid search type'], 400);
         }
 
-        if($request->searchType == 'department' )
-        {
+        $column = $searchTypes[$searchType];
+        $query = Employee::select([
+            'employees.id',
+            'employees.first_name',
+            'employees.last_name',
+            'employees.middle_name',
+            'employees.suffix',
+            'employee_work_assignments.job_title_id',
+            'employee_work_assignments.work_location_id',
+            'employee_work_assignments.employment_type_id',
+            'employee_work_assignments.division_id',
+            'employee_work_assignments.department_id',
+            'employee_work_assignments.sub_department_id',
+            'employee_work_assignments.sub_department_unit_id',
+            'employee_workshifts.id as workshift_id',
+            'employee_workshifts.period_from',
+            'employee_workshifts.period_to',
+        ])
+        ->join('employee_work_assignments', 'employees.id', '=', 'employee_work_assignments.employee_id')
+        ->leftJoin('employee_workshifts', function($join) {
+            $join->on('employees.id', '=', 'employee_workshifts.employee_id')
+                ->where('employee_workshifts.is_active', '=', 1);
+        })
+        ->where('employee_work_assignments.is_active', 1)
+        ->where("employee_work_assignments.$column", $request->searchId)
+        ->get();
 
-            $query = Employee::select([
-                'employees.id',
-                'employees.first_name',
-                'employees.last_name',
-                'employees.middle_name',
-                'employees.suffix',
-                'employee_work_assignments.job_title_id',
-                'employee_work_assignments.work_location_id',
-                'employee_work_assignments.employment_type_id',
-                'employee_work_assignments.division_id',
-                'employee_work_assignments.department_id',
-                'employee_work_assignments.sub_department_id',
-                'employee_work_assignments.sub_department_unit_id',
-                'employee_workshifts.id as workshift_id',
-                'employee_workshifts.period_from',
-                'employee_workshifts.period_to',
+        $query->map(function ($employee) use ($request) {
+            $workshiftDetails = DB::table('employee_workshifts_details')
+                ->select([
+                    'employee_workshifts_details.id',
+                    'employee_workshifts_details.work_shift_id',
+                    'employee_workshifts_details.employee_workshift_id',
+                    'employee_workshifts_details.schedule_date',
+                    'employee_workshifts_details.schedule_day',
+                    'employee_workshifts_details.division_shift_id',
+                    'employee_workshifts_details.department_shift_id',
+                    'employee_workshifts_details.sub_department_shift_id',
+                    'employee_workshifts_details.sub_department_unit_id',
+                    'employee_workshifts_details.day_off',
+                    'employee_workshifts_details.oc',
+                    'work_shifts.time_from',
+                    'work_shifts.time_to',
+                ])
+                ->leftJoin('work_shifts', function($join) {
+                    $join->on('employee_workshifts_details.work_shift_id', '=', 'work_shifts.id');
+                })
+                ->whereBetween('schedule_date', [$request->dateFrom, $request->dateTo])
+                ->where('employee_workshift_id', $employee->workshift_id)
+                ->get();
 
-            ])
-            ->join('employee_work_assignments', 'employees.id', '=', 'employee_work_assignments.employee_id')
-            ->leftJoin('employee_workshifts', function($join) {
-                $join->on('employees.id', '=', 'employee_workshifts.employee_id')
-                     ->where('employee_workshifts.is_active', '=', 1);
-            })
-
-            ->where('employee_work_assignments.is_active', 1)
-            ->where('employee_work_assignments.department_id', $request->searchId)
-            ->get();
-
-            $query->map(function ($employee) use ($request) {
-                $workshiftDetails = DB::table('employee_workshifts_details')
-                    ->select([
-                        'employee_workshifts_details.id',
-                        'employee_workshifts_details.work_shift_id',
-                        'employee_workshifts_details.employee_workshift_id',
-                        'employee_workshifts_details.schedule_date',
-                        'employee_workshifts_details.schedule_day',
-                        'employee_workshifts_details.division_shift_id',
-                        'employee_workshifts_details.department_shift_id',
-                        'employee_workshifts_details.sub_department_shift_id',
-                        'employee_workshifts_details.sub_department_unit_id',
-                        'employee_workshifts_details.day_off',
-                        'employee_workshifts_details.oc',
-                        'work_shifts.time_from',
-                        'work_shifts.time_to',
-                    ])
-                    ->leftJoin('work_shifts', function($join) {
-                            $join->on('employee_workshifts_details.work_shift_id', '=', 'work_shifts.id');
-                        })
-                    ->whereBetween('schedule_date', [$request->dateFrom, $request->dateTo])
-                    ->where('employee_workshift_id', $employee->workshift_id)
-                    ->get();
-
-                    $workshiftDetails->map(function ($employee) {
-                        if (isset($employee->time_from) || isset($employee->time_to)) {
-                            $employee->time_from = Carbon::parse($employee->time_from)->format('g:i A');
-                            $employee->time_to = Carbon::parse($employee->time_to)->format('g:i A');
-                        } else {
-                            $employee->time_from = null;
-                            $employee->time_to = null;
-                        }
-                        return $employee;
-                    });
-                $employee->selectedShift = $workshiftDetails->isNotEmpty() ? $workshiftDetails : null;
-
-                return $employee;
+            $workshiftDetails->map(function ($shift) {
+                if (isset($shift->time_from) || isset($shift->time_to)) {
+                    $shift->time_from = Carbon::parse($shift->time_from)->format('g:i A');
+                    $shift->time_to = Carbon::parse($shift->time_to)->format('g:i A');
+                } else {
+                    $shift->time_from = null;
+                    $shift->time_to = null;
+                }
+                return $shift;
             });
-            return response()->json($query);
-        }
-        if($request->searchType == 'subdepartment' )
-        {
 
-            $query = Employee::select([
-                'employees.id',
-                'employees.first_name',
-                'employees.last_name',
-                'employees.middle_name',
-                'employees.suffix',
-                'employee_work_assignments.job_title_id',
-                'employee_work_assignments.work_location_id',
-                'employee_work_assignments.employment_type_id',
-                'employee_work_assignments.division_id',
-                'employee_work_assignments.department_id',
-                'employee_work_assignments.sub_department_id',
-                'employee_work_assignments.sub_department_unit_id',
-                'employee_workshifts.id as workshift_id',
-                'employee_workshifts.period_from',
-                'employee_workshifts.period_to',
+            $employee->selectedShift = $workshiftDetails->isNotEmpty() ? $workshiftDetails : null;
 
-            ])
-            ->join('employee_work_assignments', 'employees.id', '=', 'employee_work_assignments.employee_id')
-            ->leftJoin('employee_workshifts', function($join) {
-                $join->on('employees.id', '=', 'employee_workshifts.employee_id')
-                     ->where('employee_workshifts.is_active', '=', 1);
-            })
+            return $employee;
+        });
 
-            ->where('employee_work_assignments.is_active', 1)
-            ->where('employee_work_assignments.sub_department_id', $request->searchId)
-            ->get();
-
-            $query->map(function ($employee) use ($request) {
-                $workshiftDetails = DB::table('employee_workshifts_details')
-                    ->select([
-                        'employee_workshifts_details.id',
-                        'employee_workshifts_details.work_shift_id',
-                        'employee_workshifts_details.employee_workshift_id',
-                        'employee_workshifts_details.schedule_date',
-                        'employee_workshifts_details.schedule_day',
-                        'employee_workshifts_details.division_shift_id',
-                        'employee_workshifts_details.department_shift_id',
-                        'employee_workshifts_details.sub_department_shift_id',
-                        'employee_workshifts_details.sub_department_unit_id',
-                        'employee_workshifts_details.day_off',
-                        'employee_workshifts_details.oc',
-                        'work_shifts.time_from',
-                        'work_shifts.time_to',
-                    ])
-                    ->leftJoin('work_shifts', function($join) {
-                            $join->on('employee_workshifts_details.work_shift_id', '=', 'work_shifts.id');
-                        })
-                    ->whereBetween('schedule_date', [$request->dateFrom, $request->dateTo])
-                    ->where('employee_workshift_id', $employee->workshift_id)
-                    ->get();
-
-                    $workshiftDetails->map(function ($employee) {
-                        if (isset($employee->time_from) || isset($employee->time_to)) {
-                            $employee->time_from = Carbon::parse($employee->time_from)->format('g:i A');
-                            $employee->time_to = Carbon::parse($employee->time_to)->format('g:i A');
-                        } else {
-                            $employee->time_from = null;
-                            $employee->time_to = null;
-                        }
-                        return $employee;
-                    });
-                $employee->selectedShift = $workshiftDetails->isNotEmpty() ? $workshiftDetails : null;
-
-                return $employee;
-            });
-            return response()->json($query);
-        }
-
-        if($request->searchType == 'subdepartmentunit' )
-        {
-
-            $query = Employee::select([
-                'employees.id',
-                'employees.first_name',
-                'employees.last_name',
-                'employees.middle_name',
-                'employees.suffix',
-                'employee_work_assignments.job_title_id',
-                'employee_work_assignments.work_location_id',
-                'employee_work_assignments.employment_type_id',
-                'employee_work_assignments.division_id',
-                'employee_work_assignments.department_id',
-                'employee_work_assignments.sub_department_id',
-                'employee_work_assignments.sub_department_unit_id',
-                'employee_workshifts.id as workshift_id',
-                'employee_workshifts.period_from',
-                'employee_workshifts.period_to',
-
-            ])
-            ->join('employee_work_assignments', 'employees.id', '=', 'employee_work_assignments.employee_id')
-            ->leftJoin('employee_workshifts', function($join) {
-                $join->on('employees.id', '=', 'employee_workshifts.employee_id')
-                     ->where('employee_workshifts.is_active', '=', 1);
-            })
-
-            ->where('employee_work_assignments.is_active', 1)
-            ->where('employee_work_assignments.sub_department_unit_id', $request->searchId)
-            ->get();
-
-            $query->map(function ($employee) use ($request) {
-                $workshiftDetails = DB::table('employee_workshifts_details')
-                    ->select([
-                        'employee_workshifts_details.id',
-                        'employee_workshifts_details.work_shift_id',
-                        'employee_workshifts_details.employee_workshift_id',
-                        'employee_workshifts_details.schedule_date',
-                        'employee_workshifts_details.schedule_day',
-                        'employee_workshifts_details.division_shift_id',
-                        'employee_workshifts_details.department_shift_id',
-                        'employee_workshifts_details.sub_department_shift_id',
-                        'employee_workshifts_details.sub_department_unit_id',
-                        'employee_workshifts_details.day_off',
-                        'employee_workshifts_details.oc',
-                        'work_shifts.time_from',
-                        'work_shifts.time_to',
-                    ])
-                    ->leftJoin('work_shifts', function($join) {
-                            $join->on('employee_workshifts_details.work_shift_id', '=', 'work_shifts.id');
-                        })
-                    ->whereBetween('schedule_date', [$request->dateFrom, $request->dateTo])
-                    ->where('employee_workshift_id', $employee->workshift_id)
-                    ->get();
-
-                    $workshiftDetails->map(function ($employee) {
-                        if (isset($employee->time_from) || isset($employee->time_to)) {
-                            $employee->time_from = Carbon::parse($employee->time_from)->format('g:i A');
-                            $employee->time_to = Carbon::parse($employee->time_to)->format('g:i A');
-                        } else {
-                            $employee->time_from = null;
-                            $employee->time_to = null;
-                        }
-                        return $employee;
-                    });
-                $employee->selectedShift = $workshiftDetails->isNotEmpty() ? $workshiftDetails : null;
-
-                return $employee;
-            });
-            return response()->json($query);
-        }
-
+        return response()->json($query);
     }
+    // public function getlist(Request $request)
+    // {
+
+    //     if($request->searchType == 'division' )
+    //     {
+
+    //         $query = Employee::select([
+    //             'employees.id',
+    //             'employees.first_name',
+    //             'employees.last_name',
+    //             'employees.middle_name',
+    //             'employees.suffix',
+    //             'employee_work_assignments.job_title_id',
+    //             'employee_work_assignments.work_location_id',
+    //             'employee_work_assignments.employment_type_id',
+    //             'employee_work_assignments.division_id',
+    //             'employee_work_assignments.department_id',
+    //             'employee_work_assignments.sub_department_id',
+    //             'employee_work_assignments.sub_department_unit_id',
+    //             'employee_workshifts.id as workshift_id',
+    //             'employee_workshifts.period_from',
+    //             'employee_workshifts.period_to',
+    //         ])
+    //         ->join('employee_work_assignments', 'employees.id', '=', 'employee_work_assignments.employee_id')
+    //         ->leftJoin('employee_workshifts', function($join) {
+    //             $join->on('employees.id', '=', 'employee_workshifts.employee_id')
+    //                  ->where('employee_workshifts.is_active', '=', 1);
+    //         })
+    //         ->where('employee_work_assignments.is_active', 1)
+    //         ->where('employee_work_assignments.division_id', $request->searchId)
+    //         ->get();
+
+    //         $query->map(function ($employee) use ($request) {
+    //             $workshiftDetails = DB::table('employee_workshifts_details')
+    //                 ->select([
+    //                     'employee_workshifts_details.id',
+    //                     'employee_workshifts_details.work_shift_id',
+    //                     'employee_workshifts_details.employee_workshift_id',
+    //                     'employee_workshifts_details.schedule_date',
+    //                     'employee_workshifts_details.schedule_day',
+    //                     'employee_workshifts_details.division_shift_id',
+    //                     'employee_workshifts_details.department_shift_id',
+    //                     'employee_workshifts_details.sub_department_shift_id',
+    //                     'employee_workshifts_details.sub_department_unit_id',
+    //                     'employee_workshifts_details.day_off',
+    //                     'employee_workshifts_details.oc',
+    //                     'work_shifts.time_from',
+    //                     'work_shifts.time_to',
+    //                 ])
+    //                 ->leftJoin('work_shifts', function($join) {
+    //                         $join->on('employee_workshifts_details.work_shift_id', '=', 'work_shifts.id');
+    //                     })
+    //                 ->whereBetween('schedule_date', [$request->dateFrom, $request->dateTo])
+    //                 ->where('employee_workshift_id', $employee->workshift_id)
+    //                 ->get();
+
+    //                 $workshiftDetails->map(function ($employee) {
+    //                     if (isset($employee->time_from) || isset($employee->time_to)) {
+    //                         $employee->time_from = Carbon::parse($employee->time_from)->format('g:i A');
+    //                         $employee->time_to = Carbon::parse($employee->time_to)->format('g:i A');
+    //                     } else {
+    //                         $employee->time_from = null;
+    //                         $employee->time_to = null;
+    //                     }
+    //                     return $employee;
+    //                 });
+
+    //             $employee->selectedShift = $workshiftDetails->isNotEmpty() ? $workshiftDetails : null;
+
+    //             return $employee;
+    //         });
+
+    //         return response()->json($query);
+
+    //     }
+
+    //     if($request->searchType == 'department' )
+    //     {
+
+    //         $query = Employee::select([
+    //             'employees.id',
+    //             'employees.first_name',
+    //             'employees.last_name',
+    //             'employees.middle_name',
+    //             'employees.suffix',
+    //             'employee_work_assignments.job_title_id',
+    //             'employee_work_assignments.work_location_id',
+    //             'employee_work_assignments.employment_type_id',
+    //             'employee_work_assignments.division_id',
+    //             'employee_work_assignments.department_id',
+    //             'employee_work_assignments.sub_department_id',
+    //             'employee_work_assignments.sub_department_unit_id',
+    //             'employee_workshifts.id as workshift_id',
+    //             'employee_workshifts.period_from',
+    //             'employee_workshifts.period_to',
+
+    //         ])
+    //         ->join('employee_work_assignments', 'employees.id', '=', 'employee_work_assignments.employee_id')
+    //         ->leftJoin('employee_workshifts', function($join) {
+    //             $join->on('employees.id', '=', 'employee_workshifts.employee_id')
+    //                  ->where('employee_workshifts.is_active', '=', 1);
+    //         })
+
+    //         ->where('employee_work_assignments.is_active', 1)
+    //         ->where('employee_work_assignments.department_id', $request->searchId)
+    //         ->get();
+
+    //         $query->map(function ($employee) use ($request) {
+    //             $workshiftDetails = DB::table('employee_workshifts_details')
+    //                 ->select([
+    //                     'employee_workshifts_details.id',
+    //                     'employee_workshifts_details.work_shift_id',
+    //                     'employee_workshifts_details.employee_workshift_id',
+    //                     'employee_workshifts_details.schedule_date',
+    //                     'employee_workshifts_details.schedule_day',
+    //                     'employee_workshifts_details.division_shift_id',
+    //                     'employee_workshifts_details.department_shift_id',
+    //                     'employee_workshifts_details.sub_department_shift_id',
+    //                     'employee_workshifts_details.sub_department_unit_id',
+    //                     'employee_workshifts_details.day_off',
+    //                     'employee_workshifts_details.oc',
+    //                     'work_shifts.time_from',
+    //                     'work_shifts.time_to',
+    //                 ])
+    //                 ->leftJoin('work_shifts', function($join) {
+    //                         $join->on('employee_workshifts_details.work_shift_id', '=', 'work_shifts.id');
+    //                     })
+    //                 ->whereBetween('schedule_date', [$request->dateFrom, $request->dateTo])
+    //                 ->where('employee_workshift_id', $employee->workshift_id)
+    //                 ->get();
+
+    //                 $workshiftDetails->map(function ($employee) {
+    //                     if (isset($employee->time_from) || isset($employee->time_to)) {
+    //                         $employee->time_from = Carbon::parse($employee->time_from)->format('g:i A');
+    //                         $employee->time_to = Carbon::parse($employee->time_to)->format('g:i A');
+    //                     } else {
+    //                         $employee->time_from = null;
+    //                         $employee->time_to = null;
+    //                     }
+    //                     return $employee;
+    //                 });
+    //             $employee->selectedShift = $workshiftDetails->isNotEmpty() ? $workshiftDetails : null;
+
+    //             return $employee;
+    //         });
+    //         return response()->json($query);
+    //     }
+    //     if($request->searchType == 'subdepartment' )
+    //     {
+
+    //         $query = Employee::select([
+    //             'employees.id',
+    //             'employees.first_name',
+    //             'employees.last_name',
+    //             'employees.middle_name',
+    //             'employees.suffix',
+    //             'employee_work_assignments.job_title_id',
+    //             'employee_work_assignments.work_location_id',
+    //             'employee_work_assignments.employment_type_id',
+    //             'employee_work_assignments.division_id',
+    //             'employee_work_assignments.department_id',
+    //             'employee_work_assignments.sub_department_id',
+    //             'employee_work_assignments.sub_department_unit_id',
+    //             'employee_workshifts.id as workshift_id',
+    //             'employee_workshifts.period_from',
+    //             'employee_workshifts.period_to',
+
+    //         ])
+    //         ->join('employee_work_assignments', 'employees.id', '=', 'employee_work_assignments.employee_id')
+    //         ->leftJoin('employee_workshifts', function($join) {
+    //             $join->on('employees.id', '=', 'employee_workshifts.employee_id')
+    //                  ->where('employee_workshifts.is_active', '=', 1);
+    //         })
+
+    //         ->where('employee_work_assignments.is_active', 1)
+    //         ->where('employee_work_assignments.sub_department_id', $request->searchId)
+    //         ->get();
+
+    //         $query->map(function ($employee) use ($request) {
+    //             $workshiftDetails = DB::table('employee_workshifts_details')
+    //                 ->select([
+    //                     'employee_workshifts_details.id',
+    //                     'employee_workshifts_details.work_shift_id',
+    //                     'employee_workshifts_details.employee_workshift_id',
+    //                     'employee_workshifts_details.schedule_date',
+    //                     'employee_workshifts_details.schedule_day',
+    //                     'employee_workshifts_details.division_shift_id',
+    //                     'employee_workshifts_details.department_shift_id',
+    //                     'employee_workshifts_details.sub_department_shift_id',
+    //                     'employee_workshifts_details.sub_department_unit_id',
+    //                     'employee_workshifts_details.day_off',
+    //                     'employee_workshifts_details.oc',
+    //                     'work_shifts.time_from',
+    //                     'work_shifts.time_to',
+    //                 ])
+    //                 ->leftJoin('work_shifts', function($join) {
+    //                         $join->on('employee_workshifts_details.work_shift_id', '=', 'work_shifts.id');
+    //                     })
+    //                 ->whereBetween('schedule_date', [$request->dateFrom, $request->dateTo])
+    //                 ->where('employee_workshift_id', $employee->workshift_id)
+    //                 ->get();
+
+    //                 $workshiftDetails->map(function ($employee) {
+    //                     if (isset($employee->time_from) || isset($employee->time_to)) {
+    //                         $employee->time_from = Carbon::parse($employee->time_from)->format('g:i A');
+    //                         $employee->time_to = Carbon::parse($employee->time_to)->format('g:i A');
+    //                     } else {
+    //                         $employee->time_from = null;
+    //                         $employee->time_to = null;
+    //                     }
+    //                     return $employee;
+    //                 });
+    //             $employee->selectedShift = $workshiftDetails->isNotEmpty() ? $workshiftDetails : null;
+
+    //             return $employee;
+    //         });
+    //         return response()->json($query);
+    //     }
+
+    //     if($request->searchType == 'subdepartmentunit' )
+    //     {
+
+    //         $query = Employee::select([
+    //             'employees.id',
+    //             'employees.first_name',
+    //             'employees.last_name',
+    //             'employees.middle_name',
+    //             'employees.suffix',
+    //             'employee_work_assignments.job_title_id',
+    //             'employee_work_assignments.work_location_id',
+    //             'employee_work_assignments.employment_type_id',
+    //             'employee_work_assignments.division_id',
+    //             'employee_work_assignments.department_id',
+    //             'employee_work_assignments.sub_department_id',
+    //             'employee_work_assignments.sub_department_unit_id',
+    //             'employee_workshifts.id as workshift_id',
+    //             'employee_workshifts.period_from',
+    //             'employee_workshifts.period_to',
+
+    //         ])
+    //         ->join('employee_work_assignments', 'employees.id', '=', 'employee_work_assignments.employee_id')
+    //         ->leftJoin('employee_workshifts', function($join) {
+    //             $join->on('employees.id', '=', 'employee_workshifts.employee_id')
+    //                  ->where('employee_workshifts.is_active', '=', 1);
+    //         })
+
+    //         ->where('employee_work_assignments.is_active', 1)
+    //         ->where('employee_work_assignments.sub_department_unit_id', $request->searchId)
+    //         ->get();
+
+    //         $query->map(function ($employee) use ($request) {
+    //             $workshiftDetails = DB::table('employee_workshifts_details')
+    //                 ->select([
+    //                     'employee_workshifts_details.id',
+    //                     'employee_workshifts_details.work_shift_id',
+    //                     'employee_workshifts_details.employee_workshift_id',
+    //                     'employee_workshifts_details.schedule_date',
+    //                     'employee_workshifts_details.schedule_day',
+    //                     'employee_workshifts_details.division_shift_id',
+    //                     'employee_workshifts_details.department_shift_id',
+    //                     'employee_workshifts_details.sub_department_shift_id',
+    //                     'employee_workshifts_details.sub_department_unit_id',
+    //                     'employee_workshifts_details.day_off',
+    //                     'employee_workshifts_details.oc',
+    //                     'work_shifts.time_from',
+    //                     'work_shifts.time_to',
+    //                 ])
+    //                 ->leftJoin('work_shifts', function($join) {
+    //                         $join->on('employee_workshifts_details.work_shift_id', '=', 'work_shifts.id');
+    //                     })
+    //                 ->whereBetween('schedule_date', [$request->dateFrom, $request->dateTo])
+    //                 ->where('employee_workshift_id', $employee->workshift_id)
+    //                 ->get();
+
+    //                 $workshiftDetails->map(function ($employee) {
+    //                     if (isset($employee->time_from) || isset($employee->time_to)) {
+    //                         $employee->time_from = Carbon::parse($employee->time_from)->format('g:i A');
+    //                         $employee->time_to = Carbon::parse($employee->time_to)->format('g:i A');
+    //                     } else {
+    //                         $employee->time_from = null;
+    //                         $employee->time_to = null;
+    //                     }
+    //                     return $employee;
+    //                 });
+    //             $employee->selectedShift = $workshiftDetails->isNotEmpty() ? $workshiftDetails : null;
+
+    //             return $employee;
+    //         });
+    //         return response()->json($query);
+    //     }
+
+    // }
 
     public function getWorkShifts(Request $request)
     {
