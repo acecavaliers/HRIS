@@ -210,16 +210,21 @@
             </div>
         </div>
         <hr>
+        {{ cal }}
         <div class="p-4">
             <div class="flex justify-end">
-                <!-- <div >
-                    <button v-if="employees.length>0" type="button" @click="setToAll('emp','')" class="p-2 bg-blue-600 text-white text-sm rounded-md">Assign to All</button>
-                </div> -->
-                <div class="flex justify-end">
+                <div class="flex justify-start space-x-1">
+                    <input type="number" v-model="periodSetting.s_a" class="w-16"/>
+                    <input type="number" v-model="periodSetting.s_b"  class="w-16"/>
+                    <input type="number" v-model="periodSetting.e_a"  class="w-16"/>
+                    <input type="number" v-model="periodSetting.e_b"  class="w-16"/>
+                </div>
+                <div class="flex items-center justify-end space-x-2">
+                    <label for="">Set By</label>
                     <Menu as="div" class="relative">
                         <MenuButton
                             type="button"
-                            class="flex items-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                            class="flex items-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 uppercase w-24"
                         >
                             {{ set.view }}
                             <ChevronDownIcon
@@ -254,14 +259,14 @@
                                     </MenuItem>
                                     <MenuItem v-slot="{ active }">
                                         <a
-                                            @click="viewAs('payrolperiod')"
+                                            @click="viewAs('payroll')"
                                             :class="[
                                                 active
                                                     ? 'bg-gray-100 text-gray-900'
                                                     : 'text-gray-700',
                                                 'block px-4 py-2 text-sm',
                                             ]"
-                                            >10/25</a
+                                            >Payroll (10/25)</a
                                         >
                                     </MenuItem>
                                 </div>
@@ -272,7 +277,6 @@
                     <button type="button" @click="nextPayrollPeriod" class="p-2 bg-blue-600 text-white text-sm rounded-md mx-1">Next Payroll</button> -->
                 </div>
             </div>
-
             <div class="flex items-center justify-between bg-gray-200 mt-2 border-t border-x rounded-t-md px-2 py-2">
                 <h1 class="text-gray-800 text-sm font-medium">
                     Workshift Period: <b>{{dateToWords( ews.period_from) }} </b> - <b>{{ dateToWords(ews.period_to) }},  {{ ews.period_to.substring(0,4) }}</b>
@@ -308,7 +312,7 @@
                                             </h1>
                                             <div class="mt-1 ml-0.5">
                                                 <p class="uppercase text-xs text-gray-600 font-normal p-0" :class="{'text-red-500' : ds.dayofweek === 'Sunday'}">{{ dateToWords(ds.date).substring(0,3) }}</p>
-                                                <p v-if="cal !=='payrolperiod'" class="text-xs text-gray-600 font-bold p-0 -mt-1" :class="{'text-red-500' : ds.dayofweek === 'Sunday'}">{{ ds.dayofweek }}</p>
+                                                <p v-if="set.view !=='payroll'" class="text-xs text-gray-600 font-bold p-0 -mt-1" :class="{'text-red-500' : ds.dayofweek === 'Sunday'}">{{ ds.dayofweek }}</p>
                                                 <p v-else class="text-xs text-gray-600 font-bold p-0 -mt-1" :class="{'text-red-500' : ds.dayofweek === 'Sunday'}">{{ ds.dayofweek.substring(0,3) }}</p>
                                             </div>
                                          </div>
@@ -629,7 +633,7 @@ export default {
             isVisible:false,
             selected:{selectedDivision:'Select Division', selectedDept:'Select Department', selectedSubDept:'Select Sub-Department', selectedSubDeptUnit:'Select Sub-Department Unit'},
             days: [],
-            set:{shifts:'Select Shift',view:'Set By'},
+            set:{shifts:'Select Shift',view:'week'},
             workShifts:[],
             currentShift:'',
             emp_Sched: {},
@@ -644,6 +648,7 @@ export default {
             periodDates:[],
             selectedDate:'',
             saveShifts:[],
+            periodSetting:{s_a:11,s_b:25,e_a:26,e_b:10},
         }
     },
     computed: {
@@ -748,7 +753,8 @@ export default {
 
         },
         viewAs(type){
-            this.cal = type;
+            this.set.view = type;
+            this.set.view = type;
             this.generatePayrollDays();
             if (this.selected.selectedDivision !== 'Select Division'){
                 this.getEmployee(this.search.currentType, this.search.currentID);
@@ -1126,7 +1132,7 @@ export default {
         updatePayrollDays() {
             const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-            if (this.cal !== 'payrolperiod'){
+            if (this.set.view === 'payroll'){
                 const currentDate = this.currentDate;
                 const currentDay = currentDate.getDate();
                 const currentMonth = currentDate.getMonth() + 1;
@@ -1134,16 +1140,16 @@ export default {
 
                 this.days = [];  // Reset days array
 
-                if (currentDay >= 11 && currentDay <= 25) {
+                if (currentDay >= this.periodSetting.s_a && currentDay <= this.periodSetting.s_b) {
                     const lastDayOfCurrentMonth = new Date(currentYear, currentMonth, 0).getDate();
-                    for (let i = 26; i <= lastDayOfCurrentMonth; i++) {
+                    for (let i = this.periodSetting.e_a; i <= lastDayOfCurrentMonth; i++) {
                         const date = new Date(currentYear, currentMonth - 1, i);
                         this.days.push({
                             date: this.formatDate(date),
                             dayofweek: weekdays[date.getDay()]
                         });
                     }
-                    for (let i = 1; i <= 10; i++) {
+                    for (let i = 1; i <= this.periodSetting.e_b; i++) {
                         const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
                         const nextYear = currentMonth === 12 ? currentYear + 1 : currentYear;
                         const date = new Date(nextYear, nextMonth - 1, i);
@@ -1152,10 +1158,10 @@ export default {
                             dayofweek: weekdays[date.getDay()]
                         });
                     }
-                } else if (currentDay >= 26) {
+                } else if (currentDay >= this.periodSetting.e_a) {
                     const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
                     const nextYear = currentMonth === 12 ? currentYear + 1 : currentYear;
-                    for (let i = 11; i <= 25; i++) {
+                    for (let i = this.periodSetting.s_a; i <= this.periodSetting.s_b; i++) {
                         const date = new Date(nextYear, nextMonth - 1, i);
                         this.days.push({
                             date: this.formatDate(date),
@@ -1163,7 +1169,7 @@ export default {
                         });
                     }
                 } else {
-                    for (let i = 11; i <= 25; i++) {
+                    for (let i = this.periodSetting.s_a; i <= this.periodSetting.s_b; i++) {
                         const date = new Date(currentYear, currentMonth - 1, i);
                         this.days.push({
                             date: this.formatDate(date),
