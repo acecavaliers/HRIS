@@ -1,5 +1,5 @@
 <template>
-    <Head title="Employees" />
+    <Head title="Employees Workshift" />
      <MasterLayout>
         <template #header>
              <h2 class="font-semibold text-xl text-gray-800 leading-tight">EMPLOYEE WORKSHIFT</h2>
@@ -58,7 +58,6 @@
                             </transition>
                         </Menu>
                     </div>
-
                 </div>
             </div>
             <!-- Departments -->
@@ -212,13 +211,14 @@
         <hr>
         {{ cal }}
         <div class="p-4">
+            <input type="text" v-model="role" class="w-16" placeholder="Role"/>
             <div class="flex justify-end">
-                <div class="flex justify-start space-x-1">
+                <!-- <div class="flex justify-start space-x-1">
                     <input type="number" v-model="periodSetting.s_a" class="w-16"/>
                     <input type="number" v-model="periodSetting.s_b"  class="w-16"/>
                     <input type="number" v-model="periodSetting.e_a"  class="w-16"/>
                     <input type="number" v-model="periodSetting.e_b"  class="w-16"/>
-                </div>
+                </div> -->
                 <div class="flex items-center justify-end space-x-2">
                     <label for="">Set By</label>
                     <Menu as="div" class="relative">
@@ -516,8 +516,6 @@
                                                         <span>On-Call</span>
                                                     </label>
 
-
-
                                                 </div>
                                             </div>
                                         </div>
@@ -558,18 +556,6 @@
                                     <span class="ms-3 text-sm font-medium text-gray-700">Assign to all Employee</span>
                                 </label>
                             </div>
-                            <!-- <div  v-if="setType !== 'Edit'" >
-                                    <label class="flex justify-start cursor-pointer w-full space-x-1 p-2 text-sm border rounded-t-md hover:bg-gray-100">
-                                        <input id="cbx-restDay" type="checkbox" @change="setToAll('emp','')" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-lg">
-                                        <span>Assign to all Employee</span>
-                                    </label>
-
-                                    <label class="flex justify-start cursor-pointer w-full space-x-1 p-2 text-sm border rounded-b-md hover:bg-gray-100">
-                                        <input id="cbx-restDay" type="checkbox" @change="setToAll('shift',$event)" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-lg">
-                                        <span>Set for the rest of days period</span>
-                                    </label>
-
-                                 </div> -->
                         </div>
 
 
@@ -668,44 +654,43 @@ export default {
             this.set.shifts = `${shift.time_from} - ${shift.time_to}`;
         },
         setEmpSched(type, employeeData, date, index){
-            const employee = this.employees.find(emp => emp.id === employeeData.id);
-            if (type !== 'shifts'){
-                this.setType = 'Edit';
-                this.ewsUpdate = {};
-                this.emp_Shift = [];
-                const matchingShift = employee.selectedShift.find(shift => shift.schedule_date === date);
-                if (matchingShift) {
-                    console.log('Show WWWWWWWWW:', matchingShift);
+            if (this.role == 1){
+                const employee = this.employees.find(emp => emp.id === employeeData.id);
+                if (type !== 'shifts'){
+                    this.setType = 'Edit';
+                    this.ewsUpdate = {};
+                    this.emp_Shift = [];
+                    const matchingShift = employee.selectedShift.find(shift => shift.schedule_date === date);
+                    if (matchingShift) {
+                        this.ewsUpdate.work_shift_id = matchingShift.work_shift_id;
+                        this.ewsUpdate.employee_workshift_id = matchingShift.employee_workshift_id;
+                        this.ewsUpdate.schedule_date = matchingShift.schedule_date;
+                        this.ewsUpdate.schedule_day = matchingShift.schedule_day;
+                        this.ewsUpdate.day_off = (matchingShift.day_off === '1') ? true : false ;
+                        this.ewsUpdate.oc = (matchingShift.oc === '1') ? true : false ;
+                        this.set.shifts = matchingShift.time_from + ' - ' + matchingShift.time_to;
 
-                    this.ewsUpdate.work_shift_id = matchingShift.work_shift_id;
-                    this.ewsUpdate.employee_workshift_id = matchingShift.employee_workshift_id;
-                    this.ewsUpdate.schedule_date = matchingShift.schedule_date;
-                    this.ewsUpdate.schedule_day = matchingShift.schedule_day;
-                    this.ewsUpdate.day_off = (matchingShift.day_off === '1') ? true : false ;
-                    this.ewsUpdate.oc = (matchingShift.oc === '1') ? true : false ;
-                    this.set.shifts = matchingShift.time_from + ' - ' + matchingShift.time_to;
+                    }
+                    this.emp_Sched = employee;
+                    this.modalOpen(type, employee.id)
 
+                }else{
+                    this.setType = 'Set';
+                    if (employee) {
+                        this.emp_Shift = this.days.map(day => ({
+                        schedule_date: this.formatDate(day.date),
+                        schedule_day: day.dayofweek,
+                        day_off:false,
+                        oc:false,
+                        }));
+                    }
+
+                    this.selectedDate = index;
+                    this.saveShifts = this.emp_Shift[index];
+                    this.emp_Sched = employee;
+                    this.emp_Sched.day = date;
+                    this.modalOpen(type, employee.id)
                 }
-                console.log('Show emp_Shift:', this.emp_Shift);
-                this.emp_Sched = employee;
-                this.modalOpen(type, employee.id)
-
-            }else{
-                this.setType = 'Set';
-                if (employee) {
-                    this.emp_Shift = this.days.map(day => ({
-                    schedule_date: this.formatDate(day.date),
-                    schedule_day: day.dayofweek,
-                    day_off:false,
-                    oc:false,
-                    }));
-                }
-
-                this.selectedDate = index;
-                this.saveShifts = this.emp_Shift[index];
-                this.emp_Sched = employee;
-                this.emp_Sched.day = date;
-                this.modalOpen(type, employee.id)
             }
 
 
@@ -737,12 +722,11 @@ export default {
 
             }else{
                 if(event.target.checked){
-                    const employees = this.employees; // Assuming 'employees' is defined in your data or computed properties
+                    const employees = this.employees;
                     if (employees.length > 0) {
                         this.employeeIds = this.employees.map(employee => employee.id);
                         const topEmployeeId = employees[0].id;
                         this.setType = 'Set';
-                    // this.modalOpen('shifts', topEmployeeId);
                     this.ews.work_shift_id == 0;
                     }
                 }else{
@@ -790,17 +774,13 @@ export default {
         },
 
         saveworkshift() {
-            console.log("this.periodDates.length",this.periodDates.length);
-            console.log("this.ewsUpdate",this.ewsUpdate);
             if(this.setType === 'Edit'){
-                console.log('EDITTTT', this.ewsUpdate.employee_workshift_id);
                 axios.patch(route('employeeworkschedule.update', this.ewsUpdate.employee_workshift_id),
                 {
                     formdata:this.ewsUpdate,
                 }
                 )
                 .then(response => {
-                console.log(response.data);
                 if (response.data === 'success') {
                     this.getEmployee(this.search.currentType, this.search.currentID);
                     this.isVisible=false;
@@ -828,7 +808,6 @@ export default {
                 }
                 )
                 .then(response => {
-                console.log(response.data);
                 if (response.data === 'success') {
                     this.getEmployee(this.search.currentType, this.search.currentID);
                     this.isVisible=false;
@@ -1010,10 +989,7 @@ export default {
                     }
                 }).then(response => {
                     this.employees = response.data;
-                    console.log('response.data',response.data);
                     this.populateAndSyncSelectedShifts();
-                    console.log('DATES EQUAL',this.employees);
-                    console.log('DATES EQUAL',this.days);
                 })
             }
             if (src_type === 'department'){
@@ -1028,8 +1004,6 @@ export default {
                 }).then(response => {
                     this.employees = response.data;
                     this.populateAndSyncSelectedShifts();
-                    // console.log('DATES EQUAL',this.employees);
-                    // console.log('DATES EQUAL',this.days);
                 })
             }
             if (src_type === 'subdepartment'){
@@ -1044,8 +1018,6 @@ export default {
                 }).then(response => {
                     this.employees = response.data;
                     this.populateAndSyncSelectedShifts();
-                    // console.log('DATES EQUAL',this.employees);
-                    // console.log('DATES EQUAL',this.days);
                 })
             }
             if (src_type === 'subdepartmentunit'){
@@ -1060,8 +1032,6 @@ export default {
                 }).then(response => {
                     this.employees = response.data;
                     this.populateAndSyncSelectedShifts();
-                    // console.log('DATES EQUAL',this.employees);
-                    // console.log('DATES EQUAL',this.days);
                 })
             }
 
@@ -1080,23 +1050,17 @@ export default {
                 }
             });
             });
-
-            console.log('Updated employees:', this.employees);
         },
         getWorkShifts(src_type, src_id){
-            // if (src_type === 'division'){
+
             axios.get(route('employeeworkschedule.getWorkShifts'),{
                 params:{
                     searchId: src_id,
                     searchType: src_type,
                 }
             }).then(response => {
-                console.log('XXXXXXX',response.data)
                 this.workShifts = response.data;
-
-            console.log('WWWWW',this.workShifts)
             })
-            // }
         },
 
         dateToWords(date) {
@@ -1265,7 +1229,6 @@ export default {
         document.addEventListener("click", this.handleClickOutside);
     },
     beforeDestroy() {
-        // Remove the document click listener when the component is destroyed
         document.removeEventListener("click", this.handleClickOutside);
     },
 }
