@@ -8,65 +8,62 @@
 
         <!-- CONTENT -->
         <div class="grid grid-cols-4">
-
             <div v-for="item in menu" :key="item"  class="py-1">
                 <div class="p-4 text-sm w-full">
-
-                <div class="w-full">
-                    <p class="  pr-2 f-14 text-gray-800 font-medium px-1 d-flex">{{ item }}:</p>
-                    <div class="w-full relative inline-block">
-                        <Menu as="div" class="relative">
-                            <MenuButton
-                                type="button"
-                                class="flex items-center justify-between text-left text-xs gap-x-1.5 w-full rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                            >
-                                {{ selected[item] }}
-                                <ChevronDownIcon
-                                    class="-mr-1 h-5 w-5 text-gray-400"
-                                    aria-hidden="true"
-                                />
-                            </MenuButton>
-
-                            <transition
-                                enter-active-class="transition ease-out duration-100"
-                                enter-from-class="transform opacity-0 scale-95"
-                                enter-to-class="transform opacity-100 scale-100"
-                                leave-active-class="transition ease-in duration-75"
-                                leave-from-class="transform opacity-100 scale-100"
-                                leave-to-class="transform opacity-0 scale-95"
-                            >
-                                <MenuItems
-                                    class="absolute right-0 z-10 mt-3 w-full max-h-80 origin-top-right overflow-auto rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                    <div class="w-full">
+                        <p class="  pr-2 f-14 text-gray-800 font-medium px-1 d-flex uppercase">{{ replace(item,'_','-') }}:</p>
+                        <div class="w-full relative inline-block">
+                            <Menu as="div" class="relative">
+                                <MenuButton
+                                    type="button"
+                                    class="flex items-center justify-between text-left text-xs gap-x-1.5 w-full rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                                 >
-                                    <div v-for="(data, index) in dataCollections[item]" :key="data.id" class="py-1">
-                                        <MenuItem v-slot="{ active }" v-if="data.subData.length> 0" >
-                                            <a  @click="showDept(item, data.name,data.subData,data.id)"
-                                                class="cursor-pointer"
-                                                :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm',]"
-                                            >
-                                                {{ data.name }}
-                                            </a>
-                                        </MenuItem>
-                                        <MenuItem v-slot="{ active }" v-else >
-                                            <a  @click="modalClose(item, data.name, data.id)"
-                                                class="cursor-pointer"
-                                                :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm',]"
-                                            >
-                                                {{ data.name }}
-                                            </a>
-                                        </MenuItem>
-                                    </div>
-                                </MenuItems>
-                            </transition>
-                        </Menu>
+                                    {{ selected[item] }}
+                                    <ChevronDownIcon
+                                        class="-mr-1 h-5 w-5 text-gray-400"
+                                        aria-hidden="true"
+                                    />
+                                </MenuButton>
+
+                                <transition
+                                    enter-active-class="transition ease-out duration-100"
+                                    enter-from-class="transform opacity-0 scale-95"
+                                    enter-to-class="transform opacity-100 scale-100"
+                                    leave-active-class="transition ease-in duration-75"
+                                    leave-from-class="transform opacity-100 scale-100"
+                                    leave-to-class="transform opacity-0 scale-95"
+                                >
+                                    <MenuItems
+                                        class="absolute right-0 z-10 mt-3 w-full max-h-80 origin-top-right overflow-auto rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                    >
+                                        <div v-for="(data, index) in dataCollections[item]" :key="data.id" class="py-1">
+                                            <MenuItem v-slot="{ active }" v-if="data.subData.length> 0" >
+                                                <a  @click="showDept(item, data.name,data.subData,data.id)"
+                                                    class="cursor-pointer"
+                                                    :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm',]"
+                                                >
+                                                    {{ data.name }}
+                                                </a>
+                                            </MenuItem>
+                                            <MenuItem v-slot="{ active }" v-else >
+                                                <a  @click="modalClose(item, data.name, data.id)"
+                                                    class="cursor-pointer"
+                                                    :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm',]"
+                                                >
+                                                    {{ data.name }}
+                                                </a>
+                                            </MenuItem>
+                                        </div>
+                                    </MenuItems>
+                                </transition>
+                            </Menu>
+                        </div>
                     </div>
                 </div>
-            </div>
             </div>
         </div>
 
         <hr>
-        {{ cal }}
         <div class="p-4">
             <input type="text" v-model="role" class="w-16" placeholder="Role"/>
             <div class="flex justify-end">
@@ -457,18 +454,23 @@ export default {
                 { name: 'EMPLOYEES', href: route('employees.index'), current: false },
 
             ],
-            menu:['divisions','departments','subDepartments','subDepartmentUnits'],
+            menu:['divisions','departments','sub_departments','sub_department_units'],
             ews:{},
             ewsUpdate:{},
             dataCollections:{
                 divisions: [],
                 departments: [],
-                subDepartments: [],
-                subDepartmentUnits: [],
+                sub_departments: [],
+                sub_department_units: [],
             },
             employees: [],
             isVisible:false,
-            selected:{divisions:'Select Division', departments:'Select Department', subDepartments:'Select Sub-Department', subDepartmentUnits:'Select Sub-Department Unit'},
+            selected:{
+                divisions:'Select Division',
+                departments:'Select Department',
+                sub_departments:'Select Sub-Department',
+                sub_department_units:'Select Sub-Department Unit'
+            },
             days: [],
             set:{shifts:'Select Shift',view:'week'},
             workShifts:[],
@@ -479,13 +481,16 @@ export default {
             employeeIds:[],
             updateID:'',
             search:{},
-            cal:'',
             role:1,
-            setPeriod:0,
             periodDates:[],
             selectedDate:'',
             saveShifts:[],
-            periodSetting:{s_a:11,s_b:25,e_a:26,e_b:10},
+            periodSetting:{
+                s_a:11,
+                s_b:25,
+                e_a:26,
+                e_b:10
+            },
         }
     },
     computed: {
@@ -499,6 +504,9 @@ export default {
         },
     },
     methods: {
+        replace(string, searchValue, replaceValue) {
+            return string.replace(new RegExp(searchValue, 'g'), replaceValue).toUpperCase();
+        },
         selectedShift(shift){
             this.ews.work_shift_id = shift.id;
             this.ewsUpdate.work_shift_id = shift.id;
@@ -524,7 +532,6 @@ export default {
                     }
                     this.emp_Sched = employee;
                     this.modalOpen(type, employee.id)
-
                 }else{
                     this.setType = 'Set';
                     if (employee) {
@@ -535,7 +542,6 @@ export default {
                         oc:false,
                         }));
                     }
-
                     this.selectedDate = index;
                     this.saveShifts = this.emp_Shift[index];
                     this.emp_Sched = employee;
@@ -548,7 +554,6 @@ export default {
 
         },
         modalOpen(name, id){
-
             if(name === 'shifts'){
                 this.currentShift= '';
                 this.isVisible=true;
@@ -562,15 +567,12 @@ export default {
         setToAll(type, event) {
             if(type === 'shift'){
                 if(event.target.checked){
-                    this.setPeriod = 1;
                     this.saveShifts = this.emp_Shift[this.selectedDate];
                     this.periodDates = this.emp_Shift;
                 }else{
-                    this.setPeriod = 0;
                     this.saveShifts = this.emp_Shift[this.selectedDate];
                     this.periodDates =[];
                 }
-
             }else{
                 if(event.target.checked){
                     const employees = this.employees;
@@ -583,7 +585,6 @@ export default {
                 }else{
                         this.employeeIds = [];
                     }
-
             }
 
         },
@@ -606,7 +607,6 @@ export default {
         },
 
         toggleRestDay(event,setType, shift, type) {
-
             if (setType === 'Set'){
                 if (type === 0) {
                     shift.day_off = event.target.checked;
@@ -614,13 +614,11 @@ export default {
                     shift.oc = event.target.checked;
                 }
             }else{
-
                 if (type === 0) {
                     this.ewsUpdate.day_off = event.target.checked;
                 } else {
                     this.ewsUpdate.oc = event.target.checked;
                 }
-
             }
         },
 
@@ -649,7 +647,6 @@ export default {
                 });
 
             }else{
-
                 axios.post('employeeworkschedule',
                 {   formdata:this.ews,
                     shift_details:this.saveShifts,
@@ -663,13 +660,11 @@ export default {
                     this.getEmployee(this.search.currentType, this.search.currentID);
                     this.isVisible=false;
                     this.set.shifts = 'Select Shift'
-                    this.this.setPeriod=0;
                 }else {
                     {
                     this.getEmployee(this.search.currentType, this.search.currentID);
                     this.isVisible=false;
                     this.set.shifts = 'Select Shift'
-                    this.this.setPeriod=0;
                 }
                 }
                 })
@@ -690,15 +685,15 @@ export default {
         onDivisionChange(type){
             if (type === 'divisions'){
                 this.selected.departments = 'Select Department'
-                this.selected.subDepartments = 'Select Sub-Department'
-                this.selected.subDepartmentUnits = 'Select Sub-Department Unit'
+                this.selected.sub_departments = 'Select Sub-Department'
+                this.selected.sub_department_units = 'Select Sub-Department Unit'
             }
             if (type === 'departments'){
-                this.selected.subDepartments = 'Select Sub-Department'
-                this.selected.subDepartmentUnits = 'Select Sub-Department Unit'
+                this.selected.sub_departments = 'Select Sub-Department'
+                this.selected.sub_department_units = 'Select Sub-Department Unit'
             }
-            if (type === 'subDepartments'){
-                this.selected.subDepartmentUnits = 'Select Sub-Department Unit'
+            if (type === 'sub_departments'){
+                this.selected.sub_department_units = 'Select Sub-Department Unit'
             }
         },
         showDept(type, div_name,depts,div_id) {
@@ -712,7 +707,7 @@ export default {
                 this.onDivisionChange(type);
             }
             if (type === 'departments'){
-                this.dataCollections.subDepartments= depts;
+                this.dataCollections.sub_departments= depts;
                 this.selected.departments = div_name;
                 this.search.currentType = type;
                 this.search.currentID = div_id;
@@ -720,9 +715,9 @@ export default {
                 this.getEmployee(type, div_id);
                 this.onDivisionChange(type);
             }
-            if (type === 'subDepartments'){
-                this.dataCollections.subDepartmentUnits= depts;
-                this.selected.subDepartments = div_name;
+            if (type === 'sub_departments'){
+                this.dataCollections.sub_department_units= depts;
+                this.selected.sub_departments = div_name;
                 this.search.currentType = type;
                 this.search.currentID = div_id;
                 this.getWorkShifts(type, div_id);
@@ -745,15 +740,15 @@ export default {
                 this.getWorkShifts(type, id);
                 this.getEmployee(type, id);
             }
-            if(type === 'subDepartments'){
-                this.selected.subDepartments = selected;
+            if(type === 'sub_departments'){
+                this.selected.sub_departments = selected;
                 this.search.currentType = type;
                 this.search.currentID = id;
                 this.getWorkShifts(type, id);
                 this.getEmployee(type, id);
             }
-            if(type === 'subDepartmentUnits'){
-                this.selected.subDepartmentUnits = selected;
+            if(type === 'sub_department_units'){
+                this.selected.sub_department_units = selected;
                 this.search.currentType = type;
                 this.search.currentID = id;
                 this.getWorkShifts(type, id);
@@ -770,10 +765,9 @@ export default {
 
 
         async getDepartments() {
-
             try {
                 const response = await axios.get(route('employeeworkschedule.getSubDeptUnit'));
-                this.dataCollections.subDepartmentUnits = response.data.map((val) => ({
+                this.dataCollections.sub_department_units = response.data.map((val) => ({
                 id: val.id,
                 name: val.name,
                 sub_department_id: Number(val.sub_department_id),
@@ -785,8 +779,8 @@ export default {
 
             try {
                 const response = await axios.get(route('employeeworkschedule.getSubDept'));
-                this.dataCollections.subDepartments = response.data.map((val) => {
-                const subdeptunit = this.dataCollections.subDepartmentUnits.filter(dept => dept.sub_department_id === val.id);
+                this.dataCollections.sub_departments = response.data.map((val) => {
+                const subdeptunit = this.dataCollections.sub_department_units.filter(dept => dept.sub_department_id === val.id);
                 return {
                     id: val.id,
                     name: val.name,
@@ -801,7 +795,7 @@ export default {
             try {
                 const response = await axios.get(route('employeeworkschedule.getDept'));
                 this.dataCollections.departments = response.data.map((val) => {
-                const subdept = this.dataCollections.subDepartments.filter(dept => dept.department_id === val.id);
+                const subdept = this.dataCollections.sub_departments.filter(dept => dept.department_id === val.id);
                 return {
                     id: val.id,
                     name: val.name,
@@ -851,35 +845,32 @@ export default {
                         searchType: src_type,
                         dateFrom: this.ews.period_from,
                         dateTo: this.ews.period_to,
-
                     }
                 }).then(response => {
                     this.employees = response.data;
                     this.populateAndSyncSelectedShifts();
                 })
             }
-            if (src_type === 'subDepartments'){
+            if (src_type === 'sub_departments'){
                 axios.get(route('employeeworkschedule.getlist'),{
                     params:{
                         searchId: src_id,
                         searchType: src_type,
                         dateFrom: this.ews.period_from,
                         dateTo: this.ews.period_to,
-
                     }
                 }).then(response => {
                     this.employees = response.data;
                     this.populateAndSyncSelectedShifts();
                 })
             }
-            if (src_type === 'subDepartmentUnits'){
+            if (src_type === 'sub_department_units'){
                 axios.get(route('employeeworkschedule.getlist'),{
                     params:{
                         searchId: src_id,
                         searchType: src_type,
                         dateFrom: this.ews.period_from,
                         dateTo: this.ews.period_to,
-
                     }
                 }).then(response => {
                     this.employees = response.data;
@@ -893,9 +884,7 @@ export default {
             if (!employee.selectedShift) {
                 employee.selectedShift = [];
             }
-
             const selectedDates = new Set(employee.selectedShift.map(shift => shift.schedule_date));
-
             this.days.forEach(day => {
                 if (!selectedDates.has(day.date)) {
                 employee.selectedShift.push({ schedule_date: day.date, schedule_day:'n/a' });
@@ -940,22 +929,18 @@ export default {
             } else {
                 currentDate = new Date(dd);
             }
-
             this.currentDate = currentDate;
             this.updatePayrollDays();
         },
 
         updatePayrollDays() {
             const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-
             if (this.set.view === 'payroll'){
                 const currentDate = this.currentDate;
                 const currentDay = currentDate.getDate();
                 const currentMonth = currentDate.getMonth() + 1;
                 const currentYear = currentDate.getFullYear();
-
-                this.days = [];  // Reset days array
-
+                this.days = [];
                 if (currentDay >= this.periodSetting.s_a && currentDay <= this.periodSetting.s_b) {
                     const lastDayOfCurrentMonth = new Date(currentYear, currentMonth, 0).getDate();
                     for (let i = this.periodSetting.e_a; i <= lastDayOfCurrentMonth; i++) {
@@ -996,12 +981,10 @@ export default {
             } else {
                 // Generate days for the next week from current date
                 const currentDate = this.currentDate;
-                this.days = [];  // Reset days array
-
+                this.days = [];
                 // Calculate the start date of the next week
                 const startOfNextWeek = new Date(currentDate);
                 startOfNextWeek.setDate(currentDate.getDate() + (7 - currentDate.getDay()));
-
                 // Loop through the next 7 days
                 for (let i = 0; i < 7; i++) {
                     const date = new Date(startOfNextWeek);
@@ -1012,7 +995,6 @@ export default {
                     });
                 }
             }
-
             this.ews.period_from = this.formatDate(this.days[0].date);
             this.ews.period_to = this.formatDate(this.days[this.days.length - 1].date);
         },
@@ -1069,22 +1051,15 @@ export default {
     },
 
     created(){
-
         this.getDepartments();
-
         this.generatePayrollDays();
-
     },
 
     mounted() {
-
         document.addEventListener("click", this.handleClickOutside);
     },
     beforeDestroy() {
         document.removeEventListener("click", this.handleClickOutside);
     },
 }
-
-
-
 </script>

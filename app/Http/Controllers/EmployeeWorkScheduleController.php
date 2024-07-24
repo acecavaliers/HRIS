@@ -431,8 +431,8 @@ class EmployeeWorkScheduleController extends Controller
         $searchTypes = [
             'divisions' => 'division_id',
             'departments' => 'department_id',
-            'subDepartments' => 'sub_department_id',
-            'subDepartmentUnits' => 'sub_department_unit_id',
+            'sub_departments' => 'sub_department_id',
+            'sub_department_units' => 'sub_department_unit_id',
         ];
 
         $searchType = $request->searchType;
@@ -518,6 +518,49 @@ class EmployeeWorkScheduleController extends Controller
 
         return response()->json($query);
     }
+
+    public function getWorkShifts(Request $request)
+    {
+        $searchType = $request->searchType;
+        $searchId = $request->searchId;
+
+        $tableMap = [
+            'divisions' => 'division_shifts',
+            'departments' => 'department_shifts',
+            'sub_departments' => 'sub_department_shifts',
+            'sub_department_units' => 'sub_department_unit_shifts'
+        ];
+
+        $columnMap = [
+            'divisions' => 'division_id',
+            'departments' => 'department_id',
+            'sub_departments' => 'sub_department_id',
+            'sub_department_units' => 'sub_department_unit_id'
+        ];
+
+        if (!array_key_exists($searchType, $tableMap)) {
+            return response()->json(['error' => 'Invalid search type'], 400);
+        }
+
+        $shifts = DB::table('work_shifts as T0')
+            ->join($tableMap[$searchType] . ' as T1', 'T0.id', '=', 'T1.work_shift_id')
+            ->select('T0.id', 'T0.shift_name', 'T0.time_from', 'T0.time_to')
+            ->where('T0.is_active', 1)
+            ->where('T1.is_active', 1)
+            ->where("T1.{$columnMap[$searchType]}", $searchId)
+            ->get();
+
+        // Format the time fields
+        $formattedShifts = $shifts->map(function ($shift) {
+            $shift->time_from = Carbon::parse($shift->time_from)->format('g:i A');
+            $shift->time_to = Carbon::parse($shift->time_to)->format('g:i A');
+            $shift->time_from_to = "{$shift->time_from} - {$shift->time_to}";
+            return $shift;
+        });
+
+        return response()->json($formattedShifts);
+    }
+
     // public function getlist(Request $request)
     // {
 
@@ -811,93 +854,93 @@ class EmployeeWorkScheduleController extends Controller
 
     // }
 
-    public function getWorkShifts(Request $request)
-    {
+    // public function getWorkShifts(Request $request)
+    // {
 
-        if($request->searchType == 'divisions'){
+    //     if($request->searchType == 'divisions'){
 
-            $shifts = DB::table('work_shifts as T0')
-            ->join('division_shifts as T1', 'T0.id', '=', 'T1.work_shift_id')
-            ->select('T0.id','T0.shift_name', 'T0.time_from', 'T0.time_to')
-            ->where('T0.is_active', 1)
-            ->where('T1.is_active', 1)
-            ->where('T1.division_id', $request->searchId )
-            ->get();
+    //         $shifts = DB::table('work_shifts as T0')
+    //         ->join('division_shifts as T1', 'T0.id', '=', 'T1.work_shift_id')
+    //         ->select('T0.id','T0.shift_name', 'T0.time_from', 'T0.time_to')
+    //         ->where('T0.is_active', 1)
+    //         ->where('T1.is_active', 1)
+    //         ->where('T1.division_id', $request->searchId )
+    //         ->get();
 
-            // Format the time fields
-            $formattedShifts = $shifts->map(function ($shift) {
-                $shift->time_from = Carbon::parse($shift->time_from)->format('g:i A');
-                $shift->time_to = Carbon::parse($shift->time_to)->format('g:i A');
-                $shift->time_from_to = "{$shift->time_from} - {$shift->time_to}";
-                return $shift;
-            });
+    //         // Format the time fields
+    //         $formattedShifts = $shifts->map(function ($shift) {
+    //             $shift->time_from = Carbon::parse($shift->time_from)->format('g:i A');
+    //             $shift->time_to = Carbon::parse($shift->time_to)->format('g:i A');
+    //             $shift->time_from_to = "{$shift->time_from} - {$shift->time_to}";
+    //             return $shift;
+    //         });
 
-            return response()->json($formattedShifts);
+    //         return response()->json($formattedShifts);
 
-        }
-        if($request->searchType == 'departments'){
+    //     }
+    //     if($request->searchType == 'departments'){
 
-            $shifts = DB::table('work_shifts as T0')
-            ->join('department_shifts as T1', 'T0.id', '=', 'T1.work_shift_id')
-            ->select('T0.id','T0.shift_name', 'T0.time_from', 'T0.time_to')
-            ->where('T0.is_active', 1)
-            ->where('T1.is_active', 1)
-            ->where('T1.department_id', $request->searchId )
-            ->get();
+    //         $shifts = DB::table('work_shifts as T0')
+    //         ->join('department_shifts as T1', 'T0.id', '=', 'T1.work_shift_id')
+    //         ->select('T0.id','T0.shift_name', 'T0.time_from', 'T0.time_to')
+    //         ->where('T0.is_active', 1)
+    //         ->where('T1.is_active', 1)
+    //         ->where('T1.department_id', $request->searchId )
+    //         ->get();
 
-            // Format the time fields
-            $formattedShifts = $shifts->map(function ($shift) {
-                $shift->time_from = Carbon::parse($shift->time_from)->format('g:i A');
-                $shift->time_to = Carbon::parse($shift->time_to)->format('g:i A');
-                return $shift;
-            });
+    //         // Format the time fields
+    //         $formattedShifts = $shifts->map(function ($shift) {
+    //             $shift->time_from = Carbon::parse($shift->time_from)->format('g:i A');
+    //             $shift->time_to = Carbon::parse($shift->time_to)->format('g:i A');
+    //             return $shift;
+    //         });
 
-            return response()->json($formattedShifts);
+    //         return response()->json($formattedShifts);
 
-        }
-        if($request->searchType == 'subDepartments'){
+    //     }
+    //     if($request->searchType == 'sub_departments'){
 
-            $shifts = DB::table('work_shifts as T0')
-            ->join('sub_department_shifts as T1', 'T0.id', '=', 'T1.work_shift_id')
-            ->select('T0.id','T0.shift_name', 'T0.time_from', 'T0.time_to')
-            ->where('T0.is_active', 1)
-            ->where('T1.is_active', 1)
-            ->where('T1.sub_department_id', $request->searchId )
-            ->get();
+    //         $shifts = DB::table('work_shifts as T0')
+    //         ->join('sub_department_shifts as T1', 'T0.id', '=', 'T1.work_shift_id')
+    //         ->select('T0.id','T0.shift_name', 'T0.time_from', 'T0.time_to')
+    //         ->where('T0.is_active', 1)
+    //         ->where('T1.is_active', 1)
+    //         ->where('T1.sub_department_id', $request->searchId )
+    //         ->get();
 
-            // Format the time fields
-            $formattedShifts = $shifts->map(function ($shift) {
-                $shift->time_from = Carbon::parse($shift->time_from)->format('g:i A');
-                $shift->time_to = Carbon::parse($shift->time_to)->format('g:i A');
-                return $shift;
-            });
+    //         // Format the time fields
+    //         $formattedShifts = $shifts->map(function ($shift) {
+    //             $shift->time_from = Carbon::parse($shift->time_from)->format('g:i A');
+    //             $shift->time_to = Carbon::parse($shift->time_to)->format('g:i A');
+    //             return $shift;
+    //         });
 
-            return response()->json($formattedShifts);
+    //         return response()->json($formattedShifts);
 
-        }
-        if($request->searchType == 'subDepartmentUnits'){
+    //     }
+    //     if($request->searchType == 'sub_department_units'){
 
-            $shifts = DB::table('work_shifts as T0')
-            ->join('sub_department_unit_shifts as T1', 'T0.id', '=', 'T1.work_shift_id')
-            ->select('T0.id','T0.shift_name', 'T0.time_from', 'T0.time_to')
-            ->where('T0.is_active', 1)
-            ->where('T1.is_active', 1)
-            ->where('T1.sub_department_unit_id', $request->searchId )
-            ->get();
+    //         $shifts = DB::table('work_shifts as T0')
+    //         ->join('sub_department_unit_shifts as T1', 'T0.id', '=', 'T1.work_shift_id')
+    //         ->select('T0.id','T0.shift_name', 'T0.time_from', 'T0.time_to')
+    //         ->where('T0.is_active', 1)
+    //         ->where('T1.is_active', 1)
+    //         ->where('T1.sub_department_unit_id', $request->searchId )
+    //         ->get();
 
-            // Format the time fields
-            $formattedShifts = $shifts->map(function ($shift) {
-                $shift->time_from = Carbon::parse($shift->time_from)->format('g:i A');
-                $shift->time_to = Carbon::parse($shift->time_to)->format('g:i A');
-                return $shift;
-            });
+    //         // Format the time fields
+    //         $formattedShifts = $shifts->map(function ($shift) {
+    //             $shift->time_from = Carbon::parse($shift->time_from)->format('g:i A');
+    //             $shift->time_to = Carbon::parse($shift->time_to)->format('g:i A');
+    //             return $shift;
+    //         });
 
-            return response()->json($formattedShifts);
+    //         return response()->json($formattedShifts);
 
-        }
+    //     }
 
 
-    }
+    // }
 
 
 }
