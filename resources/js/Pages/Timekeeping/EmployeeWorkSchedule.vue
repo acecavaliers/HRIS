@@ -16,8 +16,9 @@
                             <Menu as="div" class="relative">
                                 <MenuButton
                                     type="button"
-                                    class="flex items-center justify-between text-left text-xs gap-x-1.5 w-full rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-                                >
+                                    class="flex items-center justify-between text-left text-xs gap-x-1.5 w-full rounded-md px-3 py-2 text-sm font-semibold hadow-sm ring-1 ring-inset ring-gray-300"
+
+                                    >
                                     {{ selected[item] }}
                                     <ChevronDownIcon
                                         class="-mr-1 h-5 w-5 text-gray-400"
@@ -466,15 +467,14 @@ export default {
             employees: [],
             isVisible:false,
             selected:{
-                divisions:'Select Division',
-                departments:'Select Department',
-                sub_departments:'Select Sub-Department',
-                sub_department_units:'Select Sub-Department Unit'
+                divisions:'Select divisions',
+                departments:'Select departments',
+                sub_departments:'Select sub_departments',
+                sub_department_units:'Select sub_department_units'
             },
             days: [],
             set:{shifts:'Select Shift',view:'week'},
             workShifts:[],
-            currentShift:'',
             emp_Sched: {},
             emp_Shift: [],
             setType:'',
@@ -504,6 +504,12 @@ export default {
         },
     },
     methods: {
+        isItemSelected(item) {
+            if (item !== 'divisions'){
+                const selectedItem = item;
+                return this.selected[item] === `Select ${selectedItem}`;
+            }
+        },
         replace(string, searchValue, replaceValue) {
             return string.replace(new RegExp(searchValue, 'g'), replaceValue).toUpperCase();
         },
@@ -549,21 +555,8 @@ export default {
                     this.modalOpen(type, employee.id)
                 }
             }
-
-
-
         },
-        modalOpen(name, id){
-            if(name === 'shifts'){
-                this.currentShift= '';
-                this.isVisible=true;
-                this.ews.employee_id = id;
-            }
-            if(name === 'edit'){
-                this.isVisible=true;
-                this.ews.employee_id = id;
-            }
-        },
+
         setToAll(type, event) {
             if(type === 'shift'){
                 if(event.target.checked){
@@ -588,11 +581,12 @@ export default {
             }
 
         },
+
         viewAs(type){
             this.set.view = type;
             this.set.view = type;
             this.generatePayrollDays();
-            if (this.selected.divisions !== 'Select Division'){
+            if (this.selected.divisions !== 'Select divisions'){
                 this.getEmployee(this.search.currentType, this.search.currentID);
             }else {
                 this.employees = [];
@@ -623,60 +617,36 @@ export default {
         },
 
         saveworkshift() {
-            if(this.setType === 'Edit'){
-                axios.patch(route('employeeworkschedule.update', this.ewsUpdate.employee_workshift_id),
-                {
-                    formdata:this.ewsUpdate,
-                }
-                )
-                .then(response => {
-                if (response.data === 'success') {
-                    this.getEmployee(this.search.currentType, this.search.currentID);
-                    this.isVisible=false;
-                    this.set.shifts = 'Select Shift'
-                }else {
-                    this.getEmployee(this.search.currentType, this.search.currentID);
-                    this.isVisible=false;
-                    this.set.shifts = 'Select Shift'
-                }
-                })
-                .catch(err => {
-                if (err.response && err.response.status === 422) {
-                    this.errors = err.response.data.errors;
-                }
-                });
-
-            }else{
-                axios.post('employeeworkschedule',
-                {   formdata:this.ews,
-                    shift_details:this.saveShifts,
+            const isEdit = this.setType === 'Edit';
+            const endpoint = isEdit ? route('employeeworkschedule.update', this.ewsUpdate.employee_workshift_id) : 'employeeworkschedule';
+            const method = isEdit ? axios.patch : axios.post;
+            const payload = isEdit
+                ? { formdata: this.ewsUpdate }
+                : {
+                    formdata: this.ews,
+                    shift_details: this.saveShifts,
                     emp: this.employeeIds,
                     setby: this.periodDates.length,
-                    shiftDates:this.periodDates,
-                }
-                )
+                    shiftDates: this.periodDates
+                };
+
+            method(endpoint, payload)
                 .then(response => {
-                if (response.data === 'success') {
-                    this.getEmployee(this.search.currentType, this.search.currentID);
-                    this.isVisible=false;
-                    this.set.shifts = 'Select Shift'
-                }else {
-                    {
-                    this.getEmployee(this.search.currentType, this.search.currentID);
-                    this.isVisible=false;
-                    this.set.shifts = 'Select Shift'
-                }
-                }
+                    if (response.data === 'success') {
+                        this.getEmployee(this.search.currentType, this.search.currentID);
+                        this.isVisible = false;
+                        this.set.shifts = 'Select Shift';
+                    }
                 })
                 .catch(err => {
-                if (err.response && err.response.status === 422) {
-                    this.errors = err.response.data.errors;
-                }
+                    if (err.response && err.response.status === 422) {
+                        this.errors = err.response.data.errors;
+                    }
+                })
+                .finally(() => {
+                    this.periodDates = [];
+                    this.employeeIds = [];
                 });
-            }
-            this.periodDates = [];
-            this.employeeIds = [];
-
         },
 
         padEmployeeId(id) {
@@ -684,163 +654,164 @@ export default {
         },
         onDivisionChange(type){
             if (type === 'divisions'){
-                this.selected.departments = 'Select Department'
-                this.selected.sub_departments = 'Select Sub-Department'
-                this.selected.sub_department_units = 'Select Sub-Department Unit'
+                this.selected.departments = 'Select departments'
+                this.selected.sub_departments = 'Select sub_departments'
+                this.selected.sub_department_units = 'Select sub_department_units'
             }
             if (type === 'departments'){
-                this.selected.sub_departments = 'Select Sub-Department'
-                this.selected.sub_department_units = 'Select Sub-Department Unit'
+                this.selected.sub_departments = 'Select sub_departments'
+                this.selected.sub_department_units = 'Select sub_department_units'
             }
             if (type === 'sub_departments'){
-                this.selected.sub_department_units = 'Select Sub-Department Unit'
-            }
-        },
-        showDept(type, div_name,depts,div_id) {
-            if (type === 'divisions'){
-                this.dataCollections.departments= depts;
-                this.selected.divisions = div_name;
-                this.search.currentType = type;
-                this.search.currentID = div_id;
-                this.getWorkShifts(type, div_id);
-                this.getEmployee(type, div_id);
-                this.onDivisionChange(type);
-            }
-            if (type === 'departments'){
-                this.dataCollections.sub_departments= depts;
-                this.selected.departments = div_name;
-                this.search.currentType = type;
-                this.search.currentID = div_id;
-                this.getWorkShifts(type, div_id);
-                this.getEmployee(type, div_id);
-                this.onDivisionChange(type);
-            }
-            if (type === 'sub_departments'){
-                this.dataCollections.sub_department_units= depts;
-                this.selected.sub_departments = div_name;
-                this.search.currentType = type;
-                this.search.currentID = div_id;
-                this.getWorkShifts(type, div_id);
-                this.getEmployee(type, div_id);
+                this.selected.sub_department_units = 'Select sub_department_units'
             }
         },
 
-        modalClose(type, selected, id){
-            if(type === 'divisions'){
-                this.selected.divisions = selected;
+        showDept(type, div_name, depts, div_id) {
+            const typeMapping = {
+                'divisions': {
+                    collection: 'departments',
+                    selected: 'divisions',
+                    callback: this.onDivisionChange,
+                },
+                'departments': {
+                    collection: 'sub_departments',
+                    selected: 'departments',
+                    callback: this.onDivisionChange,
+                },
+                'sub_departments': {
+                    collection: 'sub_department_units',
+                    selected: 'sub_departments',
+                    callback: null,
+                }
+            };
+
+            if (typeMapping[type]) {
+                const { collection, selected, callback } = typeMapping[type];
+
+                this.dataCollections[collection] = depts;
+                this.selected[selected] = div_name;
                 this.search.currentType = type;
-                this.search.currentID = id;
-                this.getEmployee(type, id);
-                this.getWorkShifts(type, id);
+                this.search.currentID = div_id;
+                this.getWorkShifts(type, div_id);
+                this.getEmployee(type, div_id);
+
+                if (callback) {
+                    callback(type);
+                }
             }
-            if(type === 'departments'){
-                this.selected.departments = selected;
-                this.search.currentType = type;
-                this.search.currentID = id;
-                this.getWorkShifts(type, id);
-                this.getEmployee(type, id);
+        },
+
+        modalOpen(name, id) {
+            if (name === 'shifts' || name === 'edit') {
+                this.isVisible = true;
+                this.ews.employee_id = id;
             }
-            if(type === 'sub_departments'){
-                this.selected.sub_departments = selected;
-                this.search.currentType = type;
-                this.search.currentID = id;
-                this.getWorkShifts(type, id);
-                this.getEmployee(type, id);
-            }
-            if(type === 'sub_department_units'){
-                this.selected.sub_department_units = selected;
-                this.search.currentType = type;
-                this.search.currentID = id;
-                this.getWorkShifts(type, id);
-                this.getEmployee(type, id);
-            }
-            if(type === 'shifts'){
-                this.isVisible=false
-                this.employeeIds = [];
+        },
+
+        modalClose(type, selected, id) {
+            const clearDataCollections = (collections) => {
+                collections.forEach(collection => {
+                    this.dataCollections[collection] = [];
+                });
+            };
+            const typeActions = {
+                'divisions': {
+                    selectedField: 'divisions',
+                    clearCollections: ['departments', 'sub_departments', 'sub_department_units'],
+                },
+                'departments': {
+                    selectedField: 'departments',
+                    clearCollections: ['sub_departments', 'sub_department_units'],
+                },
+                'sub_departments': {
+                    selectedField: 'sub_departments',
+                    clearCollections: ['sub_department_units'],
+                },
+                'sub_department_units': {
+                    selectedField: 'sub_department_units',
+                    clearCollections: [],
+                },
+                'shifts': {
+                    close: true,
+                }
+            };
+
+            if (typeActions[type]) {
+                const { selectedField, clearCollections, close } = typeActions[type];
+                if (selectedField) {
+                    this.selected[selectedField] = selected;
+                }
+                if (clearCollections) {
+                    clearDataCollections(clearCollections);
+                }
+                if (close) {
+                    this.isVisible = false;
+                    this.employeeIds = [];
+                } else {
+                    this.search.currentType = type;
+                    this.search.currentID = id;
+                    this.getWorkShifts(type, id);
+                    this.getEmployee(type, id);
+                }
             }
             this.periodDates = [];
             this.set.shifts = 'Select Shift';
-
         },
-
 
         async getDepartments() {
             try {
-                const response = await axios.get(route('employeeworkschedule.getSubDeptUnit'));
-                this.dataCollections.sub_department_units = response.data.map((val) => ({
-                id: val.id,
-                name: val.name,
-                sub_department_id: Number(val.sub_department_id),
-                subData:[],
+                // Fetch all data concurrently
+                const [subDeptUnitsResponse, subDeptsResponse, deptsResponse, divisionsResponse] = await Promise.all([
+                    axios.get(route('employeeworkschedule.getSubDeptUnit')),
+                    axios.get(route('employeeworkschedule.getSubDept')),
+                    axios.get(route('employeeworkschedule.getDept')),
+                    axios.get(route('employeeworkschedule.getDivisions'))
+                ]);
+                // Process the sub_department_units
+                const subDepartmentUnits = subDeptUnitsResponse.data.map(val => ({
+                    id: val.id,
+                    name: val.name,
+                    sub_department_id: Number(val.sub_department_id),
+                    subData: []
                 }));
-            } catch (error) {
-                // console.error('Error fetching departments:', error);
-            }
-
-            try {
-                const response = await axios.get(route('employeeworkschedule.getSubDept'));
-                this.dataCollections.sub_departments = response.data.map((val) => {
-                const subdeptunit = this.dataCollections.sub_department_units.filter(dept => dept.sub_department_id === val.id);
-                return {
+                // Process the sub_departments and link them with sub_department_units
+                const subDepartments = subDeptsResponse.data.map(val => ({
                     id: val.id,
                     name: val.name,
                     department_id: Number(val.department_id),
-                    subData: subdeptunit,
-                };
-                });
-            } catch (error) {
-                // console.error('Error fetching divisions:', error);
-            }
-
-            try {
-                const response = await axios.get(route('employeeworkschedule.getDept'));
-                this.dataCollections.departments = response.data.map((val) => {
-                const subdept = this.dataCollections.sub_departments.filter(dept => dept.department_id === val.id);
-                return {
+                    subData: subDepartmentUnits.filter(unit => unit.sub_department_id === val.id)
+                }));
+                // Process the departments and link them with sub_departments
+                const departments = deptsResponse.data.map(val => ({
                     id: val.id,
                     name: val.name,
                     division_id: Number(val.division_id),
-                    subData: subdept,
-                };
-                });
-            } catch (error) {
-                // console.error('Error fetching divisions:', error);
-            }
-
-            try {
-                const response = await axios.get(route('employeeworkschedule.getDivisions'));
-                this.dataCollections.divisions = response.data.map((val) => {
-                const depts = this.dataCollections.departments.filter(dept => dept.division_id === val.id);
-                return {
+                    subData: subDepartments.filter(subDept => subDept.department_id === val.id)
+                }));
+                // Process the divisions and link them with departments
+                const divisions = divisionsResponse.data.map(val => ({
                     id: val.id,
                     name: val.name,
-                    subData: depts,
+                    subData: departments.filter(dept => dept.division_id === val.id)
+                }));
+                // Update the data collections
+                this.dataCollections = {
+                    sub_department_units: subDepartmentUnits,
+                    sub_departments: subDepartments,
+                    departments: departments,
+                    divisions: divisions
                 };
-                });
             } catch (error) {
-                // console.error('Error fetching divisions:', error);
+                console.error('Error fetching data:', error);
             }
         },
 
-        getEmployee(src_type, src_id){
-
-            if (src_type === 'divisions'){
-                axios.get(route('employeeworkschedule.getlist'),{
-                    params:{
-                        searchId: src_id,
-                        searchType: src_type,
-                        dateFrom: this.ews.period_from,
-                        dateTo: this.ews.period_to,
-
-                    }
-                }).then(response => {
-                    this.employees = response.data;
-                    this.populateAndSyncSelectedShifts();
-                })
-            }
-            if (src_type === 'departments'){
-                axios.get(route('employeeworkschedule.getlist'),{
-                    params:{
+        getEmployee(src_type, src_id) {
+            const validTypes = ['divisions', 'departments', 'sub_departments', 'sub_department_units'];
+            if (validTypes.includes(src_type)) {
+                axios.get(route('employeeworkschedule.getlist'), {
+                    params: {
                         searchId: src_id,
                         searchType: src_type,
                         dateFrom: this.ews.period_from,
@@ -849,51 +820,25 @@ export default {
                 }).then(response => {
                     this.employees = response.data;
                     this.populateAndSyncSelectedShifts();
-                })
+                });
             }
-            if (src_type === 'sub_departments'){
-                axios.get(route('employeeworkschedule.getlist'),{
-                    params:{
-                        searchId: src_id,
-                        searchType: src_type,
-                        dateFrom: this.ews.period_from,
-                        dateTo: this.ews.period_to,
-                    }
-                }).then(response => {
-                    this.employees = response.data;
-                    this.populateAndSyncSelectedShifts();
-                })
-            }
-            if (src_type === 'sub_department_units'){
-                axios.get(route('employeeworkschedule.getlist'),{
-                    params:{
-                        searchId: src_id,
-                        searchType: src_type,
-                        dateFrom: this.ews.period_from,
-                        dateTo: this.ews.period_to,
-                    }
-                }).then(response => {
-                    this.employees = response.data;
-                    this.populateAndSyncSelectedShifts();
-                })
-            }
-
         },
+
         populateAndSyncSelectedShifts() {
             this.employees.forEach(employee => {
-            if (!employee.selectedShift) {
-                employee.selectedShift = [];
-            }
-            const selectedDates = new Set(employee.selectedShift.map(shift => shift.schedule_date));
-            this.days.forEach(day => {
-                if (!selectedDates.has(day.date)) {
-                employee.selectedShift.push({ schedule_date: day.date, schedule_day:'n/a' });
+                if (!employee.selectedShift) {
+                    employee.selectedShift = [];
                 }
-            });
+                const selectedDates = new Set(employee.selectedShift.map(shift => shift.schedule_date));
+                this.days.forEach(day => {
+                    if (!selectedDates.has(day.date)) {
+                        employee.selectedShift.push({ schedule_date: day.date, schedule_day: 'n/a' });
+                    }
+                });
             });
         },
-        getWorkShifts(src_type, src_id){
 
+        getWorkShifts(src_type, src_id){
             axios.get(route('employeeworkschedule.getWorkShifts'),{
                 params:{
                     searchId: src_id,

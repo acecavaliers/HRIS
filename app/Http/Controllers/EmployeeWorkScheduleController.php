@@ -127,7 +127,7 @@ class EmployeeWorkScheduleController extends Controller
         $arr['created_by'] = Auth::user()->name;
         $setby = $request->setby;
         $shiftDates = $request->shiftDates;
-        $insertedCount = 0;
+        // $insertedCount = 0;
 
         if (!empty($empIDs)) {
             foreach ($empIDs as $empID) {
@@ -136,13 +136,14 @@ class EmployeeWorkScheduleController extends Controller
 
                 if (!$existingWorkshift) {
                     $que = EmployeeWorkshift::create($arr);
-                    $insertedCount++;
+                    // $insertedCount++;
                     $this->createWorkshiftDetails($que, $shift, $setby, $shiftDates);
                 } else {
                     $this->updateWorkshiftDetails($existingWorkshift, $shift, $setby, $shiftDates, $arr['work_shift_id']);
                 }
             }
-            return $insertedCount > 0 ? 'success' : 'existed';
+            return 'success';
+            // return $insertedCount > 0 ? 'success' : 'existed';
         } else {
             $existingWorkshift = $this->findExistingWorkshift($arr);
 
