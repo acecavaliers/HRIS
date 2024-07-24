@@ -429,10 +429,10 @@ class EmployeeWorkScheduleController extends Controller
     public function getlist(Request $request)
     {
         $searchTypes = [
-            'division' => 'division_id',
-            'department' => 'department_id',
-            'subdepartment' => 'sub_department_id',
-            'subdepartmentunit' => 'sub_department_unit_id',
+            'divisions' => 'division_id',
+            'departments' => 'department_id',
+            'subDepartments' => 'sub_department_id',
+            'subDepartmentUnits' => 'sub_department_unit_id',
         ];
 
         $searchType = $request->searchType;
@@ -814,7 +814,7 @@ class EmployeeWorkScheduleController extends Controller
     public function getWorkShifts(Request $request)
     {
 
-        if($request->searchType == 'division'){
+        if($request->searchType == 'divisions'){
 
             $shifts = DB::table('work_shifts as T0')
             ->join('division_shifts as T1', 'T0.id', '=', 'T1.work_shift_id')
@@ -835,7 +835,7 @@ class EmployeeWorkScheduleController extends Controller
             return response()->json($formattedShifts);
 
         }
-        if($request->searchType == 'department'){
+        if($request->searchType == 'departments'){
 
             $shifts = DB::table('work_shifts as T0')
             ->join('department_shifts as T1', 'T0.id', '=', 'T1.work_shift_id')
@@ -855,7 +855,7 @@ class EmployeeWorkScheduleController extends Controller
             return response()->json($formattedShifts);
 
         }
-        if($request->searchType == 'subdepartment'){
+        if($request->searchType == 'subDepartments'){
 
             $shifts = DB::table('work_shifts as T0')
             ->join('sub_department_shifts as T1', 'T0.id', '=', 'T1.work_shift_id')
@@ -875,7 +875,7 @@ class EmployeeWorkScheduleController extends Controller
             return response()->json($formattedShifts);
 
         }
-        if($request->searchType == 'subdepartmentunit'){
+        if($request->searchType == 'subDepartmentUnits'){
 
             $shifts = DB::table('work_shifts as T0')
             ->join('sub_department_unit_shifts as T1', 'T0.id', '=', 'T1.work_shift_id')

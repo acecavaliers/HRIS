@@ -8,17 +8,19 @@
 
         <!-- CONTENT -->
         <div class="grid grid-cols-4">
-            <!-- Divisions -->
-            <div class="p-4 text-sm w-full">
+
+            <div v-for="item in menu" :key="item"  class="py-1">
+                <div class="p-4 text-sm w-full">
+
                 <div class="w-full">
-                    <p class="  pr-2 f-14 text-gray-800 font-medium px-1 d-flex">Division:</p>
+                    <p class="  pr-2 f-14 text-gray-800 font-medium px-1 d-flex">{{ item }}:</p>
                     <div class="w-full relative inline-block">
                         <Menu as="div" class="relative">
                             <MenuButton
                                 type="button"
                                 class="flex items-center justify-between text-left text-xs gap-x-1.5 w-full rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                             >
-                                {{ selected.selectedDivision }}
+                                {{ selected[item] }}
                                 <ChevronDownIcon
                                     class="-mr-1 h-5 w-5 text-gray-400"
                                     aria-hidden="true"
@@ -36,21 +38,21 @@
                                 <MenuItems
                                     class="absolute right-0 z-10 mt-3 w-full max-h-80 origin-top-right overflow-auto rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
                                 >
-                                    <div v-for="(div, index) in divisions" :key="div.id" class="py-1">
-                                        <MenuItem v-slot="{ active }" v-if="div.depts.length> 0" >
-                                            <a  @click="showDept('division', div.name,div.depts,div.id)"
+                                    <div v-for="(data, index) in dataCollections[item]" :key="data.id" class="py-1">
+                                        <MenuItem v-slot="{ active }" v-if="data.subData.length> 0" >
+                                            <a  @click="showDept(item, data.name,data.subData,data.id)"
                                                 class="cursor-pointer"
                                                 :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm',]"
                                             >
-                                                {{ div.name }}
+                                                {{ data.name }}
                                             </a>
                                         </MenuItem>
                                         <MenuItem v-slot="{ active }" v-else >
-                                            <a  @click="modalClose('division', div.name, div.id)"
+                                            <a  @click="modalClose(item, data.name, data.id)"
                                                 class="cursor-pointer"
                                                 :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm',]"
                                             >
-                                                {{ div.name }}
+                                                {{ data.name }}
                                             </a>
                                         </MenuItem>
                                     </div>
@@ -60,165 +62,14 @@
                     </div>
                 </div>
             </div>
-            <!-- Departments -->
-            <div class="p-4 text-sm">
-                <div  class="w-full ">
-                    <p class="pr-2 f-14 text-gray-800 font-medium px-1 d-flex">Department:</p>
-                    <div class="w-full relative inline-block">
-                        <Menu as="div" class="relative">
-                            <MenuButton
-                                type="button"
-                                class="flex items-center justify-between text-left text-xs gap-x-1.5 w-full rounded-md px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"  :disabled="selected.selectedDivision === 'Select Division'" :class="{'bg-gray-100 text-gray-500': selected.selectedDivision === 'Select Division','bg-white text-gray-900 hover:bg-gray-50': selected.selectedDivision !== 'Select Division' }"  >
-                                {{ selected.selectedDept }}
-                                <ChevronDownIcon
-                                    class="-mr-1 h-5 w-5 text-gray-400"
-                                    aria-hidden="true"
-                                />
-                            </MenuButton>
-
-                            <transition
-                                enter-active-class="transition ease-out duration-100"
-                                enter-from-class="transform opacity-0 scale-95"
-                                enter-to-class="transform opacity-100 scale-100"
-                                leave-active-class="transition ease-in duration-75"
-                                leave-from-class="transform opacity-100 scale-100"
-                                leave-to-class="transform opacity-0 scale-95"
-                            >
-                                <MenuItems
-                                    class="absolute right-0 z-10 mt-3 w-full max-h-80 origin-top-right overflow-auto rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-                                >
-                                    <div v-for="(deps, index) in departments" :key="deps.id" class="py-1">
-                                        <MenuItem v-slot="{ active }" v-if="deps.subdept.length> 0" >
-                                            <a  @click="showDept('department', deps.name,deps.subdept,deps.id)"
-                                                class="cursor-pointer"
-                                                :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm',]"
-                                            >
-                                                {{ deps.name }}
-                                            </a>
-                                        </MenuItem>
-                                        <MenuItem v-slot="{ active }" v-else >
-                                            <a  @click="modalClose('department', deps.name, deps.id)"
-                                                class="cursor-pointer"
-                                                :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm',]"
-                                            >
-                                                {{ deps.name }}
-                                            </a>
-                                        </MenuItem>
-                                    </div>
-                                </MenuItems>
-                            </transition>
-                        </Menu>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sub Departments -->
-            <div class="p-4 text-sm">
-                <div  class="w-full ">
-                    <p class="pr-2 f-14 text-gray-800 font-medium px-1 d-flex">Sub-Department:</p>
-                    <div class="w-full relative inline-block">
-                        <Menu as="div" class="relative">
-                            <MenuButton
-                                type="button"
-                                class="flex items-center justify-between text-left text-xs gap-x-1.5 w-full rounded-md px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50" :disabled="selected.selectedDept === 'Select Department'" :class="{'bg-gray-100 text-gray-500': selected.selectedDept === 'Select Department','bg-white text-gray-900 hover:bg-gray-50': selected.selectedDept !== 'Select Department' }">
-                                {{ selected.selectedSubDept }}
-                                <ChevronDownIcon
-                                    class="-mr-1 h-5 w-5 text-gray-400"
-                                    aria-hidden="true"
-                                />
-                            </MenuButton>
-
-                            <transition
-                                enter-active-class="transition ease-out duration-100"
-                                enter-from-class="transform opacity-0 scale-95"
-                                enter-to-class="transform opacity-100 scale-100"
-                                leave-active-class="transition ease-in duration-75"
-                                leave-from-class="transform opacity-100 scale-100"
-                                leave-to-class="transform opacity-0 scale-95"
-                            >
-                                <MenuItems
-                                    class="absolute right-0 z-10 mt-3 w-full max-h-80 origin-top-right overflow-auto rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-                                >
-                                    <div v-for="(subdeps, index) in subDepartments" :key="subdeps.id" class="py-1">
-                                        <MenuItem v-slot="{ active }" v-if="subdeps.subdeptunit.length> 0" >
-                                            <a  @click="showDept('subdepartment', subdeps.name,subdeps.subdeptunit,subdeps.id)"
-                                                class="cursor-pointer"
-                                                :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm',]"
-                                            >
-                                                {{ subdeps.name }}
-                                            </a>
-                                        </MenuItem>
-                                        <MenuItem v-slot="{ active }" v-else >
-                                            <a  @click="modalClose('subdepartment', subdeps.name, subdeps.id)"
-                                                class="cursor-pointer"
-                                                :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm',]"
-                                            >
-                                                {{ subdeps.name }}
-                                            </a>
-                                        </MenuItem>
-                                    </div>
-                                </MenuItems>
-                            </transition>
-                        </Menu>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sub Departments Units-->
-            <div class="p-4 text-sm">
-                <div  class="w-full">
-                    <p class="pr-2 f-14 text-gray-800 font-medium px-1 d-flex">Sub-Department Units:</p>
-                    <div class="w-full relative inline-block">
-                        <Menu as="div" class="relative">
-                            <MenuButton
-                                type="button"
-                                class="flex items-center justify-between text-left text-xs gap-x-1.5 w-full rounded-md px-3 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50" :disabled="selected.selectedSubDept === 'Select Sub-Department'" :class="{'bg-gray-100 text-gray-500': selected.selectedSubDept === 'Select Sub-Department','bg-white text-gray-900 hover:bg-gray-50': selected.selectedSubDept !== 'Select Sub-Department' }">
-                                {{ selected.selectedSubDeptUnit }}
-                                <ChevronDownIcon
-                                    class="-mr-1 h-5 w-5 text-gray-400"
-                                    aria-hidden="true"
-                                />
-                            </MenuButton>
-
-                            <transition
-                                enter-active-class="transition ease-out duration-100"
-                                enter-from-class="transform opacity-0 scale-95"
-                                enter-to-class="transform opacity-100 scale-100"
-                                leave-active-class="transition ease-in duration-75"
-                                leave-from-class="transform opacity-100 scale-100"
-                                leave-to-class="transform opacity-0 scale-95"
-                            >
-                                <MenuItems
-                                    class="absolute right-0 z-10 mt-3 w-full max-h-80 origin-top-right overflow-auto rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-                                >
-                                    <div v-for="(item, index) in subDepartmentUnits" :key="item.id" class="py-1">
-                                        <MenuItem v-slot="{ active }" >
-                                            <a  @click="modalClose('subdepartmentunit', item.name, item.id)"
-                                                class="cursor-pointer"
-                                                :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm',]"
-                                            >
-                                                {{ item.name }}
-                                            </a>
-                                        </MenuItem>
-                                    </div>
-                                </MenuItems>
-                            </transition>
-                        </Menu>
-                    </div>
-                </div>
             </div>
         </div>
+
         <hr>
         {{ cal }}
         <div class="p-4">
             <input type="text" v-model="role" class="w-16" placeholder="Role"/>
             <div class="flex justify-end">
-                <!-- <div class="flex justify-start space-x-1">
-                    <input type="number" v-model="periodSetting.s_a" class="w-16"/>
-                    <input type="number" v-model="periodSetting.s_b"  class="w-16"/>
-                    <input type="number" v-model="periodSetting.e_a"  class="w-16"/>
-                    <input type="number" v-model="periodSetting.e_b"  class="w-16"/>
-                </div> -->
                 <div class="flex items-center justify-end space-x-2">
                     <label for="">Set By</label>
                     <Menu as="div" class="relative">
@@ -574,9 +425,6 @@
             </form>
         </div>
 
-
-
-
     </MasterLayout>
 </template>
 
@@ -609,15 +457,18 @@ export default {
                 { name: 'EMPLOYEES', href: route('employees.index'), current: false },
 
             ],
+            menu:['divisions','departments','subDepartments','subDepartmentUnits'],
             ews:{},
             ewsUpdate:{},
-            divisions: [],
-            departments: [],
-            subDepartments: [],
-            subDepartmentUnits: [],
+            dataCollections:{
+                divisions: [],
+                departments: [],
+                subDepartments: [],
+                subDepartmentUnits: [],
+            },
             employees: [],
             isVisible:false,
-            selected:{selectedDivision:'Select Division', selectedDept:'Select Department', selectedSubDept:'Select Sub-Department', selectedSubDeptUnit:'Select Sub-Department Unit'},
+            selected:{divisions:'Select Division', departments:'Select Department', subDepartments:'Select Sub-Department', subDepartmentUnits:'Select Sub-Department Unit'},
             days: [],
             set:{shifts:'Select Shift',view:'week'},
             workShifts:[],
@@ -740,7 +591,7 @@ export default {
             this.set.view = type;
             this.set.view = type;
             this.generatePayrollDays();
-            if (this.selected.selectedDivision !== 'Select Division'){
+            if (this.selected.divisions !== 'Select Division'){
                 this.getEmployee(this.search.currentType, this.search.currentID);
             }else {
                 this.employees = [];
@@ -837,41 +688,41 @@ export default {
         return id.toString().padStart(6, '0');
         },
         onDivisionChange(type){
-            if (type === 'division'){
-                this.selected.selectedDept = 'Select Department'
-                this.selected.selectedSubDept = 'Select Sub-Department'
-                this.selected.selectedSubDeptUnit = 'Select Sub-Department Unit'
+            if (type === 'divisions'){
+                this.selected.departments = 'Select Department'
+                this.selected.subDepartments = 'Select Sub-Department'
+                this.selected.subDepartmentUnits = 'Select Sub-Department Unit'
             }
-            if (type === 'department'){
-                this.selected.selectedSubDept = 'Select Sub-Department'
-                this.selected.selectedSubDeptUnit = 'Select Sub-Department Unit'
+            if (type === 'departments'){
+                this.selected.subDepartments = 'Select Sub-Department'
+                this.selected.subDepartmentUnits = 'Select Sub-Department Unit'
             }
-            if (type === 'subdepartment'){
-                this.selected.selectedSubDeptUnit = 'Select Sub-Department Unit'
+            if (type === 'subDepartments'){
+                this.selected.subDepartmentUnits = 'Select Sub-Department Unit'
             }
         },
         showDept(type, div_name,depts,div_id) {
-            if (type === 'division'){
-                this.departments= depts;
-                this.selected.selectedDivision = div_name;
+            if (type === 'divisions'){
+                this.dataCollections.departments= depts;
+                this.selected.divisions = div_name;
                 this.search.currentType = type;
                 this.search.currentID = div_id;
                 this.getWorkShifts(type, div_id);
                 this.getEmployee(type, div_id);
                 this.onDivisionChange(type);
             }
-            if (type === 'department'){
-                this.subDepartments= depts;
-                this.selected.selectedDept = div_name;
+            if (type === 'departments'){
+                this.dataCollections.subDepartments= depts;
+                this.selected.departments = div_name;
                 this.search.currentType = type;
                 this.search.currentID = div_id;
                 this.getWorkShifts(type, div_id);
                 this.getEmployee(type, div_id);
                 this.onDivisionChange(type);
             }
-            if (type === 'subdepartment'){
-                this.subDepartmentUnits= depts;
-                this.selected.selectedSubDept = div_name;
+            if (type === 'subDepartments'){
+                this.dataCollections.subDepartmentUnits= depts;
+                this.selected.subDepartments = div_name;
                 this.search.currentType = type;
                 this.search.currentID = div_id;
                 this.getWorkShifts(type, div_id);
@@ -880,29 +731,29 @@ export default {
         },
 
         modalClose(type, selected, id){
-            if(type === 'division'){
-                this.selected.selectedDivision = selected;
+            if(type === 'divisions'){
+                this.selected.divisions = selected;
                 this.search.currentType = type;
                 this.search.currentID = id;
                 this.getEmployee(type, id);
                 this.getWorkShifts(type, id);
             }
-            if(type === 'department'){
-                this.selected.selectedDept = selected;
+            if(type === 'departments'){
+                this.selected.departments = selected;
                 this.search.currentType = type;
                 this.search.currentID = id;
                 this.getWorkShifts(type, id);
                 this.getEmployee(type, id);
             }
-            if(type === 'subdepartment'){
-                this.selected.selectedSubDept = selected;
+            if(type === 'subDepartments'){
+                this.selected.subDepartments = selected;
                 this.search.currentType = type;
                 this.search.currentID = id;
                 this.getWorkShifts(type, id);
                 this.getEmployee(type, id);
             }
-            if(type === 'subdepartmentunit'){
-                this.selected.selectedSubDeptUnit = selected;
+            if(type === 'subDepartmentUnits'){
+                this.selected.subDepartmentUnits = selected;
                 this.search.currentType = type;
                 this.search.currentID = id;
                 this.getWorkShifts(type, id);
@@ -922,63 +773,64 @@ export default {
 
             try {
                 const response = await axios.get(route('employeeworkschedule.getSubDeptUnit'));
-                this.subDepartmentUnits = response.data.map((val) => ({
+                this.dataCollections.subDepartmentUnits = response.data.map((val) => ({
                 id: val.id,
                 name: val.name,
                 sub_department_id: Number(val.sub_department_id),
+                subData:[],
                 }));
             } catch (error) {
-                console.error('Error fetching departments:', error);
+                // console.error('Error fetching departments:', error);
             }
 
             try {
                 const response = await axios.get(route('employeeworkschedule.getSubDept'));
-                this.subDepartments = response.data.map((val) => {
-                const subdeptunit = this.subDepartmentUnits.filter(dept => dept.sub_department_id === val.id);
+                this.dataCollections.subDepartments = response.data.map((val) => {
+                const subdeptunit = this.dataCollections.subDepartmentUnits.filter(dept => dept.sub_department_id === val.id);
                 return {
                     id: val.id,
                     name: val.name,
                     department_id: Number(val.department_id),
-                    subdeptunit: subdeptunit,
+                    subData: subdeptunit,
                 };
                 });
             } catch (error) {
-                console.error('Error fetching divisions:', error);
+                // console.error('Error fetching divisions:', error);
             }
 
             try {
                 const response = await axios.get(route('employeeworkschedule.getDept'));
-                this.departments = response.data.map((val) => {
-                const subdept = this.subDepartments.filter(dept => dept.department_id === val.id);
+                this.dataCollections.departments = response.data.map((val) => {
+                const subdept = this.dataCollections.subDepartments.filter(dept => dept.department_id === val.id);
                 return {
                     id: val.id,
                     name: val.name,
                     division_id: Number(val.division_id),
-                    subdept: subdept,
+                    subData: subdept,
                 };
                 });
             } catch (error) {
-                console.error('Error fetching divisions:', error);
+                // console.error('Error fetching divisions:', error);
             }
 
             try {
                 const response = await axios.get(route('employeeworkschedule.getDivisions'));
-                this.divisions = response.data.map((val) => {
-                const depts = this.departments.filter(dept => dept.division_id === val.id);
+                this.dataCollections.divisions = response.data.map((val) => {
+                const depts = this.dataCollections.departments.filter(dept => dept.division_id === val.id);
                 return {
                     id: val.id,
                     name: val.name,
-                    depts: depts,
+                    subData: depts,
                 };
                 });
             } catch (error) {
-                console.error('Error fetching divisions:', error);
+                // console.error('Error fetching divisions:', error);
             }
         },
 
         getEmployee(src_type, src_id){
 
-            if (src_type === 'division'){
+            if (src_type === 'divisions'){
                 axios.get(route('employeeworkschedule.getlist'),{
                     params:{
                         searchId: src_id,
@@ -992,7 +844,7 @@ export default {
                     this.populateAndSyncSelectedShifts();
                 })
             }
-            if (src_type === 'department'){
+            if (src_type === 'departments'){
                 axios.get(route('employeeworkschedule.getlist'),{
                     params:{
                         searchId: src_id,
@@ -1006,7 +858,7 @@ export default {
                     this.populateAndSyncSelectedShifts();
                 })
             }
-            if (src_type === 'subdepartment'){
+            if (src_type === 'subDepartments'){
                 axios.get(route('employeeworkschedule.getlist'),{
                     params:{
                         searchId: src_id,
@@ -1020,7 +872,7 @@ export default {
                     this.populateAndSyncSelectedShifts();
                 })
             }
-            if (src_type === 'subdepartmentunit'){
+            if (src_type === 'subDepartmentUnits'){
                 axios.get(route('employeeworkschedule.getlist'),{
                     params:{
                         searchId: src_id,
