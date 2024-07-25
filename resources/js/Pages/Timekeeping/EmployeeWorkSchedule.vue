@@ -37,11 +37,19 @@
                                     <MenuItems
                                         class="absolute right-0 z-10 mt-3 w-full max-h-80 origin-top-right overflow-auto rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
                                     >
-                                        <div v-for="(data, index) in dataCollections[item]" :key="data.id" class="py-1">
+                                        <div class="sticky top-0 bg-white z-20 px-1 py-2 border-b">
+                                            <input
+                                                v-model="searchQueries[item]"
+                                                type="text"
+                                                placeholder="Search..."
+                                                class="uppercase block w-full px-2 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                        <div v-for="(data, index) in filteredDataCollections[item]" :key="data.id" class="py-1">
                                             <MenuItem v-slot="{ active }" v-if="data.subData.length> 0" >
                                                 <a  @click="showDept(item, data.name,data.subData,data.id)"
                                                     class="cursor-pointer"
-                                                    :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm',]"
+                                                    :class="[active ? 'bg-blue-400 text-gray-50' : 'text-gray-700', 'block px-4 py-1 text-sm',]"
                                                 >
                                                     {{ data.name }}
                                                 </a>
@@ -49,11 +57,14 @@
                                             <MenuItem v-slot="{ active }" v-else >
                                                 <a  @click="modalClose(item, data.name, data.id)"
                                                     class="cursor-pointer"
-                                                    :class="[active ? 'bg-gray-100 text-gray-900' : 'text-gray-700', 'block px-4 py-2 text-sm',]"
+                                                    :class="[active ? 'bg-blue-400 text-gray-50' : 'text-gray-700', 'block px-4 py-1 text-sm',]"
                                                 >
                                                     {{ data.name }}
                                                 </a>
                                             </MenuItem>
+                                        </div>
+                                        <div v-if="filteredDataCollections[item].length <1 && searchQueries[item] !== ''" class="px-2 py-2 text-xs">
+                                            <h1>No search result for <i>{{ replace(item,'_','-') }}</i></h1>
                                         </div>
                                     </MenuItems>
                                 </transition>
@@ -449,6 +460,12 @@ export default {
                 { name: 'EMPLOYEES', href: route('employees.index'), current: false },
 
             ],
+            searchQueries: {
+                divisions: '',
+                departments: '',
+                sub_departments: '',
+                sub_department_units: '',
+            },
             menu:['divisions','departments','sub_departments','sub_department_units'],
             ews:{},
             ewsUpdate:{},
@@ -488,6 +505,13 @@ export default {
         }
     },
     computed: {
+        filteredDataCollections() {
+            return Object.keys(this.dataCollections).reduce((result, key) => {
+                const searchQuery = this.searchQueries[key].toLowerCase();
+                result[key] = this.dataCollections[key].filter(item => item.name.toLowerCase().includes(searchQuery));
+                return result;
+            }, {});
+        },
         sortedEmployees() {
             return this.employees.map(employee => {
             const sortedShifts = [...employee.selectedShift].sort((a, b) => {
@@ -498,6 +522,7 @@ export default {
         },
     },
     methods: {
+
         isItemSelected(item) {
             if (item !== 'divisions'){
                 const selectedItem = item;
@@ -505,7 +530,7 @@ export default {
             }
         },
         replace(string, searchValue, replaceValue) {
-            return string.replace(new RegExp(searchValue, 'g'), replaceValue).toUpperCase();
+            return string.replace(new RegExp(searchValue, 'g'), replaceValue);
         },
         selectedShift(shift){
             this.ews.work_shift_id = shift.id;
