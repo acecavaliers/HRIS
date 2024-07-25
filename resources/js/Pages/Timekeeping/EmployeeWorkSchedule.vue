@@ -648,16 +648,19 @@ export default {
         },
         onDivisionChange(type){
             if (type === 'divisions'){
-                this.selected.departments = 'Select departments'
-                this.selected.sub_departments = 'Select sub_departments'
-                this.selected.sub_department_units = 'Select sub_department_units'
+                this.selected.departments = 'Select departments';
+                this.selected.sub_departments = 'Select sub_departments';
+                this.selected.sub_department_units = 'Select sub_department_units';
+                this.dataCollections.sub_departments = [];
+                this.dataCollections.sub_department_units = [];
             }
             if (type === 'departments'){
-                this.selected.sub_departments = 'Select sub_departments'
-                this.selected.sub_department_units = 'Select sub_department_units'
+                this.selected.sub_departments = 'Select sub_departments';
+                this.selected.sub_department_units = 'Select sub_department_units';
+                this.dataCollections.sub_department_units = [];
             }
             if (type === 'sub_departments'){
-                this.selected.sub_department_units = 'Select sub_department_units'
+                this.selected.sub_department_units = 'Select sub_department_units';
             }
         },
 
@@ -676,7 +679,7 @@ export default {
                 'sub_departments': {
                     collection: 'sub_department_units',
                     selected: 'sub_departments',
-                    callback: null,
+                    callback: this.onDivisionChange,
                 }
             };
 
@@ -814,6 +817,7 @@ export default {
                 }).then(response => {
                     this.employees = response.data;
                     this.populateAndSyncSelectedShifts();
+                    console.log('EMP', this.employees);
                 });
             }
         },
