@@ -44,12 +44,18 @@
                                                 placeholder="Search..."
                                                 class="pr-7 uppercase block w-full px-2 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
                                             />
-                                            <button
-                                                v-if="searchQueries[item]"
-                                                @click="clearSearch(item)"
-                                                class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
-                                            ><XCircleIcon class="h-5 w-5"/>
-                                            </button>
+                                            <span>
+                                                <button
+                                                    v-if="searchQueries[item]"
+                                                    @click="clearSearch(item)"
+                                                    class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                                                >
+                                                    <XCircleIcon class="h-5 w-5"/>
+                                                </button>
+                                                <span v-else class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 focus:outline-none">
+                                                    <MagnifyingGlassIcon class="h-5 w-5"/>
+                                                </span>
+                                            </span>
                                         </div>
                                         <div v-for="(data, index) in filteredDataCollections[item]" :key="data.id" class="py-1">
                                             <MenuItem v-slot="{ active }" v-if="data.subData.length> 0" >
@@ -83,7 +89,7 @@
 
         <hr>
         <div class="p-4">
-            <input type="text" v-model="role" class="w-16" placeholder="Role"/>
+            <input type="text" v-model="role" class="w-16 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="Role"/>
             <div class="flex justify-end">
                 <div class="flex items-center justify-end space-x-2">
                     <label for="">Set By</label>
