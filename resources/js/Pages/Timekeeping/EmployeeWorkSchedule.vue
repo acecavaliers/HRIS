@@ -37,19 +37,25 @@
                                     <MenuItems
                                         class="absolute right-0 z-10 mt-3 w-full max-h-80 origin-top-right overflow-auto rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
                                     >
-                                        <div class="sticky top-0 bg-white z-20 px-1 py-2 border-b">
+                                        <div class="sticky top-0 bg-white z-20 px-2 py-2 border-b">
                                             <input
                                                 v-model="searchQueries[item]"
                                                 type="text"
                                                 placeholder="Search..."
-                                                class="uppercase block w-full px-2 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                                class="pr-7 uppercase block w-full px-2 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
                                             />
+                                            <button
+                                                v-if="searchQueries[item]"
+                                                @click="clearSearch(item)"
+                                                class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                                            ><XCircleIcon class="h-5 w-5"/>
+                                            </button>
                                         </div>
                                         <div v-for="(data, index) in filteredDataCollections[item]" :key="data.id" class="py-1">
                                             <MenuItem v-slot="{ active }" v-if="data.subData.length> 0" >
                                                 <a  @click="showDept(item, data.name,data.subData,data.id)"
                                                     class="cursor-pointer"
-                                                    :class="[active ? 'bg-blue-400 text-gray-50' : 'text-gray-700', 'block px-4 py-1 text-sm',]"
+                                                    :class="[active ? 'bg-blue-500 text-white' : 'text-gray-700', 'block px-4 py-1 text-sm',]"
                                                 >
                                                     {{ data.name }}
                                                 </a>
@@ -57,7 +63,7 @@
                                             <MenuItem v-slot="{ active }" v-else >
                                                 <a  @click="modalClose(item, data.name, data.id)"
                                                     class="cursor-pointer"
-                                                    :class="[active ? 'bg-blue-400 text-gray-50' : 'text-gray-700', 'block px-4 py-1 text-sm',]"
+                                                    :class="[active ? 'bg-blue-500 text-white' : 'text-gray-700', 'block px-4 py-1 text-sm',]"
                                                 >
                                                     {{ data.name }}
                                                 </a>
@@ -440,7 +446,7 @@ import { Head } from '@inertiajs/vue3';
 import Breadcrumbs from '@/Pages/Templates/Breadcrumbs.vue';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
 import { EllipsisVerticalIcon } from '@heroicons/vue/20/solid'
-import { PlusCircleIcon, ChevronDownIcon, MagnifyingGlassIcon, ChevronRightIcon} from '@heroicons/vue/20/solid'
+import { PlusCircleIcon, ChevronDownIcon, XCircleIcon, MagnifyingGlassIcon, ChevronRightIcon} from '@heroicons/vue/20/solid'
 // import DayShift from '../Maintenance/DayShift.vue';
 const statuses = {
   'INFORMATION TECHNOLOGY': 'text-green-700 bg-green-50 ring-green-600/20',
@@ -523,6 +529,9 @@ export default {
     },
     methods: {
 
+        clearSearch(item) {
+            this.searchQueries[item] = '';
+        },
         isItemSelected(item) {
             if (item !== 'divisions'){
                 const selectedItem = item;
