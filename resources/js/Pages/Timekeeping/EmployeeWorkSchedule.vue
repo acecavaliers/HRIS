@@ -89,163 +89,109 @@
 
         <hr>
         <div class="p-4">
-            <input type="text" v-model="role" class="w-16 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="Role"/>
+
             <div class="flex justify-end">
-                <div class="flex items-center justify-end space-x-2">
-                    <label for="">Set By</label>
-                    <Menu as="div" class="relative">
-                        <MenuButton
-                            type="button"
-                            class="flex items-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 uppercase w-24"
-                        >
-                            {{ set.view }}
-                            <ChevronDownIcon
-                                class="-mr-1 h-5 w-5 text-gray-400"
-                                aria-hidden="true"
-                            />
-                        </MenuButton>
-
-                        <transition
-                            enter-active-class="transition ease-out duration-100"
-                            enter-from-class="transform opacity-0 scale-95"
-                            enter-to-class="transform opacity-100 scale-100"
-                            leave-active-class="transition ease-in duration-75"
-                            leave-from-class="transform opacity-100 scale-100"
-                            leave-to-class="transform opacity-0 scale-95"
-                        >
-                            <MenuItems
-                                class="absolute right-0 z-10 mt-3 w-36 origin-top-right overflow-hidden rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-                            >
-                                <div class="py-1">
-                                    <MenuItem v-slot="{ active }">
-                                        <a
-                                            @click="viewAs('week')"
-                                            :class="[
-                                                active
-                                                    ? 'bg-gray-100 text-gray-900'
-                                                    : 'text-gray-700',
-                                                'block px-4 py-2 text-sm',
-                                            ]"
-                                            >Weekly</a
-                                        >
-                                    </MenuItem>
-                                    <MenuItem v-slot="{ active }">
-                                        <a
-                                            @click="viewAs('payroll')"
-                                            :class="[
-                                                active
-                                                    ? 'bg-gray-100 text-gray-900'
-                                                    : 'text-gray-700',
-                                                'block px-4 py-2 text-sm',
-                                            ]"
-                                            >Payroll (10/25)</a
-                                        >
-                                    </MenuItem>
-                                </div>
-                            </MenuItems>
-                        </transition>
-                    </Menu>
-                    <!-- <button type="button" @click="previousPayrollPeriod" class="p-2 bg-blue-600 text-white text-sm rounded-md mx-1">Previos Payroll</button>
-                    <button type="button" @click="nextPayrollPeriod" class="p-2 bg-blue-600 text-white text-sm rounded-md mx-1">Next Payroll</button> -->
+                <input type="text" v-model="role" class="w-16 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="Role"/>
+            </div>
+            <div v-if="days.length>0">
+                <div class="flex items-center justify-between bg-gray-200 mt-2 border-t border-x rounded-t-md px-2 py-2">
+                    <h1 class="text-gray-800 text-sm font-medium">
+                        Workshift Period: <b>{{dateToWords( ews.period_from) }} </b> - <b>{{ dateToWords(ews.period_to) }},  {{ ews.period_to.substring(0,4) }}</b>
+                    </h1>
+                    <span class="text-gray-800 text-xs font-bold ">
+                        <span class="border-gray-300 bg-yellow-200 px-2 py-1.5 rounded-l-md">On-Call</span>
+                        <span class="border-gray-300 bg-red-300 px-2 py-1.5 ">Day Off</span>
+                        <span class="border-gray-300 bg-green-200 px-2 py-1.5 rounded-r-md">On-duty</span>
+                    </span>
                 </div>
-            </div>
-            <div class="flex items-center justify-between bg-gray-200 mt-2 border-t border-x rounded-t-md px-2 py-2">
-                <h1 class="text-gray-800 text-sm font-medium"> DDDDDDD
-                    <!-- Workshift Period: <b>{{dateToWords( ews.period_from) }} </b> - <b>{{ dateToWords(ews.period_to) }},  {{ ews.period_to.substring(0,4) }}</b> -->
-                </h1>
-                <span class="text-gray-800 text-xs font-bold ">
-                    <span class="border-gray-300 bg-yellow-200 px-2 py-1.5 rounded-l-md">On-Call</span>
-                    <span class="border-gray-300 bg-red-300 px-2 py-1.5 ">Day Off</span>
-                    <span class="border-gray-300 bg-green-200 px-2 py-1.5 rounded-r-md">On-duty</span>
-                </span>
-            </div>
 
-            <table class="table-auto w-full border-collapse border-r border-slate-300 ">
-                    <thead>
-                        <tr class="bg-gray-50 border pb-1 pt-1">
-                            <th class="w-2 border-r">
-                                <div class="text-right text-sm px-2 text-gray-600 ">No.</div>
-                            </th>
-                            <th class="w-80">
-                                <div class="text-left xl:block lg:block md:block sm:block hidden">
-                                    <div class="text-sm px-2 text-gray-600 ">Employee</div>
-                                </div>
-                                <div class="text-left xl:hidden lg:hidden md:hidden sm:hidden block">
-                                    <div class="text-xs px-2">Employee Name</div>
-                                </div>
-                            </th>
-                            <th v-for="ds in days" class="w-16 border">
-
-                                <div class="w-16">
+                <table class="table-auto w-full border-collapse border-r border-slate-300 ">
+                        <thead>
+                            <tr class="bg-gray-50 border pb-1 pt-1">
+                                <th class="w-2 border-r">
+                                    <div class="text-right text-sm px-2 text-gray-600 ">No.</div>
+                                </th>
+                                <th class="w-80">
                                     <div class="text-left xl:block lg:block md:block sm:block hidden">
-                                         <div class="flex jsutify-start">
-                                            <h1 class="text-3xl text-blue-500 font-bold" :class="{'text-red-500' : ds.dayofweek === 'Sunday'}">
-                                                {{ dateToWords(ds.date).substring(4,6) }}
-                                            </h1>
-                                            <div class="mt-1 ml-0.5">
-                                                <p class="uppercase text-xs text-gray-600 font-normal p-0" :class="{'text-red-500' : ds.dayofweek === 'Sunday'}">{{ dateToWords(ds.date).substring(0,3) }}</p>
-                                                <p v-if="set.view ==='WEEKLY'" class="text-xs text-gray-600 font-bold p-0 -mt-1" :class="{'text-red-500' : ds.dayofweek === 'Sunday'}">{{ ds.dayofweek }}</p>
-                                                <p v-else class="text-xs text-gray-600 font-bold p-0 -mt-1" :class="{'text-red-500' : ds.dayofweek === 'Sunday'}">{{ ds.dayofweek.substring(0,3) }}</p>
+                                        <div class="text-sm px-2 text-gray-600 ">Employee</div>
+                                    </div>
+                                    <div class="text-left xl:hidden lg:hidden md:hidden sm:hidden block">
+                                        <div class="text-xs px-2">Employee Name</div>
+                                    </div>
+                                </th>
+                                <th v-for="ds in days" class="w-16 border">
+
+                                    <div class="w-16">
+                                        <div class="text-left xl:block lg:block md:block sm:block hidden">
+                                            <div class="flex jsutify-start">
+                                                <h1 class="text-3xl text-blue-500 font-bold" :class="{'text-red-500' : ds.dayofweek === 'Sunday'}">
+                                                    {{ dateToWords(ds.date).substring(4,6) }}
+                                                </h1>
+                                                <div class="mt-1 ml-0.5">
+                                                    <p class="uppercase text-xs text-gray-600 font-normal p-0" :class="{'text-red-500' : ds.dayofweek === 'Sunday'}">{{ dateToWords(ds.date).substring(0,3) }}</p>
+                                                    <p v-if="set.view ==='WEEKLY'" class="text-xs text-gray-600 font-bold p-0 -mt-1" :class="{'text-red-500' : ds.dayofweek === 'Sunday'}">{{ ds.dayofweek }}</p>
+                                                    <p v-else class="text-xs text-gray-600 font-bold p-0 -mt-1" :class="{'text-red-500' : ds.dayofweek === 'Sunday'}">{{ ds.dayofweek.substring(0,3) }}</p>
+                                                </div>
                                             </div>
-                                         </div>
+                                        </div>
+                                        <div class="text-center xl:hidden lg:hidden md:hidden sm:hidden block">
+                                            <h1 class="text-xs text-gray-600 font-normal mt-1 -mb-1.5">{{ dateToWords(ds.date).substring(0,3) }}</h1>
+                                            <h1 class="uppercase text-sm text-blue-500 font-bold -mb-1.5">{{ dateToWords(ds.date).substring(4,6) }}</h1>
+                                            <h1 class="text-xs text-gray-600 font-normal mb-1">{{ ds.dayofweek.substring(0,3) }}</h1>
+                                        </div>
                                     </div>
-                                    <div class="text-center xl:hidden lg:hidden md:hidden sm:hidden block">
-                                        <h1 class="text-xs text-gray-600 font-normal mt-1 -mb-1.5">{{ dateToWords(ds.date).substring(0,3) }}</h1>
-                                        <h1 class="uppercase text-sm text-blue-500 font-bold -mb-1.5">{{ dateToWords(ds.date).substring(4,6) }}</h1>
-                                        <h1 class="text-xs text-gray-600 font-normal mb-1">{{ ds.dayofweek.substring(0,3) }}</h1>
+                                </th>
+                            </tr>
+                        </thead>
+                        <!-- {{ sortedEmployees }} -->
+                        <tbody>
+                            <tr v-for="(employee, index) in sortedEmployees" :key="employee.id" class="bg-white border-b transition duration-100 ease-in-out hover:bg-blue-50">
+                                <td class="text-right border-x border-slate-200 text-sm px-1.5 w-2">
+                                    <h1>{{ index+1 }}</h1>
+                                </td>
+                                <td class="border border-slate-200 px-2 w-80">
+
+                                    <div class="flex justify-between">
+                                        <h1 class="text-md font-medium py-1">{{ employee.last_name }},  {{ employee.first_name }}</h1>
                                     </div>
-                                </div>
-                            </th>
-                        </tr>
-                    </thead>
-                    <!-- {{ sortedEmployees }} -->
-                    <tbody>
-                        <tr v-for="(employee, index) in sortedEmployees" :key="employee.id" class="bg-white border-b transition duration-100 ease-in-out hover:bg-blue-50">
-                            <td class="text-right border-x border-slate-200 text-sm px-1.5 w-2">
-                                <h1>{{ index+1 }}</h1>
-                            </td>
-                            <td class="border border-slate-200 px-2 w-80">
-
-                                <div class="flex justify-between">
-                                    <h1 class="text-md font-medium py-1">{{ employee.last_name }},  {{ employee.first_name }}</h1>
-                                </div>
-                                <div class="text-sm text-gray-600">
-                                    E-{{padEmployeeId(employee.id) }} | Departament
-                                </div>
-
-
-                            </td>
-
-                            <td v-for="(ds, index) in employee.selectedShift" :key="index" class="w-16 px-0.5 py-2 " >
-                                <div  v-if="ds.schedule_day !== 'n/a'"  @click="setEmpSched('edit', employee, ds.schedule_date, index)" class="relative text-xs cursor-pointer w-full h-14 rounded border border-gray-300 hover:border-blue-500 hover:shadow-lg hover:border-2"
-                                :class="{'font-bold bg-red-200':ds.day_off == 1,'bg-yellow-100':ds.oc == 1,'bg-green-100':ds.oc != 1 && ds.day_off != 1 }">
-                                    <div class=" flex items-center justify-center text-xs w-full h-full">
-
-                                        <h1 v-if="ds.day_off == 1">
-                                            OFF
-                                            <span v-if="ds.oc==1" class="font-bold text-red-500"><br>OC</span>
-                                        </h1>
-                                        <h1 v-else>
-                                            <span>{{ ds.time_from }}</span>
-                                            <span><br>{{ ds.time_to }}</span>
-                                            <span v-if="ds.oc==1" class="font-bold text-red-500"><br>OC</span>
-                                        </h1>
+                                    <div class="text-sm text-gray-600">
+                                        E-{{padEmployeeId(employee.id) }} | Departament
                                     </div>
-                                </div>
-                                <div v-else @click="setEmpSched('shifts', employee, ds.schedule_date, index)" class="relative text-gray-400 text-xs cursor-pointer w-full h-14 rounded border border-gray-300 bg-white hover:text-blue-500 hover:border-blue-500 hover:shadow-lg hover:border-2">
-                                    <div class="flex items-center justify-center w-full h-full">
-                                        <PlusCircleIcon class=" w-5 h-5"/>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-            </table>
 
-            <div class="bg-gray-50 border-b border-x rounded-b-md px-2 py-2">
-                <p class="text-gray-800 text-sm">
-                    <b>Reminders:</b> Please ensure that all personnel schedules are set by the deadline in order to minimise needless disruption. Regards
-                </p>
+
+                                </td>
+
+                                <td v-for="(ds, index) in employee.selectedShift" :key="index" class="w-16 px-0.5 py-2 " >
+                                    <div  v-if="ds.schedule_day !== 'n/a'"  @click="setEmpSched('edit', employee, ds.schedule_date, index)" class="relative text-xs cursor-pointer w-full h-14 rounded border border-gray-300 hover:border-blue-500 hover:shadow-lg hover:border-2"
+                                    :class="{'font-bold bg-red-200':ds.day_off == 1,'bg-yellow-100':ds.oc == 1,'bg-green-100':ds.oc != 1 && ds.day_off != 1 }">
+                                        <div class=" flex items-center justify-center text-xs w-full h-full">
+
+                                            <h1 v-if="ds.day_off == 1">
+                                                OFF
+                                                <span v-if="ds.oc==1" class="font-bold text-red-500"><br>OC</span>
+                                            </h1>
+                                            <h1 v-else>
+                                                <span>{{ ds.time_from }}</span>
+                                                <span><br>{{ ds.time_to }}</span>
+                                                <span v-if="ds.oc==1" class="font-bold text-red-500"><br>OC</span>
+                                            </h1>
+                                        </div>
+                                    </div>
+                                    <div v-else @click="setEmpSched('shifts', employee, ds.schedule_date, index)" class="relative text-gray-400 text-xs cursor-pointer w-full h-14 rounded border border-gray-300 bg-white hover:text-blue-500 hover:border-blue-500 hover:shadow-lg hover:border-2">
+                                        <div class="flex items-center justify-center w-full h-full">
+                                            <PlusCircleIcon class=" w-5 h-5"/>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                </table>
+
+                <div class="bg-gray-50 border-b border-x rounded-b-md px-2 py-2">
+                    <p class="text-gray-800 text-sm">
+                        <b>Reminders:</b> Please ensure that all personnel schedules are set by the deadline in order to minimise needless disruption. Regards
+                    </p>
+                </div>
             </div>
         </div>
 
