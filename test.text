@@ -1,0 +1,30 @@
+php artisan make:model ShiftSetup -mcr
+php artisan make:model DivisionShiftSetup -mcr
+php artisan make:model DepartmentShiftSetup -mcr
+php artisan make:model SubDepartmentShiftSetup -mcr
+php artisan make:model SubDepartmentUnitShiftSetup -mcr
+
+Schema::create('sub_department_shift_setups', function (Blueprint $table) {
+            $table->id();
+            $table->foreignIdFor(SubDepartment::class)->constrained('sub_departments');
+            $table->foreignIdFor(ShiftSetup::class)->constrained('shift_setups');
+            $table->tinyInteger('is_active')->default(1);
+            $table->string('created_by')->nullable();
+            $table->string('updated_by')->nullable();
+            $table->string('deleted_by')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+Schema::create('shift_setups', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->smallInteger('first_start_date')->nullable();
+            $table->smallInteger('second_start_date')->nullable();
+            $table->tinyInteger('is_active')->default(1);
+            $table->string('created_by')->nullable();
+            $table->string('updated_by')->nullable();
+            $table->string('deleted_by')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+        });

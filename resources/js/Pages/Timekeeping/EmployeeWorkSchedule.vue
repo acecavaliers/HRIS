@@ -59,19 +59,19 @@
                                         </div>
                                         <div v-for="(data, index) in filteredDataCollections[item]" :key="data.id" class="py-1">
                                             <MenuItem v-slot="{ active }" v-if="data.subData.length> 0" >
-                                                <a  @click="showDept(item, data.name,data.subData,data.id)"
+                                                <a  @click="showDept(item, data)"
                                                     class="cursor-pointer"
                                                     :class="[active ? 'bg-blue-500 text-white' : 'text-gray-700', 'block px-4 py-1 text-sm',]"
                                                 >
-                                                    {{ data.name }}
+                                                    {{ data.id }} - {{ data.name }}
                                                 </a>
                                             </MenuItem>
                                             <MenuItem v-slot="{ active }" v-else >
-                                                <a  @click="modalClose(item, data.name, data.id)"
+                                                <a  @click="modalClose(item, data)"
                                                     class="cursor-pointer"
                                                     :class="[active ? 'bg-blue-500 text-white' : 'text-gray-700', 'block px-4 py-1 text-sm',]"
                                                 >
-                                                    {{ data.name }}
+                                                    {{ data.id }} - {{ data.name }}
                                                 </a>
                                             </MenuItem>
                                         </div>
@@ -150,8 +150,8 @@
                 </div>
             </div>
             <div class="flex items-center justify-between bg-gray-200 mt-2 border-t border-x rounded-t-md px-2 py-2">
-                <h1 class="text-gray-800 text-sm font-medium">
-                    Workshift Period: <b>{{dateToWords( ews.period_from) }} </b> - <b>{{ dateToWords(ews.period_to) }},  {{ ews.period_to.substring(0,4) }}</b>
+                <h1 class="text-gray-800 text-sm font-medium"> DDDDDDD
+                    <!-- Workshift Period: <b>{{dateToWords( ews.period_from) }} </b> - <b>{{ dateToWords(ews.period_to) }},  {{ ews.period_to.substring(0,4) }}</b> -->
                 </h1>
                 <span class="text-gray-800 text-xs font-bold ">
                     <span class="border-gray-300 bg-yellow-200 px-2 py-1.5 rounded-l-md">On-Call</span>
@@ -184,7 +184,7 @@
                                             </h1>
                                             <div class="mt-1 ml-0.5">
                                                 <p class="uppercase text-xs text-gray-600 font-normal p-0" :class="{'text-red-500' : ds.dayofweek === 'Sunday'}">{{ dateToWords(ds.date).substring(0,3) }}</p>
-                                                <p v-if="set.view !=='payroll'" class="text-xs text-gray-600 font-bold p-0 -mt-1" :class="{'text-red-500' : ds.dayofweek === 'Sunday'}">{{ ds.dayofweek }}</p>
+                                                <p v-if="set.view ==='WEEKLY'" class="text-xs text-gray-600 font-bold p-0 -mt-1" :class="{'text-red-500' : ds.dayofweek === 'Sunday'}">{{ ds.dayofweek }}</p>
                                                 <p v-else class="text-xs text-gray-600 font-bold p-0 -mt-1" :class="{'text-red-500' : ds.dayofweek === 'Sunday'}">{{ ds.dayofweek.substring(0,3) }}</p>
                                             </div>
                                          </div>
@@ -618,7 +618,6 @@ export default {
 
         viewAs(type){
             this.set.view = type;
-            this.set.view = type;
             this.generatePayrollDays();
             if (this.selected.divisions !== 'Select divisions'){
                 this.getEmployee(this.search.currentType, this.search.currentID);
@@ -704,7 +703,7 @@ export default {
             }
         },
 
-        showDept(type, div_name, depts, div_id) {
+        showDept(type, data) {
             const typeMapping = {
                 'divisions': {
                     collection: 'departments',
@@ -726,12 +725,14 @@ export default {
             if (typeMapping[type]) {
                 const { collection, selected, callback } = typeMapping[type];
 
-                this.dataCollections[collection] = depts;
-                this.selected[selected] = div_name;
+                this.dataCollections[collection] = data.subData;
+                this.selected[selected] = data.name;
                 this.search.currentType = type;
-                this.search.currentID = div_id;
-                this.getWorkShifts(type, div_id);
-                this.getEmployee(type, div_id);
+                this.search.currentID = data.id;
+                console.log('shiftSetup',data.shiftSetup)
+                this.generatePayrollDays('',data.shiftSetup);
+                this.getWorkShifts(type, data.id);
+                this.getEmployee(type, data.id);
 
                 if (callback) {
                     callback(type);
@@ -746,7 +747,7 @@ export default {
             }
         },
 
-        modalClose(type, selected, id) {
+        modalClose(type, data) {
             const clearDataCollections = (collections) => {
                 collections.forEach(collection => {
                     this.dataCollections[collection] = [];
@@ -777,7 +778,7 @@ export default {
             if (typeActions[type]) {
                 const { selectedField, clearCollections, close } = typeActions[type];
                 if (selectedField) {
-                    this.selected[selectedField] = selected;
+                    this.selected[selectedField] = data.name;
                 }
                 if (clearCollections) {
                     clearDataCollections(clearCollections);
@@ -787,9 +788,11 @@ export default {
                     this.employeeIds = [];
                 } else {
                     this.search.currentType = type;
-                    this.search.currentID = id;
-                    this.getWorkShifts(type, id);
-                    this.getEmployee(type, id);
+                    this.search.currentID = data.id;
+                    console.log('shiftSetup',data.shiftSetup)
+                    this.generatePayrollDays('',data.shiftSetup);
+                    this.getWorkShifts(type, data.id);
+                    this.getEmployee(type, data.id);
                 }
             }
             this.periodDates = [];
@@ -805,32 +808,57 @@ export default {
                     axios.get(route('employeeworkschedule.getDept')),
                     axios.get(route('employeeworkschedule.getDivisions'))
                 ]);
+
                 // Process the sub_department_units
                 const subDepartmentUnits = subDeptUnitsResponse.data.map(val => ({
                     id: val.id,
                     name: val.name,
                     sub_department_id: Number(val.sub_department_id),
-                    subData: []
+                    subData: [],
+                    shiftSetup: {
+                        name: val.shift_setup_name,
+                        with_start_date: val.with_start_date,
+                        first_start_date: val.first_start_date,
+                        second_start_date: val.second_start_date
+                    }
                 }));
                 // Process the sub_departments and link them with sub_department_units
                 const subDepartments = subDeptsResponse.data.map(val => ({
                     id: val.id,
                     name: val.name,
                     department_id: Number(val.department_id),
-                    subData: subDepartmentUnits.filter(unit => unit.sub_department_id === val.id)
+                    subData: subDepartmentUnits.filter(unit => unit.sub_department_id === val.id),
+                    shiftSetup: {
+                        name: val.shift_setup_name,
+                        with_start_date: val.with_start_date,
+                        first_start_date: val.first_start_date,
+                        second_start_date: val.second_start_date
+                    }
                 }));
                 // Process the departments and link them with sub_departments
                 const departments = deptsResponse.data.map(val => ({
                     id: val.id,
                     name: val.name,
                     division_id: Number(val.division_id),
-                    subData: subDepartments.filter(subDept => subDept.department_id === val.id)
+                    subData: subDepartments.filter(subDept => subDept.department_id === val.id),
+                    shiftSetup: {
+                        name: val.shift_setup_name,
+                        with_start_date: val.with_start_date,
+                        first_start_date: val.first_start_date,
+                        second_start_date: val.second_start_date
+                    }
                 }));
                 // Process the divisions and link them with departments
                 const divisions = divisionsResponse.data.map(val => ({
                     id: val.id,
                     name: val.name,
-                    subData: departments.filter(dept => dept.division_id === val.id)
+                    subData: departments.filter(dept => dept.division_id === val.id),
+                    shiftSetup: {
+                        name: val.shift_setup_name,
+                        with_start_date: val.with_start_date,
+                        first_start_date: val.first_start_date,
+                        second_start_date: val.second_start_date
+                    }
                 }));
                 // Update the data collections
                 this.dataCollections = {
@@ -839,6 +867,10 @@ export default {
                     departments: departments,
                     divisions: divisions
                 };
+                console.log('DIVVVV', this.dataCollections.divisions);
+                console.log('DEEPPP', this.dataCollections.departments);
+                console.log('SUBDEP', this.dataCollections.sub_departments);
+                console.log('SBDEPU', this.dataCollections.sub_department_units);
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -903,37 +935,43 @@ export default {
                 day: '2-digit',
             });
         },
-        generatePayrollDays(dd) {
+        generatePayrollDays(dd, data) {
             this.days = [];
             let currentDate;
-            dd = '2024-07-21'
+            // dd = '2024-07-21'
             if (dd === '' || dd === null || dd === undefined) {
                 currentDate = new Date();
             } else {
                 currentDate = new Date(dd);
             }
             this.currentDate = currentDate;
-            this.updatePayrollDays();
+            this.set.view = data.name;
+            this.updatePayrollDays(data);
         },
 
-        updatePayrollDays() {
+        updatePayrollDays(data) {
             const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-            if (this.set.view === 'payroll'){
+            console.log(data);
+            if (data.with_start_date !== '0'){
                 const currentDate = this.currentDate;
                 const currentDay = currentDate.getDate();
                 const currentMonth = currentDate.getMonth() + 1;
                 const currentYear = currentDate.getFullYear();
+                const s_a = data.first_start_date;
+                const s_b = data.second_start_date - 1;
+                const e_a = data.second_start_date;
+                const e_b = data.first_start_date -1;
                 this.days = [];
-                if (currentDay >= this.periodSetting.s_a && currentDay <= this.periodSetting.s_b) {
+                if (currentDay >= s_a && currentDay <= s_b) {
                     const lastDayOfCurrentMonth = new Date(currentYear, currentMonth, 0).getDate();
-                    for (let i = this.periodSetting.e_a; i <= lastDayOfCurrentMonth; i++) {
+                    for (let i = e_a; i <= lastDayOfCurrentMonth; i++) {
                         const date = new Date(currentYear, currentMonth - 1, i);
                         this.days.push({
                             date: this.formatDate(date),
                             dayofweek: weekdays[date.getDay()]
                         });
                     }
-                    for (let i = 1; i <= this.periodSetting.e_b; i++) {
+                    for (let i = 1; i <= e_b; i++) {
                         const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
                         const nextYear = currentMonth === 12 ? currentYear + 1 : currentYear;
                         const date = new Date(nextYear, nextMonth - 1, i);
@@ -942,10 +980,10 @@ export default {
                             dayofweek: weekdays[date.getDay()]
                         });
                     }
-                } else if (currentDay >= this.periodSetting.e_a) {
+                } else if (currentDay >= e_a) {
                     const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
                     const nextYear = currentMonth === 12 ? currentYear + 1 : currentYear;
-                    for (let i = this.periodSetting.s_a; i <= this.periodSetting.s_b; i++) {
+                    for (let i = s_a; i <= s_b; i++) {
                         const date = new Date(nextYear, nextMonth - 1, i);
                         this.days.push({
                             date: this.formatDate(date),
@@ -953,7 +991,7 @@ export default {
                         });
                     }
                 } else {
-                    for (let i = this.periodSetting.s_a; i <= this.periodSetting.s_b; i++) {
+                    for (let i = s_a; i <= s_b; i++) {
                         const date = new Date(currentYear, currentMonth - 1, i);
                         this.days.push({
                             date: this.formatDate(date),
@@ -1035,7 +1073,7 @@ export default {
 
     created(){
         this.getDepartments();
-        this.generatePayrollDays();
+        // this.generatePayrollDays();
     },
 
     mounted() {

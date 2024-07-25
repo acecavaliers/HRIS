@@ -22,46 +22,106 @@ use Inertia\Inertia;
 
 class EmployeeWorkScheduleController extends Controller
 {
-    public function index(){
+    public function index()
+    {
 
         return Inertia::render('Timekeeping/EmployeeWorkSchedule');
     }
-    public function getDivisions(Request $request){
+    public function getDivisions(Request $request)
+    {
 
-        $query = Division::where('is_active','1')->get();
-                            // ->get('name','id','division_id');
-        return $query;
-
-        //         $query = Division::with('departmets')->where('is_active', 1)->get();
-
+        // $query = Division::where('is_active', '1')->get();
+        // // ->get('name','id','division_id');
         // return $query;
 
-    }
+        $query = Division::select(
+            'divisions.id',
+            'divisions.code',
+            'divisions.short_name',
+            'divisions.name',
+            'shift_setups.name as shift_setup_name',
+            'shift_setups.with_start_date',
+            'shift_setups.first_start_date',
+            'shift_setups.second_start_date'
+        )
+            ->join('division_shift_setups', 'divisions.id', '=', 'division_shift_setups.division_id')
+            ->join('shift_setups', 'division_shift_setups.shift_setup_id', '=', 'shift_setups.id')
+            ->where('division_shift_setups.is_active', 1)
+            ->where('shift_setups.is_active', 1)
+            ->get();
 
-    public function getDept(Request $request){
-
-        $query = Department::where('is_active','1')
-                            // ->where('division_id', $request->divID)
-                            ->get();
-                            // ->get(['id','name','division_id','short_name']);
         return $query;
     }
 
-    public function getSubDept(Request $request){
+    public function getDept(Request $request)
+    {
 
-        $query = SubDepartment::where('is_active','1')
-                            // ->where('division_id', $request->divID)
-                            ->get();
-                            // ->get(['id','name','division_id','short_name']);
+        // $query = Department::where('is_active', '1')
+        //     ->get();
+        $query = Department::select(
+            'departments.id',
+            'division_id',
+            'departments.code',
+            'departments.short_name',
+            'departments.name',
+            'shift_setups.name as shift_setup_name',
+            'shift_setups.with_start_date',
+            'shift_setups.first_start_date',
+            'shift_setups.second_start_date'
+        )
+            ->join('department_shift_setups', 'departments.id', '=', 'department_shift_setups.department_id')
+            ->join('shift_setups', 'department_shift_setups.shift_setup_id', '=', 'shift_setups.id')
+            ->where('department_shift_setups.is_active', 1)
+            ->where('shift_setups.is_active', 1)
+            ->get();
         return $query;
     }
 
-    public function getSubDeptUnit(Request $request){
+    public function getSubDept(Request $request)
+    {
 
-        $query = SubDepartmentUnit::where('is_active','1')
-                            // ->where('division_id', $request->divID)
-                            ->get();
-                            // ->get(['id','name','division_id','short_name']);
+        // $query = SubDepartment::where('is_active', '1')
+        //     ->get();
+        $query = SubDepartment::select(
+            'sub_departments.id',
+            'department_id',
+            'sub_departments.code',
+            'sub_departments.short_name',
+            'sub_departments.name',
+            'shift_setups.name as shift_setup_name',
+            'shift_setups.with_start_date',
+            'shift_setups.first_start_date',
+            'shift_setups.second_start_date'
+        )
+            ->join('sub_department_shift_setups', 'sub_departments.id', '=', 'sub_department_shift_setups.sub_department_id')
+            ->join('shift_setups', 'sub_department_shift_setups.shift_setup_id', '=', 'shift_setups.id')
+            ->where('sub_department_shift_setups.is_active', 1)
+            ->where('shift_setups.is_active', 1)
+            ->get();
+        return $query;
+    }
+
+    public function getSubDeptUnit(Request $request)
+    {
+
+        // $query = SubDepartmentUnit::where('is_active', '1')
+        //     ->get();
+        $query = SubDepartmentUnit::select(
+            'sub_department_units.id',
+            'sub_department_id',
+            'sub_department_units.code',
+            'sub_department_units.short_name',
+            'sub_department_units.name',
+            'shift_setups.name as shift_setup_name',
+            'shift_setups.with_start_date',
+            'shift_setups.first_start_date',
+            'shift_setups.second_start_date'
+        )
+            ->join('sub_department_unit_shift_setups', 'sub_department_units.id', '=', 'sub_department_unit_shift_setups.sub_department_unit_id')
+            ->join('shift_setups', 'sub_department_unit_shift_setups.shift_setup_id', '=', 'shift_setups.id')
+            ->where('sub_department_unit_shift_setups.is_active', 1)
+            ->where('shift_setups.is_active', 1)
+            ->get();
         return $query;
     }
 
@@ -73,16 +133,18 @@ class EmployeeWorkScheduleController extends Controller
             $arr['oc'] = $arr['oc'] ? 1 : 0;
 
             $workshiftDetails = EmployeeWorkshiftsDetail::where('employee_workshift_id', $id)
-                        ->where('schedule_date', $arr['schedule_date'])
-                        ->where('employee_workshifts_details.is_active',1)
-                        ->first();
+                ->where('schedule_date', $arr['schedule_date'])
+                ->where('employee_workshifts_details.is_active', 1)
+                ->first();
 
             $rowsUpdated = 0;
 
             if ($workshiftDetails) {
-                if ($workshiftDetails->day_off != $arr['day_off'] ||
+                if (
+                    $workshiftDetails->day_off != $arr['day_off'] ||
                     $workshiftDetails->oc != $arr['oc'] ||
-                    $workshiftDetails->work_shift_id != $arr['work_shift_id']) {
+                    $workshiftDetails->work_shift_id != $arr['work_shift_id']
+                ) {
                     // Update the workshift detail
                     $workshiftDetails->day_off = $arr['day_off'];
                     $workshiftDetails->oc = $arr['oc'];
@@ -108,7 +170,7 @@ class EmployeeWorkScheduleController extends Controller
             //     }
             // }
 
-            return 'success' ;
+            return 'success';
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to update workshift detail.'], 500);
         }
@@ -160,15 +222,15 @@ class EmployeeWorkScheduleController extends Controller
     private function findExistingWorkshift($arr)
     {
         return EmployeeWorkshift::where('employee_id', $arr['employee_id'])
-            ->where(function($query) use ($arr) {
-                $query->where(function($subQuery) use ($arr) {
+            ->where(function ($query) use ($arr) {
+                $query->where(function ($subQuery) use ($arr) {
                     $subQuery->where('period_from', '<=', $arr['period_from'])
-                             ->where('period_to', '>=', $arr['period_from']);
+                        ->where('period_to', '>=', $arr['period_from']);
                 })
-                ->orWhere(function($subQuery) use ($arr) {
-                    $subQuery->where('period_from', '<=', $arr['period_to'])
-                             ->where('period_to', '>=', $arr['period_to']);
-                });
+                    ->orWhere(function ($subQuery) use ($arr) {
+                        $subQuery->where('period_from', '<=', $arr['period_to'])
+                            ->where('period_to', '>=', $arr['period_to']);
+                    });
 
                 // $query->whereBetween($arr['period_from'], [$arr['period_from'], $arr['period_to']])
                 // ->orWhereBetween('period_to', [$arr['period_from'], $arr['period_to']]);
@@ -200,7 +262,7 @@ class EmployeeWorkScheduleController extends Controller
         if ($setby < 1) {
             $existingDetail = EmployeeWorkshiftsDetail::where('employee_workshift_id', $existingWorkshift->id)
                 ->where('schedule_date', $shift['schedule_date'])
-                ->where('employee_workshifts_details.is_active',1)
+                ->where('employee_workshifts_details.is_active', 1)
                 ->first();
             if (!$existingDetail) {
                 $shift['employee_workshift_id'] = $existingWorkshift->id;
@@ -209,10 +271,10 @@ class EmployeeWorkScheduleController extends Controller
                 EmployeeWorkshiftsDetail::create($shift);
             }
         } else {
-            $filteredShiftDates = array_filter($shiftDates, function($shifts) use ($existingWorkshift) {
+            $filteredShiftDates = array_filter($shiftDates, function ($shifts) use ($existingWorkshift) {
                 return !EmployeeWorkshiftsDetail::where('employee_workshift_id', $existingWorkshift->id)
                     ->where('schedule_date', $shifts['schedule_date'])
-                    ->where('employee_workshifts_details.is_active',1)
+                    ->where('employee_workshifts_details.is_active', 1)
                     ->exists();
             });
 
@@ -256,11 +318,11 @@ class EmployeeWorkScheduleController extends Controller
             'employee_work_assignments.sub_department_id',
             'employee_work_assignments.sub_department_unit_id',
         ])
-        ->join('employee_work_assignments', 'employees.id', '=', 'employee_work_assignments.employee_id')
+            ->join('employee_work_assignments', 'employees.id', '=', 'employee_work_assignments.employee_id')
 
-        ->where('employee_work_assignments.is_active', 1)
-        ->where("employee_work_assignments.$column", $request->searchId)
-        ->get();
+            ->where('employee_work_assignments.is_active', 1)
+            ->where("employee_work_assignments.$column", $request->searchId)
+            ->get();
 
         $query->map(function ($employee) use ($request) {
             $workshiftDetails = DB::table('employee_workshifts_details')
@@ -279,15 +341,15 @@ class EmployeeWorkScheduleController extends Controller
                     'work_shifts.time_from',
                     'work_shifts.time_to',
                 ])
-                ->join('employee_workshifts', function($join){
+                ->join('employee_workshifts', function ($join) {
                     $join->on('employee_workshift_id', '=', 'employee_workshifts.id');
                 })
-                ->join('work_shifts', function($join) {
+                ->join('work_shifts', function ($join) {
                     $join->on('employee_workshifts_details.work_shift_id', '=', 'work_shifts.id');
                 })
                 ->whereBetween('schedule_date', [$request->dateFrom, $request->dateTo])
-                ->where('employee_workshifts.employee_id',$employee->id)
-                ->where('employee_workshifts_details.is_active',1)
+                ->where('employee_workshifts.employee_id', $employee->id)
+                ->where('employee_workshifts_details.is_active', 1)
                 // ->where('employee_workshift_id', $employee->workshift_id)
                 ->get();
 
@@ -351,6 +413,4 @@ class EmployeeWorkScheduleController extends Controller
 
         return response()->json($formattedShifts);
     }
-
-
 }
