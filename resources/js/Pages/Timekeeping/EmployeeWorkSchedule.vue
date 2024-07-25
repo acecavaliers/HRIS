@@ -108,9 +108,9 @@
                 <table class="table-auto w-full border-collapse border-r border-slate-300 ">
                         <thead>
                             <tr class="bg-gray-50 border pb-1 pt-1">
-                                <th class="w-2 border-r">
+                                <!-- <th class="w-2 border-r">
                                     <div class="text-right text-sm px-2 text-gray-600 ">No.</div>
-                                </th>
+                                </th> -->
                                 <th class="w-80">
                                     <div class="text-left xl:block lg:block md:block sm:block hidden">
                                         <div class="text-sm px-2 text-gray-600 ">Employee</div>
@@ -146,9 +146,9 @@
                         <!-- {{ sortedEmployees }} -->
                         <tbody>
                             <tr v-for="(employee, index) in sortedEmployees" :key="employee.id" class="bg-white border-b transition duration-100 ease-in-out hover:bg-blue-50">
-                                <td class="text-right border-x border-slate-200 text-sm px-1.5 w-2">
+                                <!-- <td class="text-right border-x border-slate-200 text-sm px-1.5 w-2">
                                     <h1>{{ index+1 }}</h1>
-                                </td>
+                                </td> -->
                                 <td class="border border-slate-200 px-2 w-80">
 
                                     <div class="flex justify-between">
