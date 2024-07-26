@@ -120,24 +120,24 @@
                                             <div class="text-xs px-2">Employee Name</div>
                                         </div>
                                     </th>
-                                    <th v-for="ds in days" class="w-16 ps-1.5 border">
+                                    <th v-for="ds in days" class="w-16 ps-1.5 border" :class="{'text-red-500' : ds.dayofweek === 'Sunday', 'text-stone-600' : ds.dayofweek !== 'Sunday'}">
 
                                         <div class="w-16">
                                             <div class="text-left xl:block lg:block md:block sm:block hidden">
                                                 <div class="flex jsutify-start">
-                                                    <h1 class="text-3xl text-blue-500 font-bold" :class="{'text-red-500' : ds.dayofweek === 'Sunday'}">
+                                                    <h1 class="text-3xl font-bold" >
                                                         {{ dateToWords(ds.date).substring(4,6) }}
                                                     </h1>
                                                     <div class="mt-1 ml-0.5">
-                                                        <p class="uppercase text-xs text-gray-600 font-normal p-0" :class="{'text-red-500' : ds.dayofweek === 'Sunday'}">{{ dateToWords(ds.date).substring(0,3) }}</p>
-                                                        <p v-if="set.view ==='WEEKLY'" class="text-xs text-gray-600 font-bold p-0 -mt-1" :class="{'text-red-500' : ds.dayofweek === 'Sunday'}">{{ ds.dayofweek }}</p>
-                                                        <p v-else class="text-xs text-gray-600 font-bold p-0 -mt-1" :class="{'text-red-500' : ds.dayofweek === 'Sunday'}">{{ ds.dayofweek.substring(0,3) }}</p>
+                                                        <p class="uppercase text-xs text-gray-600 font-normal p-0" >{{ dateToWords(ds.date).substring(0,3) }}</p>
+                                                        <p v-if="set.view ==='WEEKLY'" class="text-xs text-gray-600 font-bold p-0 -mt-1" >{{ ds.dayofweek }}</p>
+                                                        <p v-else class="text-xs text-gray-600 font-bold p-0 -mt-1" >{{ ds.dayofweek.substring(0,3) }}</p>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="text-center xl:hidden lg:hidden md:hidden sm:hidden block">
                                                 <h1 class="text-xs text-gray-600 font-normal mt-1 -mb-1.5">{{ dateToWords(ds.date).substring(0,3) }}</h1>
-                                                <h1 class="uppercase text-sm text-blue-500 font-bold -mb-1.5">{{ dateToWords(ds.date).substring(4,6) }}</h1>
+                                                <h1 class="uppercase text-sm font-bold -mb-1.5">{{ dateToWords(ds.date).substring(4,6) }}</h1>
                                                 <h1 class="text-xs text-gray-600 font-normal mb-1">{{ ds.dayofweek.substring(0,3) }}</h1>
                                             </div>
                                         </div>
@@ -146,7 +146,7 @@
                             </thead>
                             <!-- {{ sortedEmployees }} -->
                             <tbody>
-                                <tr v-for="(employee, index) in sortedEmployees" :key="employee.id" class="bg-white border-b transition duration-100 ease-in-out hover:bg-blue-50">
+                                <tr v-for="(employee, index) in sortedEmployees" :key="employee.id" class="bg-white border-b transition duration-100 ease-in-out hover:bg-sky-50">
                                     <td class="border border-slate-200 px-2 w-80">
 
                                         <div class="flex justify-between">
@@ -158,7 +158,7 @@
                                     </td>
 
                                     <td v-for="(ds, index) in employee.selectedShift" :key="index" class="w-16 px-0.5 py-2 " >
-                                        <div  v-if="ds.schedule_day !== 'n/a'"  @click="setEmpSched('edit', employee, ds.schedule_date, index)" class="relative text-xs cursor-pointer w-full h-14 rounded border border-gray-300 hover:border-blue-500 hover:shadow-lg hover:border-2"
+                                        <div  v-if="ds.schedule_day !== 'n/a'"  @click="setEmpSched('edit', employee, ds.schedule_date, index)" class="relative text-xs cursor-pointer w-full h-14 rounded border border-gray-300 hover:border-sky-500 hover:shadow-lg hover:border-2"
                                         :class="{'font-bold bg-red-200':ds.day_off == 1,'bg-yellow-100':ds.oc == 1,'bg-green-100':ds.oc != 1 && ds.day_off != 1 }">
                                             <div class=" flex items-center justify-center text-xs w-full h-full">
                                                 <h1 v-if="ds.day_off == 1">
@@ -172,7 +172,7 @@
                                                 </h1>
                                             </div>
                                         </div>
-                                        <div v-else @click="setEmpSched('shifts', employee, ds.schedule_date, index)" class="relative text-gray-400 text-xs cursor-pointer w-full h-14 rounded border border-gray-300 bg-white hover:text-blue-500 hover:border-blue-500 hover:shadow-lg hover:border-2">
+                                        <div v-else @click="setEmpSched('shifts', employee, ds.schedule_date, index)" class="relative text-gray-400 text-xs cursor-pointer w-full h-14 rounded border border-gray-300 bg-white hover:text-blue-500 hover:border-sky-500 hover:shadow-lg hover:border-2">
                                             <div class="flex items-center justify-center w-full h-full">
                                                 <PlusCircleIcon class=" w-5 h-5"/>
                                             </div>
