@@ -4,387 +4,385 @@
         <template #header>
              <h2 class="font-semibold text-xl text-gray-800 leading-tight">EMPLOYEE WORKSHIFT</h2>
         </template>
-        <Breadcrumbs :pages="breadcrumbspages"></Breadcrumbs>
+        <Breadcrumbs :pages="breadcrumbspages">
+        </Breadcrumbs>
+        <div class="flex justify-end">
+            <input type="text" v-model="role" class="w-16 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="Role"/>
+        </div>
 
-        <!-- CONTENT -->
-        <div class="grid grid-cols-4">
-            <div v-for="item in menu" :key="item"  class="py-1">
-                <div class="p-4 text-sm w-full">
-                    <div class="w-full">
-                        <p class="  pr-2 f-14 text-gray-800 font-medium px-1 d-flex uppercase">{{ replace(item,'_','-') }}:</p>
-                        <div class="w-full relative inline-block">
-                            <Menu as="div" class="relative">
-                                <MenuButton
-                                    type="button"
-                                    class="flex items-center justify-between text-left text-xs gap-x-1.5 w-full rounded-md px-3 py-2 text-sm font-semibold hadow-sm ring-1 ring-inset ring-gray-300"
 
+        <!-- CONTENT manager-->
+         <div>
+            <div v-if="role == 1" class="grid grid-cols-4 border-y">
+                <div v-for="item in menu" :key="item"  class="py-1">
+                    <div class="p-4 text-sm w-full">
+                        <div class="w-full">
+                            <p class="  pr-2 f-14 text-gray-800 font-medium px-1 d-flex uppercase">{{ replace(item,'_','-') }}:</p>
+                            <div class="w-full relative inline-block">
+                                <Menu as="div" class="relative">
+                                    <MenuButton
+                                        type="button"
+                                        class="flex items-center justify-between text-left text-xs gap-x-1.5 w-full rounded-md px-3 py-2 text-sm font-semibold hadow-sm ring-1 ring-inset ring-gray-300"
+
+                                        >
+                                        {{ selected[item] }}
+                                        <ChevronDownIcon
+                                            class="-mr-1 h-5 w-5 text-gray-400"
+                                            aria-hidden="true"
+                                        />
+                                    </MenuButton>
+
+                                    <transition
+                                        enter-active-class="transition ease-out duration-100"
+                                        enter-from-class="transform opacity-0 scale-95"
+                                        enter-to-class="transform opacity-100 scale-100"
+                                        leave-active-class="transition ease-in duration-75"
+                                        leave-from-class="transform opacity-100 scale-100"
+                                        leave-to-class="transform opacity-0 scale-95"
                                     >
-                                    {{ selected[item] }}
-                                    <ChevronDownIcon
-                                        class="-mr-1 h-5 w-5 text-gray-400"
-                                        aria-hidden="true"
-                                    />
-                                </MenuButton>
-
-                                <transition
-                                    enter-active-class="transition ease-out duration-100"
-                                    enter-from-class="transform opacity-0 scale-95"
-                                    enter-to-class="transform opacity-100 scale-100"
-                                    leave-active-class="transition ease-in duration-75"
-                                    leave-from-class="transform opacity-100 scale-100"
-                                    leave-to-class="transform opacity-0 scale-95"
-                                >
-                                    <MenuItems
-                                        class="absolute right-0 z-10 mt-3 w-full max-h-80 origin-top-right overflow-auto rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-                                    >
-                                        <div class="sticky top-0 bg-white z-20 px-2 py-2 border-b">
-                                            <input
-                                                v-model="searchQueries[item]"
-                                                type="text"
-                                                placeholder="Search..."
-                                                class="pr-7 uppercase block w-full px-2 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                            />
-                                            <span>
-                                                <button
-                                                    v-if="searchQueries[item]"
-                                                    @click="clearSearch(item)"
-                                                    class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
-                                                >
-                                                    <XCircleIcon class="h-5 w-5"/>
-                                                </button>
-                                                <span v-else class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 focus:outline-none">
-                                                    <MagnifyingGlassIcon class="h-5 w-5"/>
+                                        <MenuItems
+                                            class="absolute right-0 z-10 mt-3 w-full max-h-80 origin-top-right overflow-auto rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                        >
+                                            <div class="sticky top-0 bg-white z-20 px-2 py-2 border-b">
+                                                <input
+                                                    v-model="searchQueries[item]"
+                                                    type="text"
+                                                    placeholder="Search..."
+                                                    class="pr-7 uppercase block w-full px-2 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                                />
+                                                <span>
+                                                    <button
+                                                        v-if="searchQueries[item]"
+                                                        @click="clearSearch(item)"
+                                                        class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                                                    >
+                                                        <XCircleIcon class="h-5 w-5"/>
+                                                    </button>
+                                                    <span v-else class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 focus:outline-none">
+                                                        <MagnifyingGlassIcon class="h-5 w-5"/>
+                                                    </span>
                                                 </span>
-                                            </span>
-                                        </div>
-                                        <div v-for="(data, index) in filteredDataCollections[item]" :key="data.id" class="py-1">
-                                            <MenuItem v-slot="{ active }" v-if="data.subData.length> 0" >
-                                                <a  @click="showDept(item, data)"
-                                                    class="cursor-pointer"
-                                                    :class="[active ? 'bg-blue-500 text-white' : 'text-gray-700', 'block px-4 py-1 text-sm',]"
-                                                >
-                                                    {{ data.id }} - {{ data.name }}
-                                                </a>
-                                            </MenuItem>
-                                            <MenuItem v-slot="{ active }" v-else >
-                                                <a  @click="modalClose(item, data)"
-                                                    class="cursor-pointer"
-                                                    :class="[active ? 'bg-blue-500 text-white' : 'text-gray-700', 'block px-4 py-1 text-sm',]"
-                                                >
-                                                    {{ data.id }} - {{ data.name }}
-                                                </a>
-                                            </MenuItem>
-                                        </div>
-                                        <div v-if="filteredDataCollections[item].length <1 && searchQueries[item] !== ''" class="px-2 py-2 text-xs">
-                                            <h1>No search result for <i>{{ replace(item,'_','-') }}</i></h1>
-                                        </div>
-                                    </MenuItems>
-                                </transition>
-                            </Menu>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <hr>
-        <div class="p-4">
-
-            <div class="flex justify-end">
-                <input type="text" v-model="role" class="w-16 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="Role"/>
-            </div>
-            <div v-if="days.length>0">
-                <div class="flex items-center justify-between bg-gray-200 mt-2 border-t border-x rounded-t-md px-2 py-2">
-                    <h1 class="text-gray-800 text-sm font-medium">
-                        Workshift Period: <b>{{dateToWords( ews.period_from) }} </b> - <b>{{ dateToWords(ews.period_to) }},  {{ ews.period_to.substring(0,4) }}</b>
-                    </h1>
-                    <span class="text-gray-800 text-xs font-bold ">
-                        <span class="border-gray-300 bg-yellow-200 px-2 py-1.5 rounded-l-md">On-Call</span>
-                        <span class="border-gray-300 bg-red-300 px-2 py-1.5 ">Day Off</span>
-                        <span class="border-gray-300 bg-green-200 px-2 py-1.5 rounded-r-md">On-duty</span>
-                    </span>
-                </div>
-
-                <table class="table-auto w-full border-collapse border-r border-slate-300 ">
-                        <thead>
-                            <tr class="bg-gray-50 border pb-1 pt-1">
-                                <!-- <th class="w-2 border-r">
-                                    <div class="text-right text-sm px-2 text-gray-600 ">No.</div>
-                                </th> -->
-                                <th class="w-80">
-                                    <div class="text-left xl:block lg:block md:block sm:block hidden">
-                                        <div class="text-sm px-2 text-gray-600 ">Employee</div>
-                                    </div>
-                                    <div class="text-left xl:hidden lg:hidden md:hidden sm:hidden block">
-                                        <div class="text-xs px-2">Employee Name</div>
-                                    </div>
-                                </th>
-                                <th v-for="ds in days" class="w-16 border">
-
-                                    <div class="w-16">
-                                        <div class="text-left xl:block lg:block md:block sm:block hidden">
-                                            <div class="flex jsutify-start">
-                                                <h1 class="text-3xl text-blue-500 font-bold" :class="{'text-red-500' : ds.dayofweek === 'Sunday'}">
-                                                    {{ dateToWords(ds.date).substring(4,6) }}
-                                                </h1>
-                                                <div class="mt-1 ml-0.5">
-                                                    <p class="uppercase text-xs text-gray-600 font-normal p-0" :class="{'text-red-500' : ds.dayofweek === 'Sunday'}">{{ dateToWords(ds.date).substring(0,3) }}</p>
-                                                    <p v-if="set.view ==='WEEKLY'" class="text-xs text-gray-600 font-bold p-0 -mt-1" :class="{'text-red-500' : ds.dayofweek === 'Sunday'}">{{ ds.dayofweek }}</p>
-                                                    <p v-else class="text-xs text-gray-600 font-bold p-0 -mt-1" :class="{'text-red-500' : ds.dayofweek === 'Sunday'}">{{ ds.dayofweek.substring(0,3) }}</p>
-                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="text-center xl:hidden lg:hidden md:hidden sm:hidden block">
-                                            <h1 class="text-xs text-gray-600 font-normal mt-1 -mb-1.5">{{ dateToWords(ds.date).substring(0,3) }}</h1>
-                                            <h1 class="uppercase text-sm text-blue-500 font-bold -mb-1.5">{{ dateToWords(ds.date).substring(4,6) }}</h1>
-                                            <h1 class="text-xs text-gray-600 font-normal mb-1">{{ ds.dayofweek.substring(0,3) }}</h1>
-                                        </div>
-                                    </div>
-                                </th>
-                            </tr>
-                        </thead>
-                        <!-- {{ sortedEmployees }} -->
-                        <tbody>
-                            <tr v-for="(employee, index) in sortedEmployees" :key="employee.id" class="bg-white border-b transition duration-100 ease-in-out hover:bg-blue-50">
-                                <!-- <td class="text-right border-x border-slate-200 text-sm px-1.5 w-2">
-                                    <h1>{{ index+1 }}</h1>
-                                </td> -->
-                                <td class="border border-slate-200 px-2 w-80">
-
-                                    <div class="flex justify-between">
-                                        <h1 class="text-md font-medium py-1">{{ employee.last_name }},  {{ employee.first_name }}</h1>
-                                    </div>
-                                    <div class="text-sm text-gray-600">
-                                        E-{{padEmployeeId(employee.id) }} | Departament
-                                    </div>
-
-
-                                </td>
-
-                                <td v-for="(ds, index) in employee.selectedShift" :key="index" class="w-16 px-0.5 py-2 " >
-                                    <div  v-if="ds.schedule_day !== 'n/a'"  @click="setEmpSched('edit', employee, ds.schedule_date, index)" class="relative text-xs cursor-pointer w-full h-14 rounded border border-gray-300 hover:border-blue-500 hover:shadow-lg hover:border-2"
-                                    :class="{'font-bold bg-red-200':ds.day_off == 1,'bg-yellow-100':ds.oc == 1,'bg-green-100':ds.oc != 1 && ds.day_off != 1 }">
-                                        <div class=" flex items-center justify-center text-xs w-full h-full">
-
-                                            <h1 v-if="ds.day_off == 1">
-                                                OFF
-                                                <span v-if="ds.oc==1" class="font-bold text-red-500"><br>OC</span>
-                                            </h1>
-                                            <h1 v-else>
-                                                <span>{{ ds.time_from }}</span>
-                                                <span><br>{{ ds.time_to }}</span>
-                                                <span v-if="ds.oc==1" class="font-bold text-red-500"><br>OC</span>
-                                            </h1>
-                                        </div>
-                                    </div>
-                                    <div v-else @click="setEmpSched('shifts', employee, ds.schedule_date, index)" class="relative text-gray-400 text-xs cursor-pointer w-full h-14 rounded border border-gray-300 bg-white hover:text-blue-500 hover:border-blue-500 hover:shadow-lg hover:border-2">
-                                        <div class="flex items-center justify-center w-full h-full">
-                                            <PlusCircleIcon class=" w-5 h-5"/>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                </table>
-
-                <div class="bg-gray-50 border-b border-x rounded-b-md px-2 py-2">
-                    <p class="text-gray-800 text-sm">
-                        <b>Reminders:</b> Please ensure that all personnel schedules are set by the deadline in order to minimise needless disruption. Regards
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <div  ref="modalContainerShifts">
-            <form @submit.prevent="saveworkshift">
-                <div v-if="isVisible" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
-                    <div class="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:max-w-md sm:w-full">
-                        <div class="px-4 py-3 border-b border-gray-200 flex justify-between items-center">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900">
-                                {{ setType }} Employee Workshift
-                            </h3>
-                            <button @click="modalClose('shifts','','')" class="text-gray-400 hover:text-gray-500">
-                                <span class="sr-only">Close</span>
-                                <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="6" d="M6 18L18 6M6 6l12 12"/>
-                                </svg>
-                            </button>
-                        </div>
-
-                        <div class="px-4 mt-2">
-                            <h1>Name: <b>{{ emp_Sched.full_name }}</b></h1>
-                            <p v-if="employeeIds.length>0" class="text-xs">and {{ employeeIds.length -1  }} other employees</p>
-
-                                <!-- mid -->
-                                 <div v-if="setType !== 'Edit'" v-for="dates in emp_Shift" :key="dates.schedule_date">
-                                    <!--   v-if="dates.schedule_date ===  emp_Sched.day"   -->
-                                    <div v-if="dates.schedule_date ===  emp_Sched.day" class="pt-2">
-                                        <h1 class="w-1/2 text-sm uppercase font-medium bg-gray-600 border-gray-600 border text-white px-1 py-1.5 rounded-t-md">{{ fullDateToWords(dates.schedule_date)}} - ({{ dates.schedule_day.substring(0,3) }})</h1>
-                                        <div class="bg-white px-2 py-2 rounded-tr-md border-t border-x">
-                                            <div class="w-full py-2 space-y-1">
-                                                <Menu as="div" class="relative -mt-0.5">
-                                                    <MenuButton
-                                                        type="button"
-                                                        class="flex items-center justify-between gap-x-1.5 w-full rounded-md px-3 py-2 text-sm font-semibold" :disabled="workShifts.length<1" :class="{'bg-gray-100 text-gray-400' :workShifts.length<1,'bg-white text-gray-600  ring-1 ring-inset ring-gray-200 hover:bg-gray-50' :workShifts.length>0,}"
+                                            <div v-for="(data, index) in filteredDataCollections[item]" :key="data.id" class="py-1">
+                                                <MenuItem v-slot="{ active }" v-if="data.subData.length> 0" >
+                                                    <a  @click="showDept(item, data)"
+                                                        class="cursor-pointer"
+                                                        :class="[active ? 'bg-blue-500 text-white' : 'text-gray-700', 'block px-4 py-1 text-sm',]"
                                                     >
-                                                        {{ set.shifts }}
-                                                        <ChevronDownIcon
-                                                            class="-mr-1 h-5 w-5 text-gray-400"
-                                                            aria-hidden="true"
-                                                        />
-                                                    </MenuButton>
-
-                                                    <transition
-                                                        enter-active-class="transition ease-out duration-100"
-                                                        enter-from-class="transform opacity-0 scale-95"
-                                                        enter-to-class="transform opacity-100 scale-100"
-                                                        leave-active-class="transition ease-in duration-75"
-                                                        leave-from-class="transform opacity-100 scale-100"
-                                                        leave-to-class="transform opacity-0 scale-95"
+                                                        {{ data.id }} - {{ data.name }}
+                                                    </a>
+                                                </MenuItem>
+                                                <MenuItem v-slot="{ active }" v-else >
+                                                    <a  @click="modalClose(item, data)"
+                                                        class="cursor-pointer"
+                                                        :class="[active ? 'bg-blue-500 text-white' : 'text-gray-700', 'block px-4 py-1 text-sm',]"
                                                     >
-                                                        <MenuItems
-                                                            class="absolute right-0 z-10 mt-2 w-full origin-top-right overflow-hidden rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-                                                        >
-                                                            <div v-for="(shifts, index) in workShifts" :key="index" class="py-1" >
-                                                                <MenuItem v-slot="{ active }">
-                                                                    <a
-                                                                        @click="selectedShift(shifts)"
-                                                                        :class="[
-                                                                            active
-                                                                                ? 'bg-gray-100 text-gray-900'
-                                                                                : 'text-gray-700',
-                                                                            'block px-4 py-2 text-sm',
-                                                                        ]"
-                                                                        >{{ shifts.shift_name }} ({{ shifts.time_from }}-{{ shifts.time_to }})</a
-                                                                    >
-                                                                </MenuItem>
-                                                            </div>
-                                                        </MenuItems>
-                                                    </transition>
-                                                </Menu>
-
-                                                <div class="w-full flex items-center justify-between space-x-1.5">
-                                                    <label :class="{'bg-gray-100 text-gray-400' :workShifts.length<1,'bg-white border border-gray-200 text-gray-900 hover:bg-blue-400' :workShifts.length>0,}" class="flex justify-start cursor-pointer rounded-md w-full space-x-1 px-2 py-2 text-sm">
-                                                        <input @change="toggleRestDay($event,setType, dates, 0)"   :disabled="workShifts.length<1" id="cbx-restDay" type="checkbox" class="mt-0.5 mr-1.5 w-4 h-4 bg-gray-100 border-gray-300 rounded-lg text-red-500 focus:ring-red-500">
-                                                        <span>Day-Off</span>
-                                                    </label>
-
-                                                    <label :class="{'bg-gray-100 text-gray-400' :workShifts.length<1,'bg-white border border-gray-200 text-gray-900 hover:bg-blue-400' :workShifts.length>0,}" class="flex justify-start cursor-pointer rounded-md w-full space-x-1 px-2 py-2 text-sm">
-                                                        <input @change="toggleRestDay($event,setType, dates, 1)"   :disabled="workShifts.length<1" id="cbx-oncall" type="checkbox" class="mt-0.5 mr-1.5 w-4 h-4 bg-gray-100 border-gray-300 rounded-lg text-yellow-300  focus:ring-yellow-300">
-                                                        <span>On-Call</span>
-                                                    </label>
-                                                </div>
+                                                        {{ data.id }} - {{ data.name }}
+                                                    </a>
+                                                </MenuItem>
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div v-else>
-                                    <h1 class="w-1/2 text-sm uppercase font-medium bg-gray-600 border-gray-600 border text-white px-1 py-1.5 rounded-t-md">{{ fullDateToWords(ewsUpdate.schedule_date)}} - ({{ ewsUpdate.schedule_day.substring(0,3) }})</h1>
-                                    <div class="bg-white px-2 py-2 rounded-tr-md border-t border-x">
-                                            <div class="w-full py-2 space-y-1">
-                                                <Menu as="div" class="relative -mt-0.5">
-                                                    <MenuButton
-                                                        type="button"
-                                                        class="flex items-center justify-between gap-x-1.5 w-full rounded-md px-3 py-2 text-sm font-semibold" :disabled="workShifts.length<1" :class="{'bg-gray-100 text-gray-400' :workShifts.length<1,'bg-white text-gray-600  ring-1 ring-inset ring-gray-200 hover:bg-gray-50' :workShifts.length>0,}"
-                                                    >
-                                                        {{ set.shifts }}
-                                                        <ChevronDownIcon
-                                                            class="-mr-1 h-5 w-5 text-gray-400"
-                                                            aria-hidden="true"
-                                                        />
-                                                    </MenuButton>
-
-                                                    <transition
-                                                        enter-active-class="transition ease-out duration-100"
-                                                        enter-from-class="transform opacity-0 scale-95"
-                                                        enter-to-class="transform opacity-100 scale-100"
-                                                        leave-active-class="transition ease-in duration-75"
-                                                        leave-from-class="transform opacity-100 scale-100"
-                                                        leave-to-class="transform opacity-0 scale-95"
-                                                    >
-                                                        <MenuItems
-                                                            class="absolute right-0 z-10 mt-2 w-full origin-top-right overflow-hidden rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
-                                                        >
-                                                            <div v-for="(shifts, index) in workShifts" :key="index" class="py-1" >
-                                                                <MenuItem v-slot="{ active }">
-                                                                    <a
-                                                                        @click="selectedShift(shifts)"
-                                                                        :class="[
-                                                                            active
-                                                                                ? 'bg-gray-100 text-gray-900'
-                                                                                : 'text-gray-700',
-                                                                            'block px-4 py-2 text-sm',
-                                                                        ]"
-                                                                        >{{ shifts.shift_name }} ({{ shifts.time_from }}-{{ shifts.time_to }})</a
-                                                                    >
-                                                                </MenuItem>
-                                                            </div>
-                                                        </MenuItems>
-                                                    </transition>
-                                                </Menu>
-
-                                                <div class="w-full flex items-center justify-between space-x-1.5">
-                                                    <label :class="{'bg-gray-100 text-gray-400' :workShifts.length<1,'bg-white border border-gray-200 text-gray-900 hover:bg-blue-400' :workShifts.length>0,}" class="flex justify-start cursor-pointer rounded-md w-full space-x-1 px-2 py-2 text-sm">
-                                                        <input v-model="ewsUpdate.day_off"  :disabled="workShifts.length<1" id="cbx-restDay" type="checkbox" class="mt-0.5 mr-1.5 w-4 h-4 bg-gray-100 border-gray-300 rounded-lg text-red-500 focus:ring-red-500">
-                                                        <span>Day-Off</span>
-                                                    </label>
-
-                                                    <label :class="{'bg-gray-100 text-gray-400' :workShifts.length<1,'bg-white border border-gray-200 text-gray-900 hover:bg-blue-400' :workShifts.length>0,}" class="flex justify-start cursor-pointer rounded-md w-full space-x-1 px-2 py-2 text-sm">
-                                                        <input v-model="ewsUpdate.oc"  :disabled="workShifts.length<1" id="cbx-oncall" type="checkbox" class="mt-0.5 mr-1.5 w-4 h-4 bg-gray-100 border-gray-300 rounded-lg text-yellow-300  focus:ring-yellow-300">
-                                                        <span>On-Call</span>
-                                                    </label>
-
-                                                </div>
+                                            <div v-if="filteredDataCollections[item].length <1 && searchQueries[item] !== ''" class="px-2 py-2 text-xs">
+                                                <h1>No search result for <i>{{ replace(item,'_','-') }}</i></h1>
                                             </div>
-                                        </div>
-                                </div>
-
-                            <div class="border rounded-b-lg divide-y">
-                                <label class="w-full inline-flex items-center cursor-pointer pt-2 pl-2">
-                                    <input
-                                    v-model="ews.is_active"
-                                    type="checkbox"
-                                    class="sr-only peer"
-                                    :checked="setType === 'Edit'"
-
-                                    />
-                                    <div class="relative w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                                    <span class="ms-3 text-sm font-medium text-gray-700">Active</span>
-                                </label>
-                                <label v-if="setType !== 'Edit'" class="w-full inline-flex items-center cursor-pointer pt-2 pl-2 border-t">
-                                    <input
-                                    type="checkbox" @change="setToAll('shift',$event)"
-                                    class="sr-only peer"
-                                    />
-                                    <div class="relative w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                                    <span class="ms-3 text-sm font-medium text-gray-700">Set for the remaining unassigned days in the period</span>
-                                </label>
-                                <label class="w-full inline-flex items-center cursor-pointer pt-2 pl-2 border-t">
-                                    <input
-                                    type="checkbox" @change="setToAll('emp',$event)"
-                                    class="sr-only peer"
-                                    />
-                                    <div class="relative w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                                    <span class="ms-3 text-sm font-medium text-gray-700">Assign to all Employee</span>
-                                </label>
+                                        </MenuItems>
+                                    </transition>
+                                </Menu>
                             </div>
                         </div>
-
-
-                        <div class="px-4 space-x-2 py-2 mt-3 border-t border-gray-200 bg-gray-50 sm:px-6 flex justify-end">
-                            <button @click="modalClose('shifts','','')" class="text-gray-400 px-4 py-1.5 rounded-md hover:bg-gray-900">
-                                <span class="">Close</span>
-                            </button>
-                            <button @click="closeModal" type="submit" class=" px-4 py-1.5 rounded-md "
-                            :class="{'bg-gray-300 text-white': set.shifts === 'Select Shift','bg-blue-500 text-white hover:bg-blue-600': set.shifts !== 'Select Shift'}"   :disabled="set.shifts === 'Select Shift' ">
-                                <span v-if="setType === 'Set'">Save</span>
-                                <span v-else>Update</span>
-                            </button>
-                        </div>
                     </div>
                 </div>
-            </form>
+            </div>
+
+            <div class="p-4">
+                <div v-if="days.length>0">
+                    <div class="flex items-center justify-between bg-gray-200 mt-2 border-t border-x rounded-t-md px-2 py-2">
+                        <h1 class="text-gray-800 text-sm font-medium">
+                            Workshift Period: <b>{{dateToWords( ews.period_from) }} </b> - <b>{{ dateToWords(ews.period_to) }},  {{ ews.period_to.substring(0,4) }}</b>
+                        </h1>
+                        <span class="text-gray-800 text-xs font-bold ">
+                            <span class="border-gray-300 bg-yellow-200 px-2 py-1.5 rounded-l-md">On-Call</span>
+                            <span class="border-gray-300 bg-red-300 px-2 py-1.5 ">Day Off</span>
+                            <span class="border-gray-300 bg-green-200 px-2 py-1.5 rounded-r-md">On-duty</span>
+                        </span>
+                    </div>
+
+                    <table class="table-auto w-full border-collapse border-r border-slate-300 ">
+                            <thead>
+                                <tr class="bg-gray-50 border pb-1 pt-1">
+                                    <!-- <th class="w-2 border-r">
+                                        <div class="text-right text-sm px-2 text-gray-600 ">No.</div>
+                                    </th> -->
+                                    <th class="w-80">
+                                        <div class="text-left xl:block lg:block md:block sm:block hidden">
+                                            <div class="text-sm px-2 text-gray-600 ">Employee</div>
+                                        </div>
+                                        <div class="text-left xl:hidden lg:hidden md:hidden sm:hidden block">
+                                            <div class="text-xs px-2">Employee Name</div>
+                                        </div>
+                                    </th>
+                                    <th v-for="ds in days" class="w-16 ps-1.5 border">
+
+                                        <div class="w-16">
+                                            <div class="text-left xl:block lg:block md:block sm:block hidden">
+                                                <div class="flex jsutify-start">
+                                                    <h1 class="text-3xl text-blue-500 font-bold" :class="{'text-red-500' : ds.dayofweek === 'Sunday'}">
+                                                        {{ dateToWords(ds.date).substring(4,6) }}
+                                                    </h1>
+                                                    <div class="mt-1 ml-0.5">
+                                                        <p class="uppercase text-xs text-gray-600 font-normal p-0" :class="{'text-red-500' : ds.dayofweek === 'Sunday'}">{{ dateToWords(ds.date).substring(0,3) }}</p>
+                                                        <p v-if="set.view ==='WEEKLY'" class="text-xs text-gray-600 font-bold p-0 -mt-1" :class="{'text-red-500' : ds.dayofweek === 'Sunday'}">{{ ds.dayofweek }}</p>
+                                                        <p v-else class="text-xs text-gray-600 font-bold p-0 -mt-1" :class="{'text-red-500' : ds.dayofweek === 'Sunday'}">{{ ds.dayofweek.substring(0,3) }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="text-center xl:hidden lg:hidden md:hidden sm:hidden block">
+                                                <h1 class="text-xs text-gray-600 font-normal mt-1 -mb-1.5">{{ dateToWords(ds.date).substring(0,3) }}</h1>
+                                                <h1 class="uppercase text-sm text-blue-500 font-bold -mb-1.5">{{ dateToWords(ds.date).substring(4,6) }}</h1>
+                                                <h1 class="text-xs text-gray-600 font-normal mb-1">{{ ds.dayofweek.substring(0,3) }}</h1>
+                                            </div>
+                                        </div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <!-- {{ sortedEmployees }} -->
+                            <tbody>
+                                <tr v-for="(employee, index) in sortedEmployees" :key="employee.id" class="bg-white border-b transition duration-100 ease-in-out hover:bg-blue-50">
+                                    <td class="border border-slate-200 px-2 w-80">
+
+                                        <div class="flex justify-between">
+                                            <h1 class="text-md font-medium py-1">{{ employee.last_name }},  {{ employee.first_name }}</h1>
+                                        </div>
+                                        <div class="text-sm text-gray-600">
+                                            E-{{padEmployeeId(employee.id) }} | Departament
+                                        </div>
+                                    </td>
+
+                                    <td v-for="(ds, index) in employee.selectedShift" :key="index" class="w-16 px-0.5 py-2 " >
+                                        <div  v-if="ds.schedule_day !== 'n/a'"  @click="setEmpSched('edit', employee, ds.schedule_date, index)" class="relative text-xs cursor-pointer w-full h-14 rounded border border-gray-300 hover:border-blue-500 hover:shadow-lg hover:border-2"
+                                        :class="{'font-bold bg-red-200':ds.day_off == 1,'bg-yellow-100':ds.oc == 1,'bg-green-100':ds.oc != 1 && ds.day_off != 1 }">
+                                            <div class=" flex items-center justify-center text-xs w-full h-full">
+                                                <h1 v-if="ds.day_off == 1">
+                                                    OFF
+                                                    <span v-if="ds.oc==1" class="font-bold text-red-500"><br>OC</span>
+                                                </h1>
+                                                <h1 v-else>
+                                                    <span>{{ ds.time_from }}</span>
+                                                    <span><br>{{ ds.time_to }}</span>
+                                                    <span v-if="ds.oc==1" class="font-bold text-red-500"><br>OC</span>
+                                                </h1>
+                                            </div>
+                                        </div>
+                                        <div v-else @click="setEmpSched('shifts', employee, ds.schedule_date, index)" class="relative text-gray-400 text-xs cursor-pointer w-full h-14 rounded border border-gray-300 bg-white hover:text-blue-500 hover:border-blue-500 hover:shadow-lg hover:border-2">
+                                            <div class="flex items-center justify-center w-full h-full">
+                                                <PlusCircleIcon class=" w-5 h-5"/>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                    </table>
+
+                    <div class="bg-gray-50 border-b border-x rounded-b-md px-2 py-2">
+                        <p class="text-gray-800 text-sm">
+                            <b>Reminders:</b> Please ensure that all personnel schedules are set by the deadline in order to minimise needless disruption. Regards
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div  ref="modalContainerShifts">
+                <form @submit.prevent="saveworkshift">
+                    <div v-if="isVisible" class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+                        <div class="bg-white rounded-lg overflow-hidden shadow-xl transform transition-all sm:max-w-md sm:w-full">
+                            <div class="px-4 py-3 border-b border-gray-200 flex justify-between items-center">
+                                <h3 class="text-lg leading-6 font-medium text-gray-900">
+                                    {{ setType }} Employee Workshift
+                                </h3>
+                                <button @click="modalClose('shifts','','')" class="text-gray-400 hover:text-gray-500">
+                                    <span class="sr-only">Close</span>
+                                    <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="6" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <div class="px-4 mt-2">
+                                <h1>Name: <b>{{ emp_Sched.full_name }}</b></h1>
+                                <p v-if="employeeIds.length>0" class="text-xs">and {{ employeeIds.length -1  }} other employees</p>
+
+                                    <!-- mid -->
+                                    <div v-if="setType !== 'Edit'" v-for="dates in emp_Shift" :key="dates.schedule_date">
+                                        <!--   v-if="dates.schedule_date ===  emp_Sched.day"   -->
+                                        <div v-if="dates.schedule_date ===  emp_Sched.day" class="pt-2">
+                                            <h1 class="w-1/2 text-sm uppercase font-medium bg-gray-600 border-gray-600 border text-white px-1 py-1.5 rounded-t-md">{{ fullDateToWords(dates.schedule_date)}} - ({{ dates.schedule_day.substring(0,3) }})</h1>
+                                            <div class="bg-white px-2 py-2 rounded-tr-md border-t border-x">
+                                                <div class="w-full py-2 space-y-1">
+                                                    <Menu as="div" class="relative -mt-0.5">
+                                                        <MenuButton
+                                                            type="button"
+                                                            class="flex items-center justify-between gap-x-1.5 w-full rounded-md px-3 py-2 text-sm font-semibold" :disabled="workShifts.length<1" :class="{'bg-gray-100 text-gray-400' :workShifts.length<1,'bg-white text-gray-600  ring-1 ring-inset ring-gray-200 hover:bg-gray-50' :workShifts.length>0,}"
+                                                        >
+                                                            {{ set.shifts }}
+                                                            <ChevronDownIcon
+                                                                class="-mr-1 h-5 w-5 text-gray-400"
+                                                                aria-hidden="true"
+                                                            />
+                                                        </MenuButton>
+
+                                                        <transition
+                                                            enter-active-class="transition ease-out duration-100"
+                                                            enter-from-class="transform opacity-0 scale-95"
+                                                            enter-to-class="transform opacity-100 scale-100"
+                                                            leave-active-class="transition ease-in duration-75"
+                                                            leave-from-class="transform opacity-100 scale-100"
+                                                            leave-to-class="transform opacity-0 scale-95"
+                                                        >
+                                                            <MenuItems
+                                                                class="absolute right-0 z-10 mt-2 w-full origin-top-right overflow-hidden rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                                            >
+                                                                <div v-for="(shifts, index) in workShifts" :key="index" class="py-1" >
+                                                                    <MenuItem v-slot="{ active }">
+                                                                        <a
+                                                                            @click="selectedShift(shifts)"
+                                                                            :class="[
+                                                                                active
+                                                                                    ? 'bg-gray-100 text-gray-900'
+                                                                                    : 'text-gray-700',
+                                                                                'block px-4 py-2 text-sm',
+                                                                            ]"
+                                                                            >{{ shifts.shift_name }} ({{ shifts.time_from }}-{{ shifts.time_to }})</a
+                                                                        >
+                                                                    </MenuItem>
+                                                                </div>
+                                                            </MenuItems>
+                                                        </transition>
+                                                    </Menu>
+
+                                                    <div class="w-full flex items-center justify-between space-x-1.5">
+                                                        <label :class="{'bg-gray-100 text-gray-400' :workShifts.length<1,'bg-white border border-gray-200 text-gray-900 hover:bg-blue-400' :workShifts.length>0,}" class="flex justify-start cursor-pointer rounded-md w-full space-x-1 px-2 py-2 text-sm">
+                                                            <input @change="toggleRestDay($event,setType, dates, 0)"   :disabled="workShifts.length<1" id="cbx-restDay" type="checkbox" class="mt-0.5 mr-1.5 w-4 h-4 bg-gray-100 border-gray-300 rounded-lg text-red-500 focus:ring-red-500">
+                                                            <span>Day-Off</span>
+                                                        </label>
+
+                                                        <label :class="{'bg-gray-100 text-gray-400' :workShifts.length<1,'bg-white border border-gray-200 text-gray-900 hover:bg-blue-400' :workShifts.length>0,}" class="flex justify-start cursor-pointer rounded-md w-full space-x-1 px-2 py-2 text-sm">
+                                                            <input @change="toggleRestDay($event,setType, dates, 1)"   :disabled="workShifts.length<1" id="cbx-oncall" type="checkbox" class="mt-0.5 mr-1.5 w-4 h-4 bg-gray-100 border-gray-300 rounded-lg text-yellow-300  focus:ring-yellow-300">
+                                                            <span>On-Call</span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div v-else>
+                                        <h1 class="w-1/2 text-sm uppercase font-medium bg-gray-600 border-gray-600 border text-white px-1 py-1.5 rounded-t-md">{{ fullDateToWords(ewsUpdate.schedule_date)}} - ({{ ewsUpdate.schedule_day.substring(0,3) }})</h1>
+                                        <div class="bg-white px-2 py-2 rounded-tr-md border-t border-x">
+                                                <div class="w-full py-2 space-y-1">
+                                                    <Menu as="div" class="relative -mt-0.5">
+                                                        <MenuButton
+                                                            type="button"
+                                                            class="flex items-center justify-between gap-x-1.5 w-full rounded-md px-3 py-2 text-sm font-semibold" :disabled="workShifts.length<1" :class="{'bg-gray-100 text-gray-400' :workShifts.length<1,'bg-white text-gray-600  ring-1 ring-inset ring-gray-200 hover:bg-gray-50' :workShifts.length>0,}"
+                                                        >
+                                                            {{ set.shifts }}
+                                                            <ChevronDownIcon
+                                                                class="-mr-1 h-5 w-5 text-gray-400"
+                                                                aria-hidden="true"
+                                                            />
+                                                        </MenuButton>
+
+                                                        <transition
+                                                            enter-active-class="transition ease-out duration-100"
+                                                            enter-from-class="transform opacity-0 scale-95"
+                                                            enter-to-class="transform opacity-100 scale-100"
+                                                            leave-active-class="transition ease-in duration-75"
+                                                            leave-from-class="transform opacity-100 scale-100"
+                                                            leave-to-class="transform opacity-0 scale-95"
+                                                        >
+                                                            <MenuItems
+                                                                class="absolute right-0 z-10 mt-2 w-full origin-top-right overflow-hidden rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                                            >
+                                                                <div v-for="(shifts, index) in workShifts" :key="index" class="py-1" >
+                                                                    <MenuItem v-slot="{ active }">
+                                                                        <a
+                                                                            @click="selectedShift(shifts)"
+                                                                            :class="[
+                                                                                active
+                                                                                    ? 'bg-gray-100 text-gray-900'
+                                                                                    : 'text-gray-700',
+                                                                                'block px-4 py-2 text-sm',
+                                                                            ]"
+                                                                            >{{ shifts.shift_name }} ({{ shifts.time_from }}-{{ shifts.time_to }})</a
+                                                                        >
+                                                                    </MenuItem>
+                                                                </div>
+                                                            </MenuItems>
+                                                        </transition>
+                                                    </Menu>
+
+                                                    <div class="w-full flex items-center justify-between space-x-1.5">
+                                                        <label :class="{'bg-gray-100 text-gray-400' :workShifts.length<1,'bg-white border border-gray-200 text-gray-900 hover:bg-blue-400' :workShifts.length>0,}" class="flex justify-start cursor-pointer rounded-md w-full space-x-1 px-2 py-2 text-sm">
+                                                            <input v-model="ewsUpdate.day_off"  :disabled="workShifts.length<1" id="cbx-restDay" type="checkbox" class="mt-0.5 mr-1.5 w-4 h-4 bg-gray-100 border-gray-300 rounded-lg text-red-500 focus:ring-red-500">
+                                                            <span>Day-Off</span>
+                                                        </label>
+
+                                                        <label :class="{'bg-gray-100 text-gray-400' :workShifts.length<1,'bg-white border border-gray-200 text-gray-900 hover:bg-blue-400' :workShifts.length>0,}" class="flex justify-start cursor-pointer rounded-md w-full space-x-1 px-2 py-2 text-sm">
+                                                            <input v-model="ewsUpdate.oc"  :disabled="workShifts.length<1" id="cbx-oncall" type="checkbox" class="mt-0.5 mr-1.5 w-4 h-4 bg-gray-100 border-gray-300 rounded-lg text-yellow-300  focus:ring-yellow-300">
+                                                            <span>On-Call</span>
+                                                        </label>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                    </div>
+
+                                <div class="border rounded-b-lg divide-y">
+                                    <label class="w-full inline-flex items-center cursor-pointer pt-2 pl-2">
+                                        <input
+                                        v-model="ews.is_active"
+                                        type="checkbox"
+                                        class="sr-only peer"
+                                        :checked="setType === 'Edit'"
+
+                                        />
+                                        <div class="relative w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                        <span class="ms-3 text-sm font-medium text-gray-700">Active</span>
+                                    </label>
+                                    <label v-if="setType !== 'Edit'" class="w-full inline-flex items-center cursor-pointer pt-2 pl-2 border-t">
+                                        <input
+                                        type="checkbox" @change="setToAll('shift',$event)"
+                                        class="sr-only peer"
+                                        />
+                                        <div class="relative w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                        <span class="ms-3 text-sm font-medium text-gray-700">Set for the remaining unassigned days in the period</span>
+                                    </label>
+                                    <label class="w-full inline-flex items-center cursor-pointer pt-2 pl-2 border-t">
+                                        <input
+                                        type="checkbox" @change="setToAll('emp',$event)"
+                                        class="sr-only peer"
+                                        />
+                                        <div class="relative w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                        <span class="ms-3 text-sm font-medium text-gray-700">Assign to all Employee</span>
+                                    </label>
+                                </div>
+                            </div>
+
+
+                            <div class="px-4 space-x-2 py-2 mt-3 border-t border-gray-200 bg-gray-50 sm:px-6 flex justify-end">
+                                <button @click="modalClose('shifts','','')" class="text-gray-400 px-4 py-1.5 rounded-md hover:bg-gray-900">
+                                    <span class="">Close</span>
+                                </button>
+                                <button @click="closeModal" type="submit" class=" px-4 py-1.5 rounded-md "
+                                :class="{'bg-gray-300 text-white': set.shifts === 'Select Shift','bg-blue-500 text-white hover:bg-blue-600': set.shifts !== 'Select Shift'}"   :disabled="set.shifts === 'Select Shift' ">
+                                    <span v-if="setType === 'Set'">Save</span>
+                                    <span v-else>Update</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
+
+        <!-- Employee -->
 
     </MasterLayout>
 </template>
