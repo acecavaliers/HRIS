@@ -95,20 +95,20 @@
 
             <div class="p-4">
                 <div v-if="days.length>0">
-                    <div class="flex items-center justify-between bg-gray-200 mt-2 border-t border-x rounded-t-md px-2 py-2">
+                    <div class="flex items-center justify-between max-h-12 bg-slate-400 border-slate-400  mt-2 border-t border-x rounded-t-md px-2 py-2">
                         <h1 class="text-gray-800 text-sm font-medium">
                             Workshift Period: <b>{{dateToWords( ews.period_from) }} </b> - <b>{{ dateToWords(ews.period_to) }},  {{ ews.period_to.substring(0,4) }}</b>
                         </h1>
                         <span class="text-gray-800 text-xs font-bold ">
-                            <span class="border-gray-300 bg-yellow-200 px-2 py-1.5 rounded-l-md">On-Call</span>
-                            <span class="border-gray-300 bg-red-300 px-2 py-1.5 ">Day Off</span>
+                            <span class="border-gray-300 bg-amber-100 px-2 py-1.5 rounded-l-md">On-Call</span>
+                            <span class="border-gray-300 bg-rose-300 px-2 py-1.5 ">Day Off</span>
                             <span class="border-gray-300 bg-green-200 px-2 py-1.5 rounded-r-md">On-duty</span>
                         </span>
                     </div>
 
                     <table class="table-auto w-full border-collapse border-r border-slate-300 ">
                             <thead>
-                                <tr class="bg-gray-50 border pb-1 pt-1">
+                                <tr class="bg-slate-100 border pb-1 pt-1">
                                     <!-- <th class="w-2 border-r">
                                         <div class="text-right text-sm px-2 text-gray-600 ">No.</div>
                                     </th> -->
@@ -120,11 +120,11 @@
                                             <div class="text-xs px-2">Employee Name</div>
                                         </div>
                                     </th>
-                                    <th v-for="ds in days" class="w-16 ps-1.5 border" :class="{'text-red-500' : ds.dayofweek === 'Sunday', 'text-stone-600' : ds.dayofweek !== 'Sunday'}">
+                                    <th v-for="ds in days" class="w-16 ps-1.5 border" :class="{'text-rose-500' : ds.dayofweek === 'Sunday', 'text-slate-500' : ds.dayofweek !== 'Sunday'}">
 
                                         <div class="w-16">
                                             <div class="text-left xl:block lg:block md:block sm:block hidden">
-                                                <div class="flex jsutify-start">
+                                                <div class="flex jsutify-start space-x-1">
                                                     <h1 class="text-3xl font-bold" >
                                                         {{ dateToWords(ds.date).substring(4,6) }}
                                                     </h1>
@@ -146,7 +146,7 @@
                             </thead>
                             <!-- {{ sortedEmployees }} -->
                             <tbody>
-                                <tr v-for="(employee, index) in sortedEmployees" :key="employee.id" class="bg-white border-b transition duration-100 ease-in-out hover:bg-sky-50">
+                                <tr v-for="(employee, index) in sortedEmployees" :key="employee.id" class="bg-white border-b transition duration-100 ease-in-out hover:bg-slate-50">
                                     <td class="border border-slate-200 px-2 w-80">
 
                                         <div class="flex justify-between">
@@ -159,7 +159,7 @@
 
                                     <td v-for="(ds, index) in employee.selectedShift" :key="index" class="w-16 px-0.5 py-2 " >
                                         <div  v-if="ds.schedule_day !== 'n/a'"  @click="setEmpSched('edit', employee, ds.schedule_date, index)" class="relative text-xs cursor-pointer w-full h-14 rounded border border-gray-300 hover:border-sky-500 hover:shadow-lg hover:border-2"
-                                        :class="{'font-bold bg-red-200':ds.day_off == 1,'bg-yellow-100':ds.oc == 1,'bg-green-100':ds.oc != 1 && ds.day_off != 1 }">
+                                        :class="{'font-bold bg-rose-300':ds.day_off == 1 && ds.oc == 0,'bg-amber-100':ds.oc == 1,'bg-green-200':ds.oc != 1 && ds.day_off != 1 && ds.oc == 0 }">
                                             <div class=" flex items-center justify-center text-xs w-full h-full">
                                                 <h1 v-if="ds.day_off == 1">
                                                     OFF
