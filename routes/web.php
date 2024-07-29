@@ -362,8 +362,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Shiftsetups
     Route::get('/shiftsetup/getcolumns', [ShiftSetupController::class, 'getcolumns'])->name('shiftsetup.getcolumns');
-    Route::get('/shiftsetup/getlist', [WorkShiftController::class, 'getlist'])->name('shiftsetup.getlist');
-    Route::get('/shiftsetup/search', [WorkShiftController::class, 'searchData'])->name('shiftsetup.search');
+    Route::get('/shiftsetup/getlist', [ShiftSetupController::class, 'getlist'])->name('shiftsetup.getlist');
+    Route::get('/shiftsetup/search', [ShiftSetupController::class, 'searchData'])->name('shiftsetup.search');
 
 
     /* Relationship */
