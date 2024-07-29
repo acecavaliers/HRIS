@@ -12,8 +12,8 @@
 
 
         <!-- CONTENT manager-->
-         <div>
-            <div v-if="role == 1" class="grid grid-cols-4 border-y">
+         <div v-if="role == 1" >
+            <div class="grid grid-cols-4 border-y">
                 <div v-for="item in menu" :key="item"  class="py-1">
                     <div class="p-4 text-sm w-full">
                         <div class="w-full">
@@ -463,8 +463,10 @@ export default {
     computed: {
         filteredDataCollections() {
             return Object.keys(this.dataCollections).reduce((result, key) => {
-                const searchQuery = this.searchQueries[key].toLowerCase();
-                result[key] = this.dataCollections[key].filter(item => item.name.toLowerCase().includes(searchQuery));
+                const searchQuery = this.searchQueries[key]?.toLowerCase() || '';
+                result[key] = this.dataCollections[key].filter(item => {
+                    return item.name?.toLowerCase().includes(searchQuery);
+                });
                 return result;
             }, {});
         },

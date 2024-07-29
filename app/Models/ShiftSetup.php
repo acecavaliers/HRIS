@@ -10,7 +10,7 @@ class ShiftSetup extends Model
 {
     use HasFactory, SoftDeletes;
 
-
+    protected $foreignKeys = [];
     protected $fillable = [
         'name',
         'with_start_date',
@@ -21,4 +21,9 @@ class ShiftSetup extends Model
         'updated_by',
         'deleted_by'
     ];
+
+    public function getForeignKeys()
+    {
+        return $this->foreignKeys;
+    }
 }
