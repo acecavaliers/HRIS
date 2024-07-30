@@ -37,9 +37,9 @@ class ShiftSetupController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = CommonController::getRequiredFields('WorkShift', $request);
+        $validated = CommonController::getRequiredFields('ShiftSetup', $request);
 
-        $systemtable = SystemTable::where('table_name', 'work_shifts')->first();
+        $systemtable = SystemTable::where('table_name', 'shift_setups')->first();
 
         $systemtabledetail = SystemTableDetail::where(array('system_table_id' => $systemtable->id, 'is_fk_getreferenced' => 0))->get();
 
