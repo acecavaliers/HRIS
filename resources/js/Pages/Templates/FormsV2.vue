@@ -428,7 +428,7 @@
         </span>
         </div><!-- /space-y-6 sm:space-y-5 -->
 
-        <!-- Multi Select -->
+        <!-- Multi Select  need update to dynamic-->
         <div v-if="title === 'WorkShift' || title === 'ShiftSetup'" class="">
 
             <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-2 pb-2">
