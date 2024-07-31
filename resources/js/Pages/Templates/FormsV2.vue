@@ -51,19 +51,16 @@
               <div class="relative flex items-start">
 
                   <div class="flex h-6 items-center">
-                  <input @change="notapplicableclick(column.column_name, notapplicablecheckbox[column.column_name])" id="not-applicable" aria-describedby="not-applicable-description" name="notapplicable" v-model="notapplicablecheckbox[column.column_name]" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600" />
+                  <input @change="notapplicableclick(column.column_name, notapplicablecheckbox[column.column_name])" :id="`not-applicable-${column.column_name}`" aria-describedby="not-applicable-description" name="notapplicable" v-model="notapplicablecheckbox[column.column_name]" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600" />
                   </div>
                   <div class="ml-3 text-sm leading-6">
-                  <label for="not-applicable" class="font-medium text-gray-900">NOT APPLICABLE</label>
+                  <label :for="`not-applicable-${column.column_name}`"  class="font-medium text-gray-900">NOT APPLICABLE</label>
                   <!-- <p id="not-applicable-description" class="text-gray-500"></p> -->
                   </div>
               </div>
                 <p v-if="errors['formdata.'+column.column_name]" class="mt-2 text-sm text-red-600" :id="column.column_name+'-error'">{{errors['formdata.'+column.column_name][0].replace('formdata.', '')}}</p>
             </div>
           </div>
-
-
-
 
            <!-- INPUT PASSWORD -->
            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5" v-if="column.formtypes.slug == 'password'">
@@ -269,8 +266,18 @@
             </div>
 
             <!-- SWITCH -->
-            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5" v-if="column.formtypes.slug == 'switch'">
+            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5" v-if="column.formtypes.slug == 'switch' && column.column_name !== 'with_start_date'">
                 <label :for="column.column_name" class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">{{ column.column_label }} <span v-if="column.is_required == 1" class="text-red-600">*</span></label>
+                <Switch v-model="form[column.column_name]" :disabled="column.is_disabled==1" :class="[form[column.column_name]==1 ? 'bg-indigo-600' : 'bg-gray-200', column.is_disabled==1? 'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500 disabled:ring-gray-200': 'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2']">
+                    <span class="sr-only">Use setting</span>
+                    <span aria-hidden="true" :class="[form[column.column_name]==1 ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out']" />
+                </Switch>
+                <p v-if="errors['formdata.'+column.column_name]" class="mt-5 text-sm text-red-600" :id="column.column_name+'-error'">{{errors['formdata.'+column.column_name][0].replace('formdata.', '')}}</p>
+            </div>
+
+            <!-- SWITCH AC-->
+            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5" v-if="column.formtypes.slug == 'switch' && column.column_name === 'with_start_date'">
+                <label :for="column.column_name" class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">{{ column.column_label }} RRRRRRRRRRR<span v-if="column.is_required == 1" class="text-red-600">*</span></label>
                 <Switch v-model="form[column.column_name]" :disabled="column.is_disabled==1" :class="[form[column.column_name]==1 ? 'bg-indigo-600' : 'bg-gray-200', column.is_disabled==1? 'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500 disabled:ring-gray-200': 'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2']">
                     <span class="sr-only">Use setting</span>
                     <span aria-hidden="true" :class="[form[column.column_name]==1 ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out']" />
@@ -422,7 +429,7 @@
         </div><!-- /space-y-6 sm:space-y-5 -->
 
         <!-- Multi Select -->
-        <div v-if="title === 'WorkShift'" class="">
+        <div v-if="title === 'WorkShift' || title === 'ShiftSetup'" class="">
 
             <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-2 pb-2">
                 <label :for="divisions" class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
