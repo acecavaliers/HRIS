@@ -277,7 +277,7 @@
 
             <!-- SWITCH AC-->
             <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5" v-if="column.formtypes.slug == 'switch' && column.column_name === 'with_start_date'">
-                <label :for="column.column_name" class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">{{ column.column_label }} RRRRRRRRRRR<span v-if="column.is_required == 1" class="text-red-600">*</span></label>
+                <label :for="column.column_name" class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">{{ column.column_label }} <span v-if="column.is_required == 1" class="text-red-600">*</span></label>
                 <Switch v-model="form[column.column_name]" :disabled="column.is_disabled==1" :class="[form[column.column_name]==1 ? 'bg-indigo-600' : 'bg-gray-200', column.is_disabled==1? 'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500 disabled:ring-gray-200': 'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2']">
                     <span class="sr-only">Use setting</span>
                     <span aria-hidden="true" :class="[form[column.column_name]==1 ? 'translate-x-5' : 'translate-x-0', 'pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out']" />
@@ -465,24 +465,7 @@
                                 leave-to-class="transform opacity-0 scale-95"
                             >
                                 <MenuItems class="absolute right-0 z-10 mb-0 w-3/4 origin-bottom-right max-h-80 overflow-auto rounded-lg bg-white shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none" style="bottom: 100%; margin-bottom: 8px;">
-                                    <!-- <div v-for="(data, index) in filteredDataCollections[item]" :key="data.id" class="py-1">
-                                        <MenuItem v-slot="{ active }" v-if="data.subData.length> 0" >
-                                            <a  @click="showDept(item, data)"
-                                                class="cursor-pointer"
-                                                :class="[active ? 'bg-blue-500 text-white' : 'text-gray-700', 'block px-4 py-1 text-sm',]"
-                                            >
-                                                {{ data.id }} - {{ data.name }}
-                                            </a>
-                                        </MenuItem>
-                                        <MenuItem v-slot="{ active }" v-else >
-                                            <a  @click="modalClose(item, data)"
-                                                class="cursor-pointer"
-                                                :class="[active ? 'bg-blue-500 text-white' : 'text-gray-700', 'block px-4 py-1 text-sm',]"
-                                            >
-                                                {{ data.id }} - {{ data.name }}
-                                            </a>
-                                        </MenuItem>
-                                    </div> -->
+
                                     <div class="sticky top-0 bg-white z-20 px-2 py-2 border-b">
                                         <input
                                             v-model="searchQueries[item]"
@@ -1413,10 +1396,10 @@ export default {
 
             formdata: this.form,
             fileInfo: this.file,
-            Divisions: this.selectedDivisions,
-            Departments: this.selectedDepartments,
-            SubDepartments: this.selectedSubDepartments,
-            SubDepartmentUnits: this.selectedSubDepartmentUnits,
+            Divisions: this.selectedMultiSelect.divisions,
+            Departments: this.selectedMultiSelect.departments,
+            SubDepartments: this.selectedMultiSelect.sub_departments,
+            SubDepartmentUnits: this.selectedMultiSelect.sub_department_units,
             }).then(response => {
               console.log(this.form);
               console.log(response.data)
