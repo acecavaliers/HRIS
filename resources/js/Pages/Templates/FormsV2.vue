@@ -429,11 +429,12 @@
         </div><!-- /space-y-6 sm:space-y-5 -->
 
         <!-- Multi Select  need update to dynamic-->
+
         <div v-if="title === 'WorkShift' || title === 'ShiftSetup'" class="">
 
-            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-2 pb-2">
+            <div v-for="item in multiMenu" :key="item"   class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-2 pb-2">
                 <label :for="divisions" class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
-                    Show multi select here for Divisions
+                    {{ item }}
                     <span  class="text-red-600">*</span>
                 </label>
                 <div class="mt-1 sm:col-span-2 sm:mt-0">
@@ -441,15 +442,15 @@
                         <Menu as="div" class="relative">
                             <MenuButton type="button" class="flex items-center justify-between w-full gap-x-1.5 rounded-r-md bg-white px-3 py-2 text-sm  text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50" >
                                 <div>
-                                    <span v-if="selectedDivisions.length>0">
-                                        <span class="text-xs ml-0.5 bg-green-200 px-1.5 py-1 rounded-lg" v-for="selected in selectedDivisions.slice(0, 5)" :key="selected.id">
+                                    <span v-if="selectedMultiSelect[item].length>0">
+                                        <span class="text-xs ml-0.5 bg-green-200 px-1.5 py-1 rounded-lg" v-for="selected in selectedMultiSelect[item].slice(0, 5)" :key="selected.id">
                                             {{ selected.shortname }}
                                         </span>
-                                        <span class="text-xs ml-0.5 px-1.5 py-1 rounded-lg" v-if="selectedDivisions.length >5" >
-                                           + {{ selectedDivisions.length - 5 }} more
+                                        <span class="text-xs ml-0.5 px-1.5 py-1 rounded-lg" v-if="selectedMultiSelect[item].length >5" >
+                                           + {{ selectedMultiSelect[item].length - 5 }} more
                                         </span>
                                     </span>
-                                    <span v-else>Select Division</span>
+                                    <span v-else>Select {{ item }}</span>
                                 </div>
 
                                 <ChevronUpDownIcon class="-mr-1 h-5 w-5 text-gray-400" aria-hidden="true" />
@@ -464,10 +465,48 @@
                                 leave-to-class="transform opacity-0 scale-95"
                             >
                                 <MenuItems class="absolute right-0 z-10 mb-0 w-3/4 origin-bottom-right max-h-80 overflow-auto rounded-lg bg-white shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none" style="bottom: 100%; margin-bottom: 8px;">
-                                    <div v-for="(item, index) in divisions" :key="item.id" class="w-full divide-y">
+                                    <!-- <div v-for="(data, index) in filteredDataCollections[item]" :key="data.id" class="py-1">
+                                        <MenuItem v-slot="{ active }" v-if="data.subData.length> 0" >
+                                            <a  @click="showDept(item, data)"
+                                                class="cursor-pointer"
+                                                :class="[active ? 'bg-blue-500 text-white' : 'text-gray-700', 'block px-4 py-1 text-sm',]"
+                                            >
+                                                {{ data.id }} - {{ data.name }}
+                                            </a>
+                                        </MenuItem>
+                                        <MenuItem v-slot="{ active }" v-else >
+                                            <a  @click="modalClose(item, data)"
+                                                class="cursor-pointer"
+                                                :class="[active ? 'bg-blue-500 text-white' : 'text-gray-700', 'block px-4 py-1 text-sm',]"
+                                            >
+                                                {{ data.id }} - {{ data.name }}
+                                            </a>
+                                        </MenuItem>
+                                    </div> -->
+                                    <div class="sticky top-0 bg-white z-20 px-2 py-2 border-b">
+                                        <input
+                                            v-model="searchQueries[item]"
+                                            type="text"
+                                            placeholder="Search..."
+                                            class="pr-7 uppercase block w-full px-2 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                        />
+                                        <span>
+                                            <button
+                                                v-if="searchQueries[item]"
+                                                @click="clearSearch(item)"
+                                                class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                                            >
+                                                <XCircleIcon class="h-5 w-5"/>
+                                            </button>
+                                            <span v-else class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 focus:outline-none">
+                                                <MagnifyingGlassIcon class="h-5 w-5"/>
+                                            </span>
+                                        </span>
+                                    </div>
+                                    <div v-for="(data, index) in filteredDataCollections[item]" :key="data.id" class="w-full divide-y">
                                         <label class="flex justify-start cursor-pointer w-full space-x-3 p-3 text-xs border-b hover:bg-gray-100">
-                                            <input id="cbx-restDay" type="checkbox" v-model="item.checked" @change="updateSelected('division', item)" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded">
-                                            <span>{{ index +1 }}. {{ item.name }}</span>
+                                            <input id="cbx-restDay" type="checkbox" v-model="data.checked" @change="updateSelected(item, data)" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded">
+                                            <span>{{ index +1 }}. {{ data.name }}</span>
                                         </label>
                                     </div>
                                 </MenuItems>
@@ -477,137 +516,6 @@
                 </div>
             </div>
 
-            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-2 pb-2">
-                <label :for="divisions" class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
-                    Show multi select here for Departments
-                    <span  class="text-red-600">*</span>
-                </label>
-                <div class="mt-1 sm:col-span-2 sm:mt-0">
-                    <div ref="modalContainer" class="max-w-lg relative ">
-                        <Menu as="div" class="relative">
-                            <MenuButton type="button" class="flex items-center justify-between w-full gap-x-1.5 rounded-r-md px-3 py-2 text-sm  text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300" :disabled="selectedDivisions.length<1" :class="{'bg-gray-200': selectedDivisions.length < 1,'bg-white hover:bg-gray-50': selectedDivisions.length > 0, }" >
-                                <div>
-                                    <span v-if="selectedDepartments.length > 0">
-                                        <span class="text-xs ml-0.5 bg-green-200 px-1.5 py-1 rounded-lg" v-for="selected in selectedDepartments.slice(0, 5)" :key="selected.id">
-                                            {{ selected.shortname }}
-                                        </span>
-                                        <span class="text-xs ml-0.5 px-1.5 py-1 rounded-lg" v-if="selectedDepartments.length >5" >
-                                           + {{ selectedDepartments.length - 5 }} more
-                                        </span>
-                                    </span>
-                                    <span v-else>Select Departments</span>
-                                </div>
-                                <ChevronUpDownIcon class="-mr-1 h-5 w-5 text-gray-400" aria-hidden="true" />
-                            </MenuButton>
-
-                            <transition
-                                enter-active-class="transition ease-out duration-100"
-                                enter-from-class="transform opacity-0 scale-95"
-                                enter-to-class="transform opacity-100 scale-100"
-                                leave-active-class="transition ease-in duration-75"
-                                leave-from-class="transform opacity-100 scale-100"
-                                leave-to-class="transform opacity-0 scale-95">
-                                <MenuItems class="absolute right-0 z-10 mb-0 w-3/4 origin-bottom-right max-h-80 overflow-auto rounded-lg bg-white shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none" style="bottom: 100%; margin-bottom: 8px;">
-                                    <div v-for="(item, index) in filteredDepartments" :key="item.id" class="w-full"  >
-                                        <label class="flex justify-start cursor-pointer w-full space-x-3 p-3 text-xs border-b hover:bg-gray-100">
-                                            <input id="cbx-restDay" type="checkbox" v-model="item.checked" @change="updateSelected('department', item)" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded">
-                                            <span>{{ index +1 }}. {{ item.name }}</span>
-                                        </label>
-                                    </div>
-                                </MenuItems>
-                            </transition>
-                        </Menu>
-                    </div>
-                </div>
-            </div>
-
-            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-2 pb-2">
-                <label :for="divisions" class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
-                    Show multi select here for Sub-Departments
-                    <span  class="text-red-600">*</span>
-                </label>
-                <div class="mt-1 sm:col-span-2 sm:mt-0">
-                    <div ref="modalContainer" class="max-w-lg relative ">
-                        <Menu as="div" class="relative">
-                            <MenuButton type="button" class="flex items-center justify-between w-full gap-x-1.5 rounded-r-md px-3 py-2 text-sm  text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300"  :disabled="selectedDepartments.length<1" :class="{'bg-gray-200': selectedDepartments.length < 1,'bg-white hover:bg-gray-50': selectedDepartments.length > 0, }" >
-                                <div>
-                                    <span v-if="selectedSubDepartments.length > 0">
-                                        <span class="text-xs ml-0.5 bg-green-200 px-1.5 py-1 rounded-lg" v-for="selected in selectedSubDepartments.slice(0, 5)" :key="selected.id">
-                                            {{ selected.shortname }}
-                                        </span>
-                                        <span class="text-xs ml-0.5 px-1.5 py-1 rounded-lg" v-if="selectedSubDepartments.length >5" >
-                                           + {{ selectedSubDepartments.length - 5 }} more
-                                        </span>
-                                    </span>
-                                    <span v-else>Select Sub-Departments</span>
-                                </div>
-                                <ChevronUpDownIcon class="-mr-1 h-5 w-5 text-gray-400" aria-hidden="true" />
-                            </MenuButton>
-
-                            <transition
-                                enter-active-class="transition ease-out duration-100"
-                                enter-from-class="transform opacity-0 scale-95"
-                                enter-to-class="transform opacity-100 scale-100"
-                                leave-active-class="transition ease-in duration-75"
-                                leave-from-class="transform opacity-100 scale-100"
-                                leave-to-class="transform opacity-0 scale-95">
-                                <MenuItems class="absolute right-0 z-10 mb-0 w-3/4 origin-bottom-right max-h-80 overflow-auto rounded-lg bg-white shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none" style="bottom: 100%; margin-bottom: 8px;">
-                                    <div v-for="(item, index) in filteredSubDepartments" :key="item.id" class="w-full"  >
-                                        <label class="flex justify-start cursor-pointer w-full space-x-3 p-3 text-xs border-b hover:bg-gray-100">
-                                            <input id="cbx-restDay" type="checkbox" v-model="item.checked" @change="updateSelected('subdepartment', item)" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded">
-                                            <span>{{ index +1 }}. {{ item.name }}</span>
-                                        </label>
-                                    </div>
-                                </MenuItems>
-                            </transition>
-                        </Menu>
-                    </div>
-                </div>
-            </div>
-
-            <div class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-y sm:border-gray-200 sm:pt-2">
-                <label :for="divisions" class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2">
-                    Show multi select here for Sub-Departments Unit
-                    <span  class="text-red-600">*</span>
-                </label>
-                <div class="mt-1 sm:col-span-2 sm:mt-0">
-                    <div ref="modalContainer" class="max-w-lg relative ">
-                        <Menu as="div" class="relative">
-                            <MenuButton type="button" class="flex items-center justify-between w-full gap-x-1.5 rounded-r-md px-3 py-2 text-sm  text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300"  :disabled="selectedSubDepartments.length<1" :class="{'bg-gray-200': selectedSubDepartments.length < 1,'bg-white hover:bg-gray-50': selectedSubDepartments.length > 0, }" >
-                                <div>
-                                    <span v-if="selectedSubDepartmentUnits.length > 0">
-                                        <span class="text-xs ml-0.5 bg-green-200 px-1.5 py-1 rounded-lg" v-for="selected in selectedSubDepartmentUnits.slice(0, 5)" :key="selected.id">
-                                            {{ selected.shortname }}
-                                        </span>
-                                        <span class="text-xs ml-0.5 px-1.5 py-1 rounded-lg" v-if="selectedSubDepartmentUnits.length >5" >
-                                           + {{ selectedSubDepartmentUnits.length - 5 }} more
-                                        </span>
-                                    </span>
-                                    <span v-else>Select Sub-Department Unit</span>
-                                </div>
-                                <ChevronUpDownIcon class="-mr-1 h-5 w-5 text-gray-400" aria-hidden="true" />
-                            </MenuButton>
-
-                            <transition
-                                enter-active-class="transition ease-out duration-100"
-                                enter-from-class="transform opacity-0 scale-95"
-                                enter-to-class="transform opacity-100 scale-100"
-                                leave-active-class="transition ease-in duration-75"
-                                leave-from-class="transform opacity-100 scale-100"
-                                leave-to-class="transform opacity-0 scale-95">
-                                <MenuItems class="absolute right-0 z-10 mb-0 w-3/4 origin-bottom-right max-h-80 overflow-auto rounded-lg bg-white shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none" style="bottom: 100%; margin-bottom: 8px;">
-                                    <div v-for="(item, index) in filteredSubDepartmentUnit" :key="item.id" class="w-full"  >
-                                        <label class="flex justify-start cursor-pointer w-full space-x-3 p-3 text-xs border-b hover:bg-gray-100">
-                                            <input id="cbx-restDay" type="checkbox" v-model="item.checked" @change="updateSelected('subdepartmentunit', item)" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded">
-                                            <span>{{ index +1 }}. {{ item.name }}</span>
-                                        </label>
-                                    </div>
-                                </MenuItems>
-                            </transition>
-                        </Menu>
-                    </div>
-                </div>
-            </div>
 
         </div>
 
@@ -632,7 +540,7 @@ import { Head,Link } from '@inertiajs/vue3';
 import { Switch} from '@headlessui/vue'
 import { ChevronUpIcon, ExclamationCircleIcon } from '@heroicons/vue/20/solid'
 import { computed, ref } from 'vue'
-import { CheckIcon, ChevronUpDownIcon,ChevronDownIcon } from '@heroicons/vue/20/solid'
+import { CheckIcon, ChevronUpDownIcon,ChevronDownIcon , XCircleIcon, MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
 import { Combobox,ComboboxButton,ComboboxInput,ComboboxLabel,ComboboxOption,ComboboxOptions, TransitionRoot,} from '@headlessui/vue'
 import Pluralize from 'pluralize';
 import { QuillEditor } from '@vueup/vue-quill'
@@ -658,6 +566,7 @@ export default {
       return{
 
          /*  editmode: false, */
+          multiMenu:['divisions','departments','sub_departments','sub_department_units'],
           form: {},
           formid: '',
           columns: [],
@@ -684,10 +593,30 @@ export default {
           file_size: '',
           file_type: '',
           referencetablecolumnforcombobox: {},
-          divisions: [],
-          departments: [],
-          subDepartments: [],
-          subDepartmentUnits: [],
+
+          dataCollections:{
+            divisions: [],
+            departments: [],
+            sub_departments: [],
+            sub_department_units: [],
+        },
+        searchQueries: {
+                divisions: '',
+                departments: '',
+                sub_departments: '',
+                sub_department_units: '',
+            },
+        //   divisions: [],
+        //   departments: [],
+        //   subDepartments: [],
+        //   subDepartmentUnits: [],
+        selectedMultiSelect:{
+            divisions:[],
+            departments:[],
+            sub_departments:[],
+            sub_department_units:[],
+
+        },
           selectedDivisions:[],
           selectedDepartments:[],
           selectedSubDepartments:[],
@@ -699,77 +628,115 @@ export default {
 
   methods:{
     updateSelected(type, item) {
-        if (type === 'division'){
-            if (item.checked) {
-                if (!this.selectedDivisions.find(div => div.id === item.id)) {
-                this.selectedDivisions.push({ division_id: item.id, shortname: item.shortname });
-                }
-            } else {
-                this.selectedDivisions = this.selectedDivisions.filter(div => div.division_id !== item.id);
-            }
-            this.filteredDepartments.forEach(dept => {
-                dept.checked = false;
-            });
-            this.filteredSubDepartments.forEach(subDept => {
-                subDept.checked = false;
-            });
-            this.filteredSubDepartmentUnit.forEach(subDeptUnit => {
-                subDeptUnit.checked = false;
-            });
-            this.selectedSubDepartmentUnits = [];
-            this.selectedSubDepartments = [];
-            this.selectedDepartments = [];
-
+    if (type === 'divisions') {
+      if (item.checked) {
+        if (!this.selectedMultiSelect.divisions.some(div => div.division_id === item.id)) {
+          this.selectedMultiSelect.divisions.push({ division_id: item.id, shortname: item.shortname });
         }
-
-        if (type === 'department'){
-            if (item.checked) {
-                if (!this.selectedDepartments.find(dept => dept.id === item.id)) {
-                this.selectedDepartments.push({ department_id: item.id, shortname: item.shortname });
-                }
-            } else {
-                this.selectedDepartments = this.selectedDepartments.filter(dept => dept.department_id !== item.id);
-            }
-
-            this.filteredSubDepartments.forEach(subDept => {
-                subDept.checked = false;
-            });
-            this.filteredSubDepartmentUnit.forEach(subDeptUnit => {
-                subDeptUnit.checked = false;
-            });
-            this.selectedSubDepartmentUnits = [];
-            this.selectedSubDepartments = [];
+      } else {
+        this.selectedMultiSelect.divisions = this.selectedMultiSelect.divisions.filter(div => div.division_id !== item.id);
+      }
+      this.clearSelections(['departments', 'sub_departments', 'sub_department_units']);
+    } else if (type === 'departments') {
+      if (item.checked) {
+        if (!this.selectedMultiSelect.departments.some(dept => dept.department_id === item.id)) {
+          this.selectedMultiSelect.departments.push({ department_id: item.id, shortname: item.shortname });
         }
-
-        if (type === 'subdepartment'){
-            if (item.checked) {
-                if (!this.selectedSubDepartments.find(subDept => subDept.id === item.id)) {
-                this.selectedSubDepartments.push({ sub_department_id: item.id, shortname: item.shortname });
-                }
-            } else {
-                this.selectedSubDepartments = this.selectedSubDepartments.filter(subDept => subDept.sub_department_id !== item.id);
-            }
-
-            this.filteredSubDepartmentUnit.forEach(subDeptUnit => {
-                subDeptUnit.checked = false;
-            });
-            this.selectedSubDepartmentUnits = [];
+      } else {
+        this.selectedMultiSelect.departments = this.selectedMultiSelect.departments.filter(dept => dept.department_id !== item.id);
+      }
+      this.clearSelections(['sub_departments', 'sub_department_units']);
+    } else if (type === 'sub_departments') {
+      if (item.checked) {
+        if (!this.selectedMultiSelect.sub_departments.some(subDept => subDept.sub_department_id === item.id)) {
+          this.selectedMultiSelect.sub_departments.push({ sub_department_id: item.id, shortname: item.shortname });
         }
-
-        if (type === 'subdepartmentunit'){
-            if (item.checked) {
-                if (!this.selectedSubDepartmentUnits.find(subDeptUnit => subDeptUnit.id === item.id)) {
-                this.selectedSubDepartmentUnits.push({ sub_department_unit_id: item.id, shortname: item.shortname });
-                }
-            } else {
-                this.selectedSubDepartmentUnits = this.selectedSubDepartmentUnits.filter(subDeptUnit => subDeptUnit.sub_department_unit_id !== item.id);
-            }
+      } else {
+        this.selectedMultiSelect.sub_departments = this.selectedMultiSelect.sub_departments.filter(subDept => subDept.sub_department_id !== item.id);
+      }
+      this.clearSelections(['sub_department_units']);
+    } else if (type === 'sub_department_units') {
+      if (item.checked) {
+        if (!this.selectedMultiSelect.sub_department_units.some(subDeptUnit => subDeptUnit.sub_department_unit_id === item.id)) {
+          this.selectedMultiSelect.sub_department_units.push({ sub_department_unit_id: item.id, shortname: item.shortname });
         }
+      } else {
+        this.selectedMultiSelect.sub_department_units = this.selectedMultiSelect.sub_department_units.filter(subDeptUnit => subDeptUnit.sub_department_unit_id !== item.id);
+      }
+    }
+    console.log('Selected Items:', this.selectedMultiSelect);
+  },
 
-        console.log('DIDIDIDID', this.selectedDivisions);
+  clearSelections(types) {
+    types.forEach(type => {
+      this.filteredDataCollections[type].forEach(item => {
+        item.checked = false;
+      });
+      this.selectedMultiSelect[type] = [];
+    });
+  },
 
+    async getDepartments() {
+        try {
+            // Fetch all data concurrently
+            const [subDeptUnitsResponse, subDeptsResponse, deptsResponse, divisionsResponse] = await Promise.all([
+                axios.get(route('employeeworkschedule.getSubDeptUnit')),
+                axios.get(route('employeeworkschedule.getSubDept')),
+                axios.get(route('employeeworkschedule.getDept')),
+                axios.get(route('employeeworkschedule.getDivisions'))
+            ]);
 
+            // Process the sub_department_units
+            const subDepartmentUnits = subDeptUnitsResponse.data.map(val => ({
+                id: val.id,
+                name: val.name,
+                shortname: val.short_name,
+                sub_department_id: Number(val.sub_department_id),
+                subData: [],
+
+            }));
+            // Process the sub_departments and link them with sub_department_units
+            const subDepartments = subDeptsResponse.data.map(val => ({
+                id: val.id,
+                name: val.name,
+                shortname: val.short_name,
+                department_id: Number(val.department_id),
+                subData: subDepartmentUnits.filter(unit => unit.sub_department_id === val.id),
+
+            }));
+            // Process the departments and link them with sub_departments
+            const departments = deptsResponse.data.map(val => ({
+                id: val.id,
+                name: val.name,
+                shortname: val.short_name,
+                division_id: Number(val.division_id),
+                subData: subDepartments.filter(subDept => subDept.department_id === val.id),
+
+            }));
+            // Process the divisions and link them with departments
+            const divisions = divisionsResponse.data.map(val => ({
+                id: val.id,
+                name: val.name,
+                shortname: val.short_name,
+                subData: departments.filter(dept => dept.division_id === val.id),
+
+            }));
+            // Update the data collections
+            this.dataCollections = {
+                sub_department_units: subDepartmentUnits,
+                sub_departments: subDepartments,
+                departments: departments,
+                divisions: divisions
+            };
+            console.log('DIVVVV', this.dataCollections.divisions);
+            console.log('DEEPPP', this.dataCollections.departments);
+            console.log('SUBDEP', this.dataCollections.sub_departments);
+            console.log('SBDEPU', this.dataCollections.sub_department_units);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
     },
+
     getDivsAndDepts() {
         axios.get(route('employeeworkschedule.getSubDeptUnit'))
             .then(response => {
@@ -1516,6 +1483,7 @@ export default {
 
   created(){
     this.getData();
+    this.getDepartments();
     this.emitter.on('getformdata', (formdata)=>{
 
         this.form[formdata.fieldname] = formdata.value
@@ -1540,35 +1508,38 @@ export default {
   },
 
   computed: {
-    // selectedDivisionIds() {
-    //     return this.selectedDivisions.map(div => div.division_id);
-    // },
+    filteredDataCollections() {
+        // Get selected IDs for filtering
+        const selectedDivisionIds = this.selectedMultiSelect.divisions.map(item => item.division_id);
+        const selectedDepartmentIds = this.selectedMultiSelect.departments.map(item => item.department_id);
+        const selectedSubDepartmentIds = this.selectedMultiSelect.sub_departments.map(item => item.sub_department_id);
 
-    // selectedDepartmentIds() {
-    //     return this.selectedDepartments.map(div => div.id);
-    // },
-
-    // selectedSubDepartmentIds() {
-    //     return this.selectedSubDepartments.map(div => div.id);
-    // },
-
-    // selectedSubDepartmentUnitIds() {
-    //     return this.selectedSubDepartmentUnits.map(div => div.id);
-    // },
-
-    filteredDepartments() {
-      return this.departments.filter(dept => this.selectedDivisions.some(div => div.division_id === dept.division_id));
+        return {
+        divisions: this.dataCollections.divisions.filter(division => {
+            // Filter by name and selected status
+            const searchQuery = this.searchQueries.divisions?.toLowerCase() || '';
+            return division.name.toLowerCase().includes(searchQuery);
+        }),
+        departments: this.dataCollections.departments.filter(department => {
+            // Filter by name, division, and selected status
+            const searchQuery = this.searchQueries.departments?.toLowerCase() || '';
+            return department.name.toLowerCase().includes(searchQuery) &&
+                (selectedDivisionIds.includes(department.division_id) || selectedDivisionIds.length === 0);
+        }),
+        sub_departments: this.dataCollections.sub_departments.filter(subDept => {
+            // Filter by name, department, and selected status
+            const searchQuery = this.searchQueries.sub_departments?.toLowerCase() || '';
+            return subDept.name.toLowerCase().includes(searchQuery) &&
+                (selectedDepartmentIds.includes(subDept.department_id) || selectedDepartmentIds.length === 0);
+        }),
+        sub_department_units: this.dataCollections.sub_department_units.filter(subDeptUnit => {
+            // Filter by name, sub_department, and selected status
+            const searchQuery = this.searchQueries.sub_department_units?.toLowerCase() || '';
+            return subDeptUnit.name.toLowerCase().includes(searchQuery) &&
+                (selectedSubDepartmentIds.includes(subDeptUnit.sub_department_id) || selectedSubDepartmentIds.length === 0);
+        }),
+        };
     },
-
-    filteredSubDepartments() {
-      return this.subDepartments.filter(subDept => this.selectedDepartments.some(dept => dept.department_id === subDept.department_id));
-    },
-
-    filteredSubDepartmentUnit() {
-      return this.subDepartmentUnits.filter(subDeptUnit => this.selectedSubDepartments.some(subDept => subDept.sub_department_id === subDeptUnit.sub_department_id));
-    },
-
-
      filterComboBoxSearch(){
       return (searchQuery, referencetable, referencetablecolumn, columnname) => {
         if (!searchQuery) {
