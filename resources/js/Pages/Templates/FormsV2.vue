@@ -613,38 +613,38 @@ export default {
     updateSelected(type, item) {
     if (type === 'divisions') {
       if (item.checked) {
-        if (!this.selectedMultiSelect.divisions.some(div => div.division_id === item.id)) {
-          this.selectedMultiSelect.divisions.push({ division_id: item.id, shortname: item.shortname });
+        if (!this.selectedMultiSelect.divisions.some(div => div.id === item.id)) {
+          this.selectedMultiSelect.divisions.push({ id: item.id, shortname: item.shortname, db:'DivisionShiftSetup', fk:'division_id' });
         }
       } else {
-        this.selectedMultiSelect.divisions = this.selectedMultiSelect.divisions.filter(div => div.division_id !== item.id);
+        this.selectedMultiSelect.divisions = this.selectedMultiSelect.divisions.filter(div => div.id !== item.id);
       }
       this.clearSelections(['departments', 'sub_departments', 'sub_department_units']);
     } else if (type === 'departments') {
       if (item.checked) {
-        if (!this.selectedMultiSelect.departments.some(dept => dept.department_id === item.id)) {
-          this.selectedMultiSelect.departments.push({ department_id: item.id, shortname: item.shortname });
+        if (!this.selectedMultiSelect.departments.some(dept => dept.id === item.id)) {
+          this.selectedMultiSelect.departments.push({ id: item.id, shortname: item.shortname, db:'DepartmentShiftSetup', fk:'department_id' });
         }
       } else {
-        this.selectedMultiSelect.departments = this.selectedMultiSelect.departments.filter(dept => dept.department_id !== item.id);
+        this.selectedMultiSelect.departments = this.selectedMultiSelect.departments.filter(dept => dept.id !== item.id);
       }
       this.clearSelections(['sub_departments', 'sub_department_units']);
     } else if (type === 'sub_departments') {
       if (item.checked) {
-        if (!this.selectedMultiSelect.sub_departments.some(subDept => subDept.sub_department_id === item.id)) {
-          this.selectedMultiSelect.sub_departments.push({ sub_department_id: item.id, shortname: item.shortname });
+        if (!this.selectedMultiSelect.sub_departments.some(subDept => subDept.id === item.id)) {
+          this.selectedMultiSelect.sub_departments.push({ id: item.id, shortname: item.shortname, db:'SubDepartmentShiftSetup', fk:'sub_department_id' });
         }
       } else {
-        this.selectedMultiSelect.sub_departments = this.selectedMultiSelect.sub_departments.filter(subDept => subDept.sub_department_id !== item.id);
+        this.selectedMultiSelect.sub_departments = this.selectedMultiSelect.sub_departments.filter(subDept => subDept.id !== item.id);
       }
       this.clearSelections(['sub_department_units']);
     } else if (type === 'sub_department_units') {
       if (item.checked) {
-        if (!this.selectedMultiSelect.sub_department_units.some(subDeptUnit => subDeptUnit.sub_department_unit_id === item.id)) {
-          this.selectedMultiSelect.sub_department_units.push({ sub_department_unit_id: item.id, shortname: item.shortname });
+        if (!this.selectedMultiSelect.sub_department_units.some(subDeptUnit => subDeptUnit.id === item.id)) {
+          this.selectedMultiSelect.sub_department_units.push({ id: item.id, shortname: item.shortname, db:'SubDepartmentUnitShiftSetup', fk:'sub_department_unit_id' });
         }
       } else {
-        this.selectedMultiSelect.sub_department_units = this.selectedMultiSelect.sub_department_units.filter(subDeptUnit => subDeptUnit.sub_department_unit_id !== item.id);
+        this.selectedMultiSelect.sub_department_units = this.selectedMultiSelect.sub_department_units.filter(subDeptUnit => subDeptUnit.id !== item.id);
       }
     }
     console.log('Selected Items:', this.selectedMultiSelect);
@@ -663,10 +663,10 @@ export default {
         try {
             // Fetch all data concurrently
             const [subDeptUnitsResponse, subDeptsResponse, deptsResponse, divisionsResponse] = await Promise.all([
-                axios.get(route('employeeworkschedule.getSubDeptUnit')),
-                axios.get(route('employeeworkschedule.getSubDept')),
-                axios.get(route('employeeworkschedule.getDept')),
-                axios.get(route('employeeworkschedule.getDivisions'))
+                axios.get(route('shiftsetup.getSubDeptUnit')),
+                axios.get(route('shiftsetup.getSubDept')),
+                axios.get(route('shiftsetup.getDept')),
+                axios.get(route('shiftsetup.getDiv'))
             ]);
 
             // Process the sub_department_units
@@ -1396,10 +1396,10 @@ export default {
 
             formdata: this.form,
             fileInfo: this.file,
-            Divisions: this.selectedMultiSelect.divisions,
-            Departments: this.selectedMultiSelect.departments,
-            SubDepartments: this.selectedMultiSelect.sub_departments,
-            SubDepartmentUnits: this.selectedMultiSelect.sub_department_units,
+            multiSelectData: this.selectedMultiSelect,
+            // Departments: this.selectedMultiSelect.departments,
+            // SubDepartments: this.selectedMultiSelect.sub_departments,
+            // SubDepartmentUnits: this.selectedMultiSelect.sub_department_units,
             }).then(response => {
               console.log(this.form);
               console.log(response.data)
@@ -1493,9 +1493,9 @@ export default {
   computed: {
     filteredDataCollections() {
         // Get selected IDs for filtering
-        const selectedDivisionIds = this.selectedMultiSelect.divisions.map(item => item.division_id);
-        const selectedDepartmentIds = this.selectedMultiSelect.departments.map(item => item.department_id);
-        const selectedSubDepartmentIds = this.selectedMultiSelect.sub_departments.map(item => item.sub_department_id);
+        const selectedDivisionIds = this.selectedMultiSelect.divisions.map(item => item.id);
+        const selectedDepartmentIds = this.selectedMultiSelect.departments.map(item => item.id);
+        const selectedSubDepartmentIds = this.selectedMultiSelect.sub_departments.map(item => item.id);
 
         return {
         divisions: this.dataCollections.divisions.filter(division => {

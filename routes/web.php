@@ -366,6 +366,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/shiftsetup/search', [ShiftSetupController::class, 'searchData'])->name('shiftsetup.search');
 
 
+    Route::get('/shiftsetup/getDiv', [ShiftSetupController::class, 'getDiv'])->name('shiftsetup.getDiv');
+    Route::get('/shiftsetup/getDept', [ShiftSetupController::class, 'getDept'])->name('shiftsetup.getDept');
+    Route::get('/shiftsetup/getSubDept', [ShiftSetupController::class, 'getSubDept'])->name('shiftsetup.getSubDept');
+    Route::get('/shiftsetup/getSubDeptUnit', [ShiftSetupController::class, 'getSubDeptUnit'])->name('shiftsetup.getSubDeptUnit');
+
+
     /* Relationship */
     Route::get('/relationships/getlist', [RelationshipController::class, 'getlist'])->name('relationships.getlist');
     Route::get('/relationships/getcolumns', [RelationshipController::class, 'getcolumns'])->name('relationships.getcolumns');

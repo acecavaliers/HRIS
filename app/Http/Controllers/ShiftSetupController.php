@@ -3,10 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\General\CommonController;
+use App\Models\Department;
 use App\Models\DepartmentShiftSetup;
+use App\Models\Division;
 use App\Models\DivisionShiftSetup;
 use App\Models\ShiftSetup;
+use App\Models\SubDepartment;
 use App\Models\SubDepartmentShiftSetup;
+use App\Models\SubDepartmentUnit;
 use App\Models\SubDepartmentUnitShiftSetup;
 use App\Models\SystemTable;
 use App\Models\SystemTableDetail;
@@ -35,6 +39,31 @@ class ShiftSetupController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+
+    public function getDiv()
+    {
+        $query = Division::where('is_active', '1')->get();
+        return $query;
+    }
+    public function getDept()
+    {
+        $query = Department::where('is_active', '1')
+            ->get();
+        return $query;
+    }
+    public function getSubDept()
+    {
+        $query = SubDepartment::where('is_active', '1')
+            ->get();
+        return $query;
+    }
+    public function getSubDeptUnit()
+    {
+        $query = SubDepartmentUnit::where('is_active', '1')
+            ->get();
+        return $query;
+    }
+
     public function store(Request $request)
     {
         $validated = CommonController::getRequiredFields('ShiftSetup', $request);
@@ -45,6 +74,8 @@ class ShiftSetupController extends Controller
 
 
         $arr = $request->formdata;
+        $multiSelect = $request->multiSelectData;
+
 
 
         if (count($systemtabledetail) > 0) {
@@ -62,39 +93,67 @@ class ShiftSetupController extends Controller
 
         if ($query) {
 
-            if (!empty($request->SubDepartmentUnits) && !empty($request->SubDepartments) && !empty($request->Departments) && !empty($request->Divisions)) {
 
-                foreach ($request->SubDepartmentUnits as $subDepartmentUnit) {
-                    $subDepartmentUnit['work_shift_id'] = $query->id;
-                    $subDepartmentUnit['created_by'] = $query->created_by;
-                    SubDepartmentUnitShiftSetup::create($subDepartmentUnit);
+            if (!empty($multiSelect['divisions'])) {
+
+                foreach ($multiSelect['divisions'] as $divisions) {
+
+                    $existingSetup = DivisionShiftSetup::where('division_id', $divisions['id'])
+                        ->where('is_active', 1)
+                        ->first();
+
+                    if (!$existingSetup || !$existingSetup->is_active) {
+                        $divisions['shift_setup_id'] = $query->id;
+                        $divisions['created_by'] = $query->created_by;
+                        DivisionShiftSetup::create($divisions);
+                    }
+                }
+            }
+            if (!empty($multiSelect['departments'])) {
+
+                foreach ($multiSelect['departments'] as $departments) {
+
+                    $existingSetup = DepartmentShiftSetup::where('department_id', $departments['id'])
+                        ->where('is_active', 1)
+                        ->first();
+
+                    if (!$existingSetup || !$existingSetup->is_active) {
+                        $departments['shift_setup_id'] = $query->id;
+                        $departments['created_by'] = $query->created_by;
+                        DepartmentShiftSetup::create($departments);
+                    }
                 }
             }
 
-            if (empty($request->SubDepartmentUnits) && !empty($request->SubDepartments) && !empty($request->Departments) && !empty($request->Divisions)) {
+            if (!empty($multiSelect['sub_departments'])) {
 
-                foreach ($request->SubDepartments as $subDepartment) {
-                    $subDepartment['work_shift_id'] = $query->id;
-                    $subDepartment['created_by'] = $query->created_by;
-                    SubDepartmentShiftSetup::create($subDepartment);
+                foreach ($multiSelect['sub_departments'] as $subDepartments) {
+
+                    $existingSetup = SubDepartmentShiftSetup::where('sub_department_id', $subDepartments['id'])
+                        ->where('is_active', 1)
+                        ->first();
+
+                    if (!$existingSetup || !$existingSetup->is_active) {
+                        $subDepartments['shift_setup_id'] = $query->id;
+                        $subDepartments['created_by'] = $query->created_by;
+                        SubDepartmentShiftSetup::create($subDepartments);
+                    }
                 }
             }
 
-            if (empty($request->SubDepartmentUnits) && empty($request->SubDepartments) && !empty($request->Departments) && !empty($request->Divisions)) {
+            if (!empty($multiSelect['sub_department_units'])) {
 
-                foreach ($request->Departments as $department) {
-                    $department['work_shift_id'] = $query->id;
-                    $department['created_by'] = $query->created_by;
-                    DepartmentShiftSetup::create($department);
-                }
-            }
+                foreach ($multiSelect['sub_department_units'] as $subDepartmentunits) {
 
-            if (empty($request->SubDepartmentUnits) && empty($request->SubDepartments) && empty($request->Departments) && !empty($request->Divisions)) {
+                    $existingSetup = SubDepartmentUnitShiftSetup::where('sub_department_unit_id', $subDepartmentunits['id'])
+                        ->where('is_active', 1)
+                        ->first();
 
-                foreach ($request->Divisions as $division) {
-                    $division['work_shift_id'] = $query->id;
-                    $division['created_by'] = $query->created_by;
-                    DivisionShiftSetup::create($division);
+                    if (!$existingSetup || !$existingSetup->is_active) {
+                        $subDepartmentunits['shift_setup_id'] = $query->id;
+                        $subDepartmentunits['created_by'] = $query->created_by;
+                        SubDepartmentUnitShiftSetup::create($subDepartmentunits);
+                    }
                 }
             }
         }

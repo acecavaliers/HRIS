@@ -27,13 +27,9 @@ class EmployeeWorkScheduleController extends Controller
 
         return Inertia::render('Timekeeping/EmployeeWorkSchedule');
     }
+
     public function getDivisions(Request $request)
     {
-
-        // $query = Division::where('is_active', '1')->get();
-        // // ->get('name','id','division_id');
-        // return $query;
-
         $query = Division::select(
             'divisions.id',
             'divisions.code',
@@ -44,10 +40,16 @@ class EmployeeWorkScheduleController extends Controller
             'shift_setups.first_start_date',
             'shift_setups.second_start_date'
         )
-            ->join('division_shift_setups', 'divisions.id', '=', 'division_shift_setups.division_id')
-            ->join('shift_setups', 'division_shift_setups.shift_setup_id', '=', 'shift_setups.id')
-            ->where('division_shift_setups.is_active', 1)
-            ->where('shift_setups.is_active', 1)
+            ->leftJoin('division_shift_setups', 'divisions.id', '=', 'division_shift_setups.division_id')
+            ->leftJoin('shift_setups', 'division_shift_setups.shift_setup_id', '=', 'shift_setups.id')
+            ->where(function ($q) {
+                $q->where('division_shift_setups.is_active', 1)
+                    ->orWhereNull('division_shift_setups.is_active');
+            })
+            ->where(function ($q) {
+                $q->where('shift_setups.is_active', 1)
+                    ->orWhereNull('shift_setups.is_active');
+            })
             ->get();
 
         return $query;
@@ -55,9 +57,6 @@ class EmployeeWorkScheduleController extends Controller
 
     public function getDept(Request $request)
     {
-
-        // $query = Department::where('is_active', '1')
-        //     ->get();
         $query = Department::select(
             'departments.id',
             'division_id',
@@ -69,19 +68,23 @@ class EmployeeWorkScheduleController extends Controller
             'shift_setups.first_start_date',
             'shift_setups.second_start_date'
         )
-            ->join('department_shift_setups', 'departments.id', '=', 'department_shift_setups.department_id')
-            ->join('shift_setups', 'department_shift_setups.shift_setup_id', '=', 'shift_setups.id')
-            ->where('department_shift_setups.is_active', 1)
-            ->where('shift_setups.is_active', 1)
+            ->leftJoin('department_shift_setups', 'departments.id', '=', 'department_shift_setups.department_id')
+            ->leftJoin('shift_setups', 'department_shift_setups.shift_setup_id', '=', 'shift_setups.id')
+            ->where(function ($q) {
+                $q->where('department_shift_setups.is_active', 1)
+                    ->orWhereNull('department_shift_setups.is_active');
+            })
+            ->where(function ($q) {
+                $q->where('shift_setups.is_active', 1)
+                    ->orWhereNull('shift_setups.is_active');
+            })
             ->get();
+
         return $query;
     }
 
     public function getSubDept(Request $request)
     {
-
-        // $query = SubDepartment::where('is_active', '1')
-        //     ->get();
         $query = SubDepartment::select(
             'sub_departments.id',
             'department_id',
@@ -93,19 +96,23 @@ class EmployeeWorkScheduleController extends Controller
             'shift_setups.first_start_date',
             'shift_setups.second_start_date'
         )
-            ->join('sub_department_shift_setups', 'sub_departments.id', '=', 'sub_department_shift_setups.sub_department_id')
-            ->join('shift_setups', 'sub_department_shift_setups.shift_setup_id', '=', 'shift_setups.id')
-            ->where('sub_department_shift_setups.is_active', 1)
-            ->where('shift_setups.is_active', 1)
+            ->leftJoin('sub_department_shift_setups', 'sub_departments.id', '=', 'sub_department_shift_setups.sub_department_id')
+            ->leftJoin('shift_setups', 'sub_department_shift_setups.shift_setup_id', '=', 'shift_setups.id')
+            ->where(function ($q) {
+                $q->where('sub_department_shift_setups.is_active', 1)
+                    ->orWhereNull('sub_department_shift_setups.is_active');
+            })
+            ->where(function ($q) {
+                $q->where('shift_setups.is_active', 1)
+                    ->orWhereNull('shift_setups.is_active');
+            })
             ->get();
+
         return $query;
     }
 
     public function getSubDeptUnit(Request $request)
     {
-
-        // $query = SubDepartmentUnit::where('is_active', '1')
-        //     ->get();
         $query = SubDepartmentUnit::select(
             'sub_department_units.id',
             'sub_department_id',
@@ -117,11 +124,18 @@ class EmployeeWorkScheduleController extends Controller
             'shift_setups.first_start_date',
             'shift_setups.second_start_date'
         )
-            ->join('sub_department_unit_shift_setups', 'sub_department_units.id', '=', 'sub_department_unit_shift_setups.sub_department_unit_id')
-            ->join('shift_setups', 'sub_department_unit_shift_setups.shift_setup_id', '=', 'shift_setups.id')
-            ->where('sub_department_unit_shift_setups.is_active', 1)
-            ->where('shift_setups.is_active', 1)
+            ->leftJoin('sub_department_unit_shift_setups', 'sub_department_units.id', '=', 'sub_department_unit_shift_setups.sub_department_unit_id')
+            ->leftJoin('shift_setups', 'sub_department_unit_shift_setups.shift_setup_id', '=', 'shift_setups.id')
+            ->where(function ($q) {
+                $q->where('sub_department_unit_shift_setups.is_active', 1)
+                    ->orWhereNull('sub_department_unit_shift_setups.is_active');
+            })
+            ->where(function ($q) {
+                $q->where('shift_setups.is_active', 1)
+                    ->orWhereNull('shift_setups.is_active');
+            })
             ->get();
+
         return $query;
     }
 
