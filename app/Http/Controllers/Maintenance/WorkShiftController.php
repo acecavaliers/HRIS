@@ -45,19 +45,17 @@ class WorkShiftController extends Controller
 
         $systemtabledetail = SystemTableDetail::where(array('system_table_id' => $systemtable->id, 'is_fk_getreferenced' => 0))->get();
 
-
         $arr = $request->formdata;
+        $multiSelect = $request->multiSelectData;
+        $saveData = [];
 
+        if (count($systemtabledetail) > 0) {
+            foreach ($systemtabledetail as $data) {
+                if (isset($data['saving_referenced_field'])) {
 
-        if(count($systemtabledetail) > 0){
-            foreach($systemtabledetail as $data){
-                if(isset($data['saving_referenced_field'])){
-
-                        $arr[$data['column_name']] = $request->formdata[$data['column_name']][$data['saving_referenced_field']];
-
+                    $arr[$data['column_name']] = $request->formdata[$data['column_name']][$data['saving_referenced_field']];
                 }
             }
-
         }
 
         $arr['created_by'] = Auth::user()->name;
@@ -66,46 +64,27 @@ class WorkShiftController extends Controller
 
         if ($query) {
 
-            if (!empty($request->SubDepartmentUnits) && !empty($request->SubDepartments) && !empty($request->Departments) && !empty($request->Divisions) ){
+            foreach ($multiSelect as $category => $multidata) {
+                if (!empty($multidata)) {
+                    foreach ($multidata as $data) {
+                        // Determine the fully qualified class name dynamically
+                        $modelClass = 'App\\Models\\' . $data['db']; // Adjust namespace as needed
+                        $foreignKey = $data['fk'];
 
-                foreach ($request->SubDepartmentUnits as $subDepartmentUnit) {
-                    $subDepartmentUnit['work_shift_id'] = $query->id;
-                    $subDepartmentUnit['created_by'] = $query->created_by;
-                    SubDepartmentUnitShift::create($subDepartmentUnit);
+                        // Check if the class exists before using it
+                        if (!class_exists($modelClass)) {
+                            continue; // Skip if the class doesn't exist
+                        }
+
+                        $saveData['work_shift_id'] = $query->id;
+                        $saveData['created_by'] = $query->created_by;
+                        $saveData[$foreignKey] = $data['id'];
+
+                        $modelClass::create($saveData); // Create new record in the respective model
+
+                    }
                 }
-
             }
-
-            if (empty($request->SubDepartmentUnits) && !empty($request->SubDepartments) && !empty($request->Departments) && !empty($request->Divisions) ){
-
-                foreach ($request->SubDepartments as $subDepartment) {
-                    $subDepartment['work_shift_id'] = $query->id;
-                    $subDepartment['created_by'] = $query->created_by;
-                    SubDepartmentShift::create($subDepartment);
-                }
-
-            }
-
-            if (empty($request->SubDepartmentUnits) && empty($request->SubDepartments) && !empty($request->Departments) && !empty($request->Divisions) ){
-
-                foreach ($request->Departments as $department) {
-                    $department['work_shift_id'] = $query->id;
-                    $department['created_by'] = $query->created_by;
-                    DepartmentShift::create($department);
-                }
-
-            }
-
-            if (empty($request->SubDepartmentUnits) && empty($request->SubDepartments) && empty($request->Departments) && !empty($request->Divisions) ){
-
-                foreach ($request->Divisions as $division) {
-                    $division['work_shift_id'] = $query->id;
-                    $division['created_by'] = $query->created_by;
-                    DivisionShift::create($division);
-                }
-
-            }
-
         }
 
         return 'success';
@@ -142,15 +121,13 @@ class WorkShiftController extends Controller
         $arr = $request->formdata;
 
 
-        if(count($systemtabledetail) > 0){
-            foreach($systemtabledetail as $data){
-                if(isset($data['saving_referenced_field'])){
+        if (count($systemtabledetail) > 0) {
+            foreach ($systemtabledetail as $data) {
+                if (isset($data['saving_referenced_field'])) {
 
-                        $arr[$data['column_name']] = $request->formdata[$data['column_name']][$data['saving_referenced_field']];
-
+                    $arr[$data['column_name']] = $request->formdata[$data['column_name']][$data['saving_referenced_field']];
                 }
             }
-
         }
         $arr['updated_by'] = Auth::user()->name;
 
@@ -163,65 +140,62 @@ class WorkShiftController extends Controller
      */
     public function destroy(string $id)
     {
-        WorkShift::where('id', $id)->update(['deleted_by'=> Auth::user()->name]);
+        WorkShift::where('id', $id)->update(['deleted_by' => Auth::user()->name]);
         WorkShift::where('id', $id)->delete();
         return 'success';
     }
 
-    public function getlist(Request $request){
+    public function getlist(Request $request)
+    {
 
         $query = WorkShift::paginate($request->showrecords);
         return $query;
-
     }
 
     public function getcolumns(Request $request)
     {
-       $systemtable = SystemTable::where('model_name', $request->modelName)->first();
-       return SystemTableDetail::with('formtypes')->where('system_table_id', $systemtable->id)->get();
+        $systemtable = SystemTable::where('model_name', $request->modelName)->first();
+        return SystemTableDetail::with('formtypes')->where('system_table_id', $systemtable->id)->get();
     }
 
-    public function searchData(Request $request){
+    public function searchData(Request $request)
+    {
 
 
         /*     return $request->is_active_all; */
-            DB::enableQueryLog();
-            //$searchdatadecode = json_decode($request->searchdata);
-            $searchdatadecode = $request->searchdata;
-            $val = 0;
-            $query = WorkShift::query();
-            foreach($searchdatadecode as $key=>$value){
+        DB::enableQueryLog();
+        //$searchdatadecode = json_decode($request->searchdata);
+        $searchdatadecode = $request->searchdata;
+        $val = 0;
+        $query = WorkShift::query();
+        foreach ($searchdatadecode as $key => $value) {
 
-                if($request->is_active_all == 'false'){
-                    if($key!= 'deleted_at'){
-                        if($key == 'created_at' || $key=='updated_at'){
-                            $query->whereDate($key, 'LIKE', '%'.$value.'%');
-                        }else if($key=='is_active'){
-                            $query->where($key, $value);
-
-                        }else{
-                            $query->where($key, 'LIKE', '%'.$value.'%');
-                        }
+            if ($request->is_active_all == 'false') {
+                if ($key != 'deleted_at') {
+                    if ($key == 'created_at' || $key == 'updated_at') {
+                        $query->whereDate($key, 'LIKE', '%' . $value . '%');
+                    } else if ($key == 'is_active') {
+                        $query->where($key, $value);
+                    } else {
+                        $query->where($key, 'LIKE', '%' . $value . '%');
                     }
-                }else{
-                    if($key!= 'deleted_at'){
-                        if($key == 'created_at' || $key=='updated_at'){
-                            $query->whereDate($key, 'LIKE', '%'.$value.'%');
-                        }else if($key=='is_active'){
-                            $query->whereIn($key, [0,1]);
-
-
-                        }else{
-                            $query->where($key, 'LIKE', '%'.$value.'%');
-                        }
+                }
+            } else {
+                if ($key != 'deleted_at') {
+                    if ($key == 'created_at' || $key == 'updated_at') {
+                        $query->whereDate($key, 'LIKE', '%' . $value . '%');
+                    } else if ($key == 'is_active') {
+                        $query->whereIn($key, [0, 1]);
+                    } else {
+                        $query->where($key, 'LIKE', '%' . $value . '%');
                     }
                 }
             }
-
-
-            $data = $query->paginate(10);
-            return $data;
-          /*   return DB::getQueryLog(); */
-
         }
+
+
+        $data = $query->paginate(10);
+        return $data;
+        /*   return DB::getQueryLog(); */
+    }
 }

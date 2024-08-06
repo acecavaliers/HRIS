@@ -549,7 +549,6 @@ export default {
       return{
 
          /*  editmode: false, */
-          multiMenu:['divisions','departments','sub_departments','sub_department_units'],
           form: {},
           formid: '',
           columns: [],
@@ -577,87 +576,66 @@ export default {
           file_type: '',
           referencetablecolumnforcombobox: {},
 
-          dataCollections:{
-            divisions: [],
-            departments: [],
-            sub_departments: [],
-            sub_department_units: [],
-        },
-        searchQueries: {
-                divisions: '',
-                departments: '',
-                sub_departments: '',
-                sub_department_units: '',
-            },
-        //   divisions: [],
-        //   departments: [],
-        //   subDepartments: [],
-        //   subDepartmentUnits: [],
-        selectedMultiSelect:{
-            divisions:[],
-            departments:[],
-            sub_departments:[],
-            sub_department_units:[],
+          multiMenu:['divisions','departments','sub_departments','sub_department_units'],
+          dataCollections:{ divisions: [], departments: [], sub_departments: [], sub_department_units: [], },
+          searchQueries: { divisions: '', departments: '', sub_departments: '', sub_department_units: '', },
+          selectedMultiSelect:{ divisions:[], departments:[], sub_departments:[], sub_department_units:[],
 
         },
-          selectedDivisions:[],
-          selectedDepartments:[],
-          selectedSubDepartments:[],
-          selectedSubDepartmentUnits:[],
 
       }
   },
 
 
   methods:{
-    updateSelected(type, item) {
-    if (type === 'divisions') {
-      if (item.checked) {
-        if (!this.selectedMultiSelect.divisions.some(div => div.id === item.id)) {
-          this.selectedMultiSelect.divisions.push({ id: item.id, shortname: item.shortname, db:'DivisionShiftSetup', fk:'division_id' });
+        updateSelected(type, item) {
+        if (type === 'divisions') {
+        if (item.checked) {
+            if (!this.selectedMultiSelect.divisions.some(div => div.id === item.id)) {
+            this.selectedMultiSelect.divisions.push({ id: item.id, shortname: item.shortname, db:'DivisionShift', fk:'division_id' });
+            }
+        } else {
+            this.selectedMultiSelect.divisions = this.selectedMultiSelect.divisions.filter(div => div.id !== item.id);
         }
-      } else {
-        this.selectedMultiSelect.divisions = this.selectedMultiSelect.divisions.filter(div => div.id !== item.id);
-      }
-      this.clearSelections(['departments', 'sub_departments', 'sub_department_units']);
-    } else if (type === 'departments') {
-      if (item.checked) {
-        if (!this.selectedMultiSelect.departments.some(dept => dept.id === item.id)) {
-          this.selectedMultiSelect.departments.push({ id: item.id, shortname: item.shortname, db:'DepartmentShiftSetup', fk:'department_id' });
+        this.clearSelections(['departments', 'sub_departments', 'sub_department_units']);
+        } else if (type === 'departments') {
+        if (item.checked) {
+            if (!this.selectedMultiSelect.departments.some(dept => dept.id === item.id)) {
+            this.selectedMultiSelect.departments.push({ id: item.id, shortname: item.shortname, db:'DepartmentShift', fk:'department_id' });
+            }
+        } else {
+            this.selectedMultiSelect.departments = this.selectedMultiSelect.departments.filter(dept => dept.id !== item.id);
         }
-      } else {
-        this.selectedMultiSelect.departments = this.selectedMultiSelect.departments.filter(dept => dept.id !== item.id);
-      }
-      this.clearSelections(['sub_departments', 'sub_department_units']);
-    } else if (type === 'sub_departments') {
-      if (item.checked) {
-        if (!this.selectedMultiSelect.sub_departments.some(subDept => subDept.id === item.id)) {
-          this.selectedMultiSelect.sub_departments.push({ id: item.id, shortname: item.shortname, db:'SubDepartmentShiftSetup', fk:'sub_department_id' });
+        this.clearSelections(['sub_departments', 'sub_department_units']);
+        } else if (type === 'sub_departments') {
+        if (item.checked) {
+            if (!this.selectedMultiSelect.sub_departments.some(subDept => subDept.id === item.id)) {
+            this.selectedMultiSelect.sub_departments.push({ id: item.id, shortname: item.shortname, db:'SubDepartmentShift', fk:'sub_department_id' });
+            }
+        } else {
+            this.selectedMultiSelect.sub_departments = this.selectedMultiSelect.sub_departments.filter(subDept => subDept.id !== item.id);
         }
-      } else {
-        this.selectedMultiSelect.sub_departments = this.selectedMultiSelect.sub_departments.filter(subDept => subDept.id !== item.id);
-      }
-      this.clearSelections(['sub_department_units']);
-    } else if (type === 'sub_department_units') {
-      if (item.checked) {
-        if (!this.selectedMultiSelect.sub_department_units.some(subDeptUnit => subDeptUnit.id === item.id)) {
-          this.selectedMultiSelect.sub_department_units.push({ id: item.id, shortname: item.shortname, db:'SubDepartmentUnitShiftSetup', fk:'sub_department_unit_id' });
+        this.clearSelections(['sub_department_units']);
+        } else if (type === 'sub_department_units') {
+        if (item.checked) {
+            if (!this.selectedMultiSelect.sub_department_units.some(subDeptUnit => subDeptUnit.id === item.id)) {
+            this.selectedMultiSelect.sub_department_units.push({ id: item.id, shortname: item.shortname, db:'SubDepartmentUnitShift', fk:'sub_department_unit_id' });
+            }
+        } else {
+            this.selectedMultiSelect.sub_department_units = this.selectedMultiSelect.sub_department_units.filter(subDeptUnit => subDeptUnit.id !== item.id);
         }
-      } else {
-        this.selectedMultiSelect.sub_department_units = this.selectedMultiSelect.sub_department_units.filter(subDeptUnit => subDeptUnit.id !== item.id);
-      }
-    }
-    console.log('Selected Items:', this.selectedMultiSelect);
-  },
+        }
+        console.log('Selected Items:', this.selectedMultiSelect);
+    },
 
-  clearSelections(types) {
-    types.forEach(type => {
-      this.filteredDataCollections[type].forEach(item => {
-        item.checked = false;
-      });
-      this.selectedMultiSelect[type] = [];
-    });
-  },
+    clearSelections(types) {
+        types.forEach(type => {
+        this.filteredDataCollections[type].forEach(item => {
+            item.checked = false;
+        });
+        this.selectedMultiSelect[type] = [];
+        });
+    },
 
     async getDepartments() {
         try {
@@ -720,64 +698,7 @@ export default {
         }
     },
 
-    getDivsAndDepts() {
-        axios.get(route('employeeworkschedule.getSubDeptUnit'))
-            .then(response => {
-                this.subDepartmentUnits = response.data.map(val => ({
-                    id: val.id,
-                    checked: false,
-                    name: val.name,
-                    shortname: val.short_name,
-                    sub_department_id: Number(val.sub_department_id),
-                }));
-            })
-            .catch(error => {
-                console.error('Error fetching departments:', error);
-            });
 
-        axios.get(route('employeeworkschedule.getSubDept'))
-            .then(response => {
-                this.subDepartments = response.data.map(val => ({
-                    id: val.id,
-                    checked: false,
-                    name: val.name,
-                    shortname: val.short_name,
-                    department_id: Number(val.department_id),
-                }));
-            })
-            .catch(error => {
-                console.error('Error fetching departments:', error);
-            });
-
-        axios.get(route('employeeworkschedule.getDept'))
-            .then(response => {
-                this.departments = response.data.map(val => ({
-                    id: val.id,
-                    checked: false,
-                    name: val.name,
-                    shortname: val.short_name,
-                    division_id: Number(val.division_id),
-                }));
-            })
-            .catch(error => {
-                console.error('Error fetching departments:', error);
-            });
-
-        axios.get(route('employeeworkschedule.getDivisions'))
-            .then(response => {
-                this.divisions = response.data.map(val => ({
-                    id: val.id,
-                    name: val.name,
-                    checked: false,
-                    shortname: val.short_name,
-                }));
-            })
-            .catch(error => {
-                console.error('Error fetching divisions:', error);
-            });
-
-
-    },
 
 
     cancelmodal(){
@@ -849,6 +770,8 @@ export default {
           }
 
       })
+
+        this.getDepartments();
       },
 
       editform(){
@@ -874,6 +797,7 @@ export default {
 
           })
 
+        this.getDepartments();
       },
 
 
@@ -1397,9 +1321,7 @@ export default {
             formdata: this.form,
             fileInfo: this.file,
             multiSelectData: this.selectedMultiSelect,
-            // Departments: this.selectedMultiSelect.departments,
-            // SubDepartments: this.selectedMultiSelect.sub_departments,
-            // SubDepartmentUnits: this.selectedMultiSelect.sub_department_units,
+
             }).then(response => {
               console.log(this.form);
               console.log(response.data)
@@ -1466,7 +1388,6 @@ export default {
 
   created(){
     this.getData();
-    this.getDepartments();
     this.emitter.on('getformdata', (formdata)=>{
 
         this.form[formdata.fieldname] = formdata.value
@@ -1480,7 +1401,6 @@ export default {
 
 
     });
-    this.getDivsAndDepts();
 
     this.emitter.on('getSignature', (evt) => {
           console.log(this.signaturepadcolumnname)
@@ -1497,30 +1417,43 @@ export default {
         const selectedDepartmentIds = this.selectedMultiSelect.departments.map(item => item.id);
         const selectedSubDepartmentIds = this.selectedMultiSelect.sub_departments.map(item => item.id);
 
+        // Check if there are no selected divisions, departments, or sub_departments
+        const hasNoSelectedDivisions = selectedDivisionIds.length === 0;
+        const hasNoSelectedDepartments = selectedDepartmentIds.length === 0;
+        const hasNoSelectedSubDepartments = selectedSubDepartmentIds.length === 0;
+
         return {
-        divisions: this.dataCollections.divisions.filter(division => {
-            // Filter by name and selected status
-            const searchQuery = this.searchQueries.divisions?.toLowerCase() || '';
-            return division.name.toLowerCase().includes(searchQuery);
-        }),
-        departments: this.dataCollections.departments.filter(department => {
-            // Filter by name, division, and selected status
-            const searchQuery = this.searchQueries.departments?.toLowerCase() || '';
-            return department.name.toLowerCase().includes(searchQuery) &&
-                (selectedDivisionIds.includes(department.division_id) || selectedDivisionIds.length === 0);
-        }),
-        sub_departments: this.dataCollections.sub_departments.filter(subDept => {
-            // Filter by name, department, and selected status
-            const searchQuery = this.searchQueries.sub_departments?.toLowerCase() || '';
-            return subDept.name.toLowerCase().includes(searchQuery) &&
-                (selectedDepartmentIds.includes(subDept.department_id) || selectedDepartmentIds.length === 0);
-        }),
-        sub_department_units: this.dataCollections.sub_department_units.filter(subDeptUnit => {
-            // Filter by name, sub_department, and selected status
-            const searchQuery = this.searchQueries.sub_department_units?.toLowerCase() || '';
-            return subDeptUnit.name.toLowerCase().includes(searchQuery) &&
-                (selectedSubDepartmentIds.includes(subDeptUnit.sub_department_id) || selectedSubDepartmentIds.length === 0);
-        }),
+            divisions: this.dataCollections.divisions.filter(division => {
+                // Filter by name and selected status
+                const searchQuery = this.searchQueries.divisions?.toLowerCase() || '';
+                return division.name.toLowerCase().includes(searchQuery);
+            }),
+            departments: this.dataCollections.departments.filter(department => {
+                // Filter by name, division, and selected status
+                const searchQuery = this.searchQueries.departments?.toLowerCase() || '';
+                return department.name.toLowerCase().includes(searchQuery) &&
+                    (selectedDivisionIds.includes(department.division_id) || hasNoSelectedDivisions);
+            }),
+            sub_departments: this.dataCollections.sub_departments.filter(subDept => {
+                // Return empty array if there are no selected divisions or departments
+                if (hasNoSelectedDivisions || hasNoSelectedDepartments) {
+                    return false;
+                }
+                // Filter by name, department, and selected status
+                const searchQuery = this.searchQueries.sub_departments?.toLowerCase() || '';
+                return subDept.name.toLowerCase().includes(searchQuery) &&
+                    selectedDepartmentIds.includes(subDept.department_id);
+            }),
+            sub_department_units: this.dataCollections.sub_department_units.filter(subDeptUnit => {
+                // Return empty array if there are no selected divisions, departments, or sub_departments
+                if (hasNoSelectedDivisions || hasNoSelectedDepartments || hasNoSelectedSubDepartments) {
+                    return false;
+                }
+                // Filter by name, sub_department, and selected status
+                const searchQuery = this.searchQueries.sub_department_units?.toLowerCase() || '';
+                return subDeptUnit.name.toLowerCase().includes(searchQuery) &&
+                    selectedSubDepartmentIds.includes(subDeptUnit.sub_department_id);
+            }),
         };
     },
      filterComboBoxSearch(){

@@ -18,6 +18,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
+
+
 class ShiftSetupController extends Controller
 {
     /**
@@ -75,6 +77,7 @@ class ShiftSetupController extends Controller
 
         $arr = $request->formdata;
         $multiSelect = $request->multiSelectData;
+        $saveData = [];
 
 
 
@@ -93,66 +96,32 @@ class ShiftSetupController extends Controller
 
         if ($query) {
 
+            foreach ($multiSelect as $category => $multidata) {
+                if (!empty($multidata)) {
+                    foreach ($multidata as $data) {
+                        // Determine the fully qualified class name dynamically
+                        $modelClass = 'App\\Models\\' . $data['db'] . 'Setup'; // Adjust namespace as needed
+                        $foreignKey = $data['fk'];
 
-            if (!empty($multiSelect['divisions'])) {
+                        // Check if the class exists before using it
+                        if (!class_exists($modelClass)) {
+                            continue; // Skip if the class doesn't exist
+                        }
 
-                foreach ($multiSelect['divisions'] as $divisions) {
+                        // Check if an active setup already exists
+                        $existingSetup = $modelClass::where($foreignKey, $data['id'])
+                            ->where('is_active', 1)
+                            ->first();
 
-                    $existingSetup = DivisionShiftSetup::where('division_id', $divisions['id'])
-                        ->where('is_active', 1)
-                        ->first();
+                        // Insert if not exists or is not active
+                        if (!$existingSetup || !$existingSetup->is_active) {
+                            $saveData['shift_setup_id'] = $query->id;
+                            $saveData['created_by'] = $query->created_by;
+                            $saveData[$foreignKey] = $data['id'];
 
-                    if (!$existingSetup || !$existingSetup->is_active) {
-                        $divisions['shift_setup_id'] = $query->id;
-                        $divisions['created_by'] = $query->created_by;
-                        DivisionShiftSetup::create($divisions);
-                    }
-                }
-            }
-            if (!empty($multiSelect['departments'])) {
 
-                foreach ($multiSelect['departments'] as $departments) {
-
-                    $existingSetup = DepartmentShiftSetup::where('department_id', $departments['id'])
-                        ->where('is_active', 1)
-                        ->first();
-
-                    if (!$existingSetup || !$existingSetup->is_active) {
-                        $departments['shift_setup_id'] = $query->id;
-                        $departments['created_by'] = $query->created_by;
-                        DepartmentShiftSetup::create($departments);
-                    }
-                }
-            }
-
-            if (!empty($multiSelect['sub_departments'])) {
-
-                foreach ($multiSelect['sub_departments'] as $subDepartments) {
-
-                    $existingSetup = SubDepartmentShiftSetup::where('sub_department_id', $subDepartments['id'])
-                        ->where('is_active', 1)
-                        ->first();
-
-                    if (!$existingSetup || !$existingSetup->is_active) {
-                        $subDepartments['shift_setup_id'] = $query->id;
-                        $subDepartments['created_by'] = $query->created_by;
-                        SubDepartmentShiftSetup::create($subDepartments);
-                    }
-                }
-            }
-
-            if (!empty($multiSelect['sub_department_units'])) {
-
-                foreach ($multiSelect['sub_department_units'] as $subDepartmentunits) {
-
-                    $existingSetup = SubDepartmentUnitShiftSetup::where('sub_department_unit_id', $subDepartmentunits['id'])
-                        ->where('is_active', 1)
-                        ->first();
-
-                    if (!$existingSetup || !$existingSetup->is_active) {
-                        $subDepartmentunits['shift_setup_id'] = $query->id;
-                        $subDepartmentunits['created_by'] = $query->created_by;
-                        SubDepartmentUnitShiftSetup::create($subDepartmentunits);
+                            $modelClass::create($saveData); // Create new record in the respective model
+                        }
                     }
                 }
             }

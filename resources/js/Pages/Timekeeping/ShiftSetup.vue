@@ -12,7 +12,7 @@ import AlertNotification from '@/Pages/Templates/AlertNotification.vue';
 
     <MasterLayout>
         <template #header>
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Work Shift</h2>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Shift Setup</h2>
         </template>
 
         <AlertNotification></AlertNotification>
