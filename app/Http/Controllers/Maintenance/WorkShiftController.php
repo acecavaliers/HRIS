@@ -45,9 +45,11 @@ class WorkShiftController extends Controller
 
         $systemtabledetail = SystemTableDetail::where(array('system_table_id' => $systemtable->id, 'is_fk_getreferenced' => 0))->get();
 
+
         $arr = $request->formdata;
         $multiSelect = $request->multiSelectData;
         $saveData = [];
+
 
         if (count($systemtabledetail) > 0) {
             foreach ($systemtabledetail as $data) {

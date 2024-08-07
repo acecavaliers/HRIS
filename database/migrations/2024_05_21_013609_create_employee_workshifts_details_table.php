@@ -17,10 +17,10 @@ return new class extends Migration
         Schema::create('employee_workshifts_details', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(EmployeeWorkshift::class)->constrained('employee_workshifts');
+            $table->bigInteger('work_shift_id');
             $table->date('schedule_date')->nullable();
             $table->string('schedule_day')->nullable();
-            $table->string('shift_start')->nullable();
-            $table->string('shift_end')->nullable();
+            $table->string('day_off')->default(0);
             $table->tinyInteger('oc')->default(0);
             $table->bigInteger('division_shift_id')->nullable();
             $table->bigInteger('department_shift_id')->nullable();

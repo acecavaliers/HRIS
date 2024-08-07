@@ -169,21 +169,6 @@ class EmployeeWorkScheduleController extends Controller
                 }
             }
 
-            // foreach ($workshiftDetails as $workshiftDetail) {
-            //     // Find the corresponding item in $arr by id
-            //     $matchingArrItem = collect($arr)->firstWhere('id', $workshiftDetail->id);
-
-            //     // Compare and update if necessary
-            //     if ($matchingArrItem && ($workshiftDetail->day_off != $matchingArrItem['day_off'] || $workshiftDetail->oc != $matchingArrItem['oc'])) {
-            //         // Update the workshift detail
-            //         $workshiftDetail->day_off = $matchingArrItem['day_off'];
-            //         $workshiftDetail->oc = $matchingArrItem['oc'];
-            //         $workshiftDetail->updated_by =  Auth::user()->name;
-            //         $workshiftDetail->save();
-            //         $rowsUpdated++;
-            //     }
-            // }
-
             return 'success';
         } catch (\Exception $e) {
             return response()->json(['error' => 'Failed to update workshift detail.'], 500);
@@ -245,9 +230,6 @@ class EmployeeWorkScheduleController extends Controller
                         $subQuery->where('period_from', '<=', $arr['period_to'])
                             ->where('period_to', '>=', $arr['period_to']);
                     });
-
-                // $query->whereBetween($arr['period_from'], [$arr['period_from'], $arr['period_to']])
-                // ->orWhereBetween('period_to', [$arr['period_from'], $arr['period_to']]);
             })
             ->first();
     }

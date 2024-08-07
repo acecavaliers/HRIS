@@ -12,8 +12,8 @@
 
 
         <!-- CONTENT manager-->
-         <div v-if="role == 1" >
-            <div class="grid grid-cols-4 border-y">
+         <div>
+            <div v-if="role == 1" class="grid grid-cols-4 border-y">
                 <div v-for="item in menu" :key="item"  class="py-1">
                     <div class="p-4 text-sm w-full">
                         <div class="w-full">
@@ -1019,7 +1019,6 @@ export default {
 
     created(){
         this.getDepartments();
-        // this.generatePayrollDays();
     },
 
     mounted() {

@@ -43,6 +43,8 @@ use App\Http\Controllers\Maintenance\SubDepartmentController;
 use App\Http\Controllers\Maintenance\SubDepartmentUnitController;
 use App\Http\Controllers\Maintenance\SubSpecializationController;
 use App\Http\Controllers\Maintenance\SuffixController;
+use App\Http\Controllers\Maintenance\TrainingCategoryController;
+use App\Http\Controllers\Maintenance\TrainingController;
 use App\Http\Controllers\Maintenance\WorkLocationController;
 use App\Http\Controllers\Recruitment\ApplicantController;
 use App\Http\Controllers\Maintenance\ApplicationStatusController;
@@ -365,7 +367,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/shiftsetup/getlist', [ShiftSetupController::class, 'getlist'])->name('shiftsetup.getlist');
     Route::get('/shiftsetup/search', [ShiftSetupController::class, 'searchData'])->name('shiftsetup.search');
 
-
     Route::get('/shiftsetup/getDiv', [ShiftSetupController::class, 'getDiv'])->name('shiftsetup.getDiv');
     Route::get('/shiftsetup/getDept', [ShiftSetupController::class, 'getDept'])->name('shiftsetup.getDept');
     Route::get('/shiftsetup/getSubDept', [ShiftSetupController::class, 'getSubDept'])->name('shiftsetup.getSubDept');
@@ -628,6 +629,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/themecolorsettings/getThemeColorSelected', [ThemeColorSettingController::class, 'getThemeColorSelected'])->name('getThemeColorSelected');
 
 
+    /* Training */
+    Route::get('/trainings/getlist', [TrainingController::class, 'getlist'])->name('trainings.getlist');
+    Route::get('/trainings/getcolumns', [TrainingController::class, 'getcolumns'])->name('trainings.getcolumns');
+    Route::get('/trainings/search', [TrainingController::class, 'searchData'])->name('trainings.search');
+
+    /* Training */
+    Route::get('/trainingcategories/getlist', [TrainingCategoryController::class, 'getlist'])->name('trainingcategories.getlist');
+    Route::get('/trainingcategories/getcolumns', [TrainingCategoryController::class, 'getcolumns'])->name('trainingcategories.getcolumns');
+    Route::get('/trainingcategories/search', [TrainingCategoryController::class, 'searchData'])->name('trainingcategories.search');
+
+
 
     Route::get('/getmodelnames', function () {
         $path = app_path('Models') . '/*.php';
@@ -761,6 +773,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         'onboardingchecklists' => OnboardingChecklistController::class,
         'employeeworkschedule' => EmployeeWorkScheduleController::class,
         'shiftsetup' => ShiftSetupController::class,
+        'trainings' => TrainingController::class,
+        'trainingcategories' => TrainingCategoryController::class,
     ]);
 });
 Route::middleware('auth')->group(function () {
