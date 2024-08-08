@@ -1601,10 +1601,6 @@ export default {
                 departments: departments,
                 divisions: divisions
             };
-            console.log('DIVVVV', this.dataCollections.divisions);
-            console.log('DEEPPP', this.dataCollections.departments);
-            console.log('SUBDEP', this.dataCollections.sub_departments);
-            console.log('SBDEPU', this.dataCollections.sub_department_units);
         } catch (error) {
             console.error('Error fetching data:', error);
         }
