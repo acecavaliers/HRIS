@@ -151,8 +151,28 @@ class WorkShiftController extends Controller
     {
 
         $query = WorkShift::paginate($request->showrecords);
+
+        foreach ($query->items() as $item) {
+            $item->division_ids = DivisionShift::where('work_shift_id', $item->id)
+                ->where('is_active', 1)
+                ->pluck('division_id');
+
+            $item->department_ids = DepartmentShift::where('work_shift_id', $item->id)
+                ->where('is_active', 1)
+                ->pluck('department_id');
+
+            $item->sub_department_ids = SubDepartmentShift::where('work_shift_id', $item->id)
+                ->where('is_active', 1)
+                ->pluck('sub_department_id');
+
+            $item->sub_department_unit_ids = SubDepartmentUnitShift::where('work_shift_id', $item->id)
+                ->where('is_active', 1)
+                ->pluck('sub_department_unit_id');
+        }
+
         return $query;
     }
+
 
     public function getcolumns(Request $request)
     {

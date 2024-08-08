@@ -162,10 +162,28 @@ class ShiftSetupController extends Controller
         //
     }
 
-    public function getlist(Request $request)
+    public function getList(Request $request)
     {
-
         $query = ShiftSetup::paginate($request->showrecords);
+
+        foreach ($query->items() as $item) {
+            $item->division_ids = DivisionShiftSetup::where('shift_setup_id', $item->id)
+                ->where('is_active', 1)
+                ->pluck('division_id');
+
+            $item->department_ids = DepartmentShiftSetup::where('shift_setup_id', $item->id)
+                ->where('is_active', 1)
+                ->pluck('department_id');
+
+            $item->sub_department_ids = SubDepartmentShiftSetup::where('shift_setup_id', $item->id)
+                ->where('is_active', 1)
+                ->pluck('sub_department_id');
+
+            $item->sub_department_unit_ids = SubDepartmentUnitShiftSetup::where('shift_setup_id', $item->id)
+                ->where('is_active', 1)
+                ->pluck('sub_department_unit_id');
+        }
+
         return $query;
     }
 
