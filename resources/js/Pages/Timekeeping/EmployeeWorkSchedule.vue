@@ -94,7 +94,12 @@
             </div>
 
             <div class="p-4">
+
                 <div v-if="days.length>0">
+                    <span class=" flex justify-end">
+                        <button type="button" @click="previousPayrollPeriod" class="p-2 bg-blue-600 text-white text-sm rounded-md mx-1">Previos Payroll</button>
+                        <button type="button" @click="nextPayrollPeriod" class="p-2 bg-blue-600 text-white text-sm rounded-md mx-1">Next Payroll</button>
+                    </span>
                     <div class="flex items-center justify-between max-h-12 bg-slate-400 border-slate-400  mt-2 border-t border-x rounded-t-md px-2 py-2">
                         <h1 class="text-gray-800 text-sm font-medium">
                             Workshift Period: <b>{{dateToWords( ews.period_from) }} </b> - <b>{{ dateToWords(ews.period_to) }},  {{ ews.period_to.substring(0,4) }}</b>
@@ -452,12 +457,7 @@ export default {
             periodDates:[],
             selectedDate:'',
             saveShifts:[],
-            periodSetting:{
-                s_a:11,
-                s_b:25,
-                e_a:26,
-                e_b:10
-            },
+            periodSetting:{},
         }
     },
     computed: {
@@ -560,16 +560,6 @@ export default {
                     }
             }
 
-        },
-
-        viewAs(type){
-            this.set.view = type;
-            this.generatePayrollDays();
-            if (this.selected.divisions !== 'Select divisions'){
-                this.getEmployee(this.search.currentType, this.search.currentID);
-            }else {
-                this.employees = [];
-            }
         },
         formatDate(dateStr) {
             const date = new Date(dateStr);
@@ -677,8 +667,10 @@ export default {
                 this.search.currentID = data.id;
                 console.log('shiftSetup',data.shiftSetup)
                 this.generatePayrollDays('',data.shiftSetup);
-                this.getWorkShifts(type, data.id);
-                this.getEmployee(type, data.id);
+                if (this.days.length > 0){
+                    this.getWorkShifts(type, data.id);
+                    this.getEmployee(type, data.id);
+                }
 
                 if (callback) {
                     callback(type);
@@ -735,10 +727,15 @@ export default {
                 } else {
                     this.search.currentType = type;
                     this.search.currentID = data.id;
-                    console.log('shiftSetup',data.shiftSetup)
+                    // console.log('shiftSetup',data.shiftSetup)
                     this.generatePayrollDays('',data.shiftSetup);
-                    this.getWorkShifts(type, data.id);
-                    this.getEmployee(type, data.id);
+                    this.periodSetting = data.shiftSetup;
+                    this.periodSetting.type = type;
+                    this.periodSetting.id = data.id;
+                    if (this.days.length > 0){
+                        this.getWorkShifts(type, data.id);
+                        this.getEmployee(type, data.id);
+                    }
                 }
             }
             this.periodDates = [];
@@ -891,7 +888,7 @@ export default {
                 currentDate = new Date(dd);
             }
             this.currentDate = currentDate;
-            this.set.view = data.name;
+            // this.set.view = data.name;
             this.updatePayrollDays(data);
         },
 
@@ -903,21 +900,21 @@ export default {
                 const currentDay = currentDate.getDate();
                 const currentMonth = currentDate.getMonth() + 1;
                 const currentYear = currentDate.getFullYear();
-                const s_a = data.first_start_date;
-                const s_b = data.second_start_date - 1;
-                const e_a = data.second_start_date;
-                const e_b = data.first_start_date -1;
+                const first_start = data.first_start_date;
+                const first_end = data.second_start_date - 1;
+                const second_start = data.second_start_date;
+                const second_end = data.first_start_date -1;
                 this.days = [];
-                if (currentDay >= s_a && currentDay <= s_b) {
+                if (currentDay >= first_start && currentDay <= first_end) {
                     const lastDayOfCurrentMonth = new Date(currentYear, currentMonth, 0).getDate();
-                    for (let i = e_a; i <= lastDayOfCurrentMonth; i++) {
+                    for (let i = second_start; i <= lastDayOfCurrentMonth; i++) {
                         const date = new Date(currentYear, currentMonth - 1, i);
                         this.days.push({
                             date: this.formatDate(date),
                             dayofweek: weekdays[date.getDay()]
                         });
                     }
-                    for (let i = 1; i <= e_b; i++) {
+                    for (let i = 1; i <= second_end; i++) {
                         const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
                         const nextYear = currentMonth === 12 ? currentYear + 1 : currentYear;
                         const date = new Date(nextYear, nextMonth - 1, i);
@@ -926,10 +923,10 @@ export default {
                             dayofweek: weekdays[date.getDay()]
                         });
                     }
-                } else if (currentDay >= e_a) {
+                } else if (currentDay >= second_start) {
                     const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
                     const nextYear = currentMonth === 12 ? currentYear + 1 : currentYear;
-                    for (let i = s_a; i <= s_b; i++) {
+                    for (let i = first_start; i <= first_end; i++) {
                         const date = new Date(nextYear, nextMonth - 1, i);
                         this.days.push({
                             date: this.formatDate(date),
@@ -937,7 +934,7 @@ export default {
                         });
                     }
                 } else {
-                    for (let i = s_a; i <= s_b; i++) {
+                    for (let i = first_start; i <= first_end; i++) {
                         const date = new Date(currentYear, currentMonth - 1, i);
                         this.days.push({
                             date: this.formatDate(date),
@@ -962,58 +959,72 @@ export default {
                     });
                 }
             }
-            this.ews.period_from = this.formatDate(this.days[0].date);
-            this.ews.period_to = this.formatDate(this.days[this.days.length - 1].date);
-        },
+            if (this.days.length > 0){
+                this.ews.period_from = this.formatDate(this.days[0].date);
+                this.ews.period_to = this.formatDate(this.days[this.days.length - 1].date);
+                this.periodSetting.with_start_date = data.with_start_date;
+            }
 
+        },
         nextPayrollPeriod() {
-            const currentDay = this.currentDate.getDate();
-            const currentMonth = this.currentDate.getMonth() + 1;
-            const currentYear = this.currentDate.getFullYear();
 
-            if (currentDay >= 11 && currentDay <= 25) {
-                this.currentDate = new Date(currentYear, currentMonth, 26);
-            } else if (currentDay >= 26) {
-                const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
-                const nextYear = currentMonth === 12 ? currentYear + 1 : currentYear;
-                this.currentDate = new Date(nextYear, nextMonth - 1, 11);
-            } else {
-                const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
-                const nextYear = currentMonth === 12 ? currentYear + 1 : currentYear;
-                this.currentDate = new Date(nextYear, nextMonth - 1, 11);
+            if (this.periodSetting.with_start_date === '0'){
+                this.generatePayrollDays(this.ews.period_from, this.periodSetting );
+                this.getWorkShifts(this.periodSetting.type, this.periodSetting.id);
             }
 
-            this.updatePayrollDays();
-            if (this.search.currentType !== ''){
-                this.getEmployee(this.search.currentType, this.search.currentID);
-            }else {
-                this.employees = [];
-            }
         },
-
         previousPayrollPeriod() {
-            const currentDay = this.currentDate.getDate();
-            const currentMonth = this.currentDate.getMonth() + 1;
-            const currentYear = this.currentDate.getFullYear();
-
-            if (currentDay >= 11 && currentDay <= 25) {
-                this.currentDate = new Date(currentYear, currentMonth - 1, 10);
-            } else if (currentDay >= 26) {
-                this.currentDate = new Date(currentYear, currentMonth - 1, 25);
-            } else {
-                const prevMonth = currentMonth === 1 ? 12 : currentMonth - 1;
-                const prevYear = currentMonth === 1 ? currentYear - 1 : currentYear;
-                const lastDayOfPrevMonth = new Date(prevYear, prevMonth, 0).getDate();
-                this.currentDate = new Date(prevYear, prevMonth - 1, lastDayOfPrevMonth);
-            }
-
-            this.updatePayrollDays();
-            if (this.search.currentType !== ''){
-                this.getEmployee(this.search.currentType, this.search.currentID);
-            }else {
-                this.employees = [];
-            }
+            // this.generatePayrollDays(this.ews.period_from, this.periodSetting );
         },
+        // nextPayrollPeriod() {
+        //     const currentDay = this.currentDate.getDate();
+        //     const currentMonth = this.currentDate.getMonth() + 1;
+        //     const currentYear = this.currentDate.getFullYear();
+
+        //     if (currentDay >= 11 && currentDay <= 25) {
+        //         this.currentDate = new Date(currentYear, currentMonth, 26);
+        //     } else if (currentDay >= 26) {
+        //         const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
+        //         const nextYear = currentMonth === 12 ? currentYear + 1 : currentYear;
+        //         this.currentDate = new Date(nextYear, nextMonth - 1, 11);
+        //     } else {
+        //         const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
+        //         const nextYear = currentMonth === 12 ? currentYear + 1 : currentYear;
+        //         this.currentDate = new Date(nextYear, nextMonth - 1, 11);
+        //     }
+
+        //     this.updatePayrollDays();
+        //     if (this.search.currentType !== ''){
+        //         this.getEmployee(this.search.currentType, this.search.currentID);
+        //     }else {
+        //         this.employees = [];
+        //     }
+        // },
+
+        // previousPayrollPeriod() {
+        //     const currentDay = this.currentDate.getDate();
+        //     const currentMonth = this.currentDate.getMonth() + 1;
+        //     const currentYear = this.currentDate.getFullYear();
+
+        //     if (currentDay >= 11 && currentDay <= 25) {
+        //         this.currentDate = new Date(currentYear, currentMonth - 1, 10);
+        //     } else if (currentDay >= 26) {
+        //         this.currentDate = new Date(currentYear, currentMonth - 1, 25);
+        //     } else {
+        //         const prevMonth = currentMonth === 1 ? 12 : currentMonth - 1;
+        //         const prevYear = currentMonth === 1 ? currentYear - 1 : currentYear;
+        //         const lastDayOfPrevMonth = new Date(prevYear, prevMonth, 0).getDate();
+        //         this.currentDate = new Date(prevYear, prevMonth - 1, lastDayOfPrevMonth);
+        //     }
+
+        //     this.updatePayrollDays();
+        //     if (this.search.currentType !== ''){
+        //         this.getEmployee(this.search.currentType, this.search.currentID);
+        //     }else {
+        //         this.employees = [];
+        //     }
+        // },
 
     },
 
