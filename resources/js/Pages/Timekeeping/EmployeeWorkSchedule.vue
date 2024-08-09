@@ -968,10 +968,10 @@ export default {
         },
         nextPayrollPeriod() {
 
-            if (this.periodSetting.with_start_date === '0'){
+            // if (this.periodSetting.with_start_date === '0'){
                 this.generatePayrollDays(this.ews.period_from, this.periodSetting );
                 this.getWorkShifts(this.periodSetting.type, this.periodSetting.id);
-            }
+            // }
 
         },
         previousPayrollPeriod() {
