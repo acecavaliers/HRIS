@@ -15,7 +15,7 @@ import AlertNotification from '@/Pages/Templates/AlertNotification.vue';
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">Request Time Off</h2>
         </template>
 
-        <AlertNotification></AlertNotification>
+        <AlertNotification/>
 
         <DataTable tabletitle="RequestTimeOff" tabledescription="List of all RequestTimeOff" :tabledata="data" :columns="columns" tablekeyname="id" columnkey="id" searchroutename="shiftsetup.search" routename="shiftsetup" formtitle="RequestTimeOff" :ismainsidebar=true :customaddbtn=false modelname="RequestTimeOff">
 
@@ -24,7 +24,6 @@ import AlertNotification from '@/Pages/Templates/AlertNotification.vue';
             </template>
 
         </DataTable>
-
 
     </MasterLayout>
 
