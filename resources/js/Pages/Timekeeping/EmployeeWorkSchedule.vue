@@ -6,9 +6,9 @@
         </template>
         <Breadcrumbs :pages="breadcrumbspages">
         </Breadcrumbs>
-        <div class="flex justify-end">
+        <!-- <div class="flex justify-end">
             <input type="text" v-model="role" class="w-16 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="Role"/>
-        </div>
+        </div> -->
 
 
         <!-- CONTENT manager-->
@@ -402,12 +402,6 @@ import Breadcrumbs from '@/Pages/Templates/Breadcrumbs.vue';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue'
 import { EllipsisVerticalIcon } from '@heroicons/vue/20/solid'
 import { PlusCircleIcon, ChevronDownIcon, XCircleIcon, MagnifyingGlassIcon, ChevronRightIcon} from '@heroicons/vue/20/solid'
-// import DayShift from '../Maintenance/DayShift.vue';
-const statuses = {
-  'INFORMATION TECHNOLOGY': 'text-green-700 bg-green-50 ring-green-600/20',
-  'FINANCE': 'text-gray-600 bg-gray-50 ring-gray-500/10',
-  'HUMAN RESOURCE': 'text-blue-600 bg-blue-50 ring-blue-500/20',
-}
 
 </script>
 
