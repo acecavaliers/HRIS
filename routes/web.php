@@ -113,6 +113,7 @@ use App\Http\Controllers\Performance\GoalController;
 use App\Http\Controllers\Performance\GoalTypeController;
 use App\Http\Controllers\Performance\GoalTrackingController;
 use App\Http\Controllers\Performance\CompetenceController;
+use App\Http\Controllers\RequestTimeOffController;
 use App\Http\Controllers\ShiftSetupController;
 use App\Models\EmployeeWorkSchedule;
 use App\Models\School;
@@ -643,7 +644,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/getmodelnames', function () {
         $path = app_path('Models') . '/*.php';
-        return collect(glob($path))->map(fn ($file) => basename($file, '.php'))->toArray();
+        return collect(glob($path))->map(fn($file) => basename($file, '.php'))->toArray();
     });
 
     Route::get('/systemtablesmain', function () {
@@ -775,6 +776,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         'shiftsetup' => ShiftSetupController::class,
         'trainings' => TrainingController::class,
         'trainingcategories' => TrainingCategoryController::class,
+        'requesttimeoff' => RequestTimeOffController::class,
     ]);
 });
 Route::middleware('auth')->group(function () {
