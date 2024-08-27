@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\RequestTimeOff;
+use App\Models\SystemTable;
+use App\Models\SystemTableDetail;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -62,5 +64,18 @@ class RequestTimeOffController extends Controller
     public function destroy(RequestTimeOff $requestTimeOff)
     {
         //
+    }
+
+    public function getList(Request $request)
+    {
+        $query = RequestTimeOff::paginate($request->showrecords);
+
+        return $query;
+    }
+
+    public function getcolumns(Request $request)
+    {
+        $systemtable = SystemTable::where('model_name', $request->modelName)->first();
+        return SystemTableDetail::with('formtypes')->where('system_table_id', $systemtable->id)->get();
     }
 }

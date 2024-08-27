@@ -374,6 +374,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/shiftsetup/getSubDeptUnit', [ShiftSetupController::class, 'getSubDeptUnit'])->name('shiftsetup.getSubDeptUnit');
 
 
+    //REQUEST TIME OFF
+    Route::get('/requesttimeoff/getcolumns', [RequestTimeOffController::class, 'getcolumns'])->name('requesttimeoff.getcolumns');
+    Route::get('/requesttimeoff/getlist', [RequestTimeOffController::class, 'getlist'])->name('requesttimeoff.getlist');
+    // Route::get('/requesttimeoff/search', [RequestTimeOffController::class, 'searchData'])->name('requesttimeoff.search');
+
+
     /* Relationship */
     Route::get('/relationships/getlist', [RelationshipController::class, 'getlist'])->name('relationships.getlist');
     Route::get('/relationships/getcolumns', [RelationshipController::class, 'getcolumns'])->name('relationships.getcolumns');

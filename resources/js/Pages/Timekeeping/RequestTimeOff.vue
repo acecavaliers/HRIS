@@ -17,7 +17,7 @@ import AlertNotification from '@/Pages/Templates/AlertNotification.vue';
 
         <AlertNotification/>
 
-        <DataTable tabletitle="RequestTimeOff" tabledescription="List of all RequestTimeOff" :tabledata="data" :columns="columns" tablekeyname="id" columnkey="id" searchroutename="shiftsetup.search" routename="shiftsetup" formtitle="RequestTimeOff" :ismainsidebar=true :customaddbtn=false modelname="RequestTimeOff">
+        <DataTable tabletitle="RequestTimeOff" tabledescription="List of all RequestTimeOff" :tabledata="data" :columns="columns" tablekeyname="id" columnkey="id" searchroutename="requesttimeoff.search" routename="requesttimeoff" formtitle="RequestTimeOff" :ismainsidebar=true :customaddbtn=false modelname="RequestTimeOff">
 
             <template #customfilterform>
 
@@ -45,7 +45,7 @@ export default {
     methods: {
         getData(){
             this.emitter.emit('loadingdata', true)
-            axios.get(route('shiftsetup.getlist'),{
+            axios.get(route('requesttimeoff.getlist'),{
                 params:{
                     showrecords: this.showrecordsval
                 }
@@ -57,7 +57,7 @@ export default {
         getcolumns(){
             var filtercol = [];
             this.emitter.emit('loadingcolumns', true)
-            axios.get(route('shiftsetup.getcolumns'), {
+            axios.get(route('requesttimeoff.getcolumns'), {
             params:{
                 modelName: this.model_name
             }

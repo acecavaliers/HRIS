@@ -1,7 +1,6 @@
 <?php
 
-use App\Models\Division;
-use App\Models\ShiftSetup;
+use App\Models\Employee;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,10 +12,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('division_shift_setups', function (Blueprint $table) {
+        Schema::create('request_time_offs', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Division::class)->constrained('divisions');
-            $table->foreignIdFor(ShiftSetup::class)->constrained('shift_setups');
+            $table->foreignIdFor(Employee::class)->constrained('employees');
+            $table->date('date_from');
+            $table->date('date_to');
+            $table->float('number_of_days', 8, 1);
+            $table->string('reason');
+            $table->tinyInteger('status')->default(0);
             $table->tinyInteger('is_active')->default(1);
             $table->string('created_by')->nullable();
             $table->string('updated_by')->nullable();
@@ -31,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('division_shift_setups');
+        Schema::dropIfExists('request_time_offs');
     }
 };
