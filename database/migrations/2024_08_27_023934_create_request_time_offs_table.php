@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignIdFor(Employee::class)->constrained('employees');
             $table->date('date_from');
             $table->date('date_to');
-            $table->float('number_of_days', 8, 1);
+            $table->decimal('number_of_days', 3, 1);
             $table->string('reason');
             $table->tinyInteger('status')->default(0);
             $table->tinyInteger('is_active')->default(1);
