@@ -8,9 +8,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class EmployeeWorkshift extends Model
 {
-    use HasFactory , SoftDeletes;
+    use HasFactory, SoftDeletes;
 
-    protected $foreignKeys = ['workshifts' => 'work_shift_id', 'employees' =>'employee_id'];
+    protected $foreignKeys = ['workshifts' => 'work_shift_id', 'employees' => 'employee_id'];
 
     protected $fillable = [
         'employee_id',
