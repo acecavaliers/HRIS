@@ -1,12 +1,4 @@
 <template>
-    <!--
-      This example requires updating your template:
-
-      ```
-      <html class="h-full bg-gray-100">
-      <body class="h-full">
-      ```
-    -->
     <div>
 
       <TransitionRoot as="template" :show="sidebarOpen">
@@ -30,9 +22,8 @@
 
                     <ApplicationLogo class="h-8 w-auto" />
 
-
-                   <!--  <img class="h-8 w-auto" src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600" alt="Your Company" /> -->
                 </div>
+
                 <div class="mt-5 h-0 flex-1 overflow-y-auto">
                     <nav class="flex-1 space-y-1 bg-white" aria-label="Sidebar">
 
@@ -45,16 +36,14 @@
                         <div v-if="!item.has_children == 1">
                             <Link @click="updateModuleCurrentActive(item.id)" :href="route(item.href)" class="group w-full flex items-center pl-2 py-2 text-sm font-medium rounded-md" :class="{ 'navigation_sidebar_active_bg_color navigation_sidebar_active_txt_color': $page.url === '/'+item.href}">
                               <span :class="{'navigation_sidebar_active_txt_color': $page.url === '/'+item.href}" class="mr-3 h-6 w-6 flex-shrink-0 text-gray-400 group-hover:text-gray-500"><font-awesome-icon :icon="'fa-solid '+item.icon" size="lg"/></span>
-                              <!--   <component :is="item.icon"  :class="[item.is_current == 1 ? 'text-gray-500' : 'text-gray-400 group-hover:text-gray-500', 'mr-3 flex-shrink-0 h-6 w-6']" aria-hidden="true" /> -->
+
                             {{ item.name }}
                             </Link>
                         </div>
                         <Disclosure as="div" v-else class="space-y-1" v-slot="{ open }" :default-open="item.submodules.some(item => $page.url == '/'+item.url_name)">
 
-                          <!-- :class="{'bg-gray-100 text-gray-900':$page.url === '/'+item.href}" -->
-                          <!--default -- :class="[item.is_current == 1 ? 'bg-gray-100 text-gray-900' : 'bg-white text-gray-600 hover:bg-gray-50 hover:text-gray-900', 'group w-full flex items-center pl-2 pr-1 py-2 text-left text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500'] -->
                             <DisclosureButton class="group w-full flex items-center pl-2 pr-1 py-2 text-left text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" :class="{'bg-gray-100 text-gray-900':$page.url === '/'+item.href}">
-                          <!--   <component :is="item.icon" class="mr-3 h-6 w-6 flex-shrink-0 text-gray-400 group-hover:text-gray-500" aria-hidden="true" /> -->
+
                           <span :class="{'text-gray-500': $page.url === '/'+item.href}" class="mr-3 h-6 w-6 flex-shrink-0 text-gray-400 group-hover:text-gray-500"><font-awesome-icon :icon="'fa-solid '+item.icon" size="lg"/></span>
                           <span class="flex-1">{{ item.name }}</span>
 
@@ -64,17 +53,10 @@
 
                             </DisclosureButton>
 
-                          <!--     <DisclosurePanel class="space-y-1">
-                                  <DisclosureButton v-for="subItem in item.submodules" :key="subItem.name" as="a" :href="route(subItem.href)" :class="{'font-black text-black-600 bg-gray-100 hover:bg-black-50 hover:text-black-900': $page.url === '/'+subItem.url_name}" class="group flex w-full items-center rounded-md py-2 pl-11 pr-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900">{{ subItem.name }}</DisclosureButton>
-                             </DisclosurePanel> -->
 
                              <DisclosurePanel class="space-y-1">
                             <div v-if="item.has_children == 1">
-                          <!--  <DisclosureButton v-for="subItem in item.submodules" :key="subItem.name" class="group flex w-full items-center rounded-md py-2 pl-11 pr-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900">
 
-                              <Link :href="route(subItem.href)">{{ subItem.name }}</Link>
-                            </DisclosureButton> -->
-                          <!--   <DisclosureButton @click="updateCurrentActive(subItem.id)" v-for="subItem in item.submodules" :key="subItem.name" as="a" :href="route(subItem.href)" class="group flex w-full items-center rounded-md py-2 pl-11 pr-2 text-sm" :class="[subItem.is_current == 1 ? 'font-black text-black-600 bg-gray-200 hover:bg-black-50 hover:text-black-900': 'font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900']">{{ subItem.name }}</DisclosureButton> -->
                             <Link @click="updateCurrentActive(subItem.id)" v-for="subItem in item.submodules" :key="subItem.name" :href="route(subItem.href)" class="group flex w-full items-center rounded-md py-2 pl-11 pr-2 text-sm" :class="{'font-black navigation_sidebar_active_txt_color navigation_sidebar_active_bg_color hover:bg-black-50 hover:text-black-900': $page.url === '/'+subItem.url_name}">{{ subItem.name }}</Link>
                           </div>
 
@@ -90,22 +72,21 @@
               </DialogPanel>
             </TransitionChild>
             <div class="w-14 flex-shrink-0" aria-hidden="true">
-              <!-- Dummy element to force sidebar to shrink to fit close icon -->
+
             </div>
           </div>
         </Dialog>
       </TransitionRoot>
 
-      <!-- Static sidebar for desktop -->
       <div class="hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col">
-        <!-- Sidebar component, swap this element with another sidebar if you like -->
+
         <div class="flex flex-grow flex-col overflow-y-auto border-r border-gray-200 navigation_logo_header_bg_color pt-5">
           <div class="flex flex-shrink-0 items-center px-4 navigation_logo_bg_color">
-           <!--  <img class="h-8 w-auto" src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600" alt="Your Company" /> -->
+
            <ApplicationLogo
                 class="h-8 w-auto"
             />
-          <!--   <h2> &nbsp;&nbsp;&nbsp;&nbsp;HRIS</h2> -->
+
             <img src='/dm_full_logo_with_tagline_onlytext.png' width="180" height="100"/>
         </div>
           <div class="mt-5 flex flex-grow flex-col navigation_sidebar_bg_color">
@@ -113,42 +94,34 @@
 
             <template v-for="modulecategory in navigation" :key="modulecategory.id">
               <!--  text-gray-400 -->
-                  <div class="text-xs font-semibold leading-6 text-center uppercase navigation_category_txt_color navigation_category_bg_color">{{ modulecategory.name}} </div>
+                  <div class="text-xs px-2 font-semibold leading-6 text-left uppercase navigation_category_txt_color navigation_category_bg_color">{{ modulecategory.name}} </div>
                   <!-- MODULES LIST -->
                   <template v-for="item in modulecategory.modules" :key="item.id">
 
-                    <div v-if="item.has_children == 0">
+                    <div v-if="item.has_children == 0" class="px-1.5">
 
-                      <Link  @click="updateModuleCurrentActive(item.id)" :href="route(item.href)" class="group w-full flex items-center pl-2 py-2 text-sm font-medium rounded-md navigation_sidebar_txt_color" :class="{'navigation_sidebar_active_bg_color navigation_sidebar_active_txt_color': $page.url === '/'+item.href}">
-                        <span :class="{'navigation_sidebar_active_txt_color': $page.url === '/'+item.href}" class="navigation_sidebar_icon_txt_color group-hover:text-gray-500 mr-3 flex-shrink-0 h-6 w-6"><font-awesome-icon :icon="'fa-solid '+item.icon" size="lg"/></span>
+                      <Link  @click="updateModuleCurrentActive(item.id)" :href="route(item.href)" class="group w-full flex items-center pl-2 py-2 text-sm font-medium rounded-md navigation_sidebar_txt_color" :class="{'navigation_sidebar_active_bg_color navigation_sidebar_active_txt_color': $page.url +'.index' === '/'+item.href}">
+                        <span :class="{'navigation_sidebar_active_txt_color': $page.url === '/'+item.href}" class="navigation_sidebar_icon_txt_color group-hover:text-gray-500 mr-3 flex-shrink-0 h-5 w-5">
+                            <font-awesome-icon :icon="'fa-solid '+item.icon" size="md"/></span>
 
-                      <!--   <component :is="item.icon" :class="[item.is_current == 1 ? 'text-gray-500' : 'text-gray-400 group-hover:text-gray-500', 'mr-3 flex-shrink-0 h-6 w-6']" aria-hidden="true" /> -->
                         {{ item.name }}
                       </Link>
 
                     </div>
-                    <!-- :default-open="item.submodules.some(item => item.is_current == 1)" -->
-                    <Disclosure as="div" v-else class="space-y-1" v-slot="{ open }"  :default-open="item.submodules.some(item => $page.url == '/'+item.url_name)">
+                    <Disclosure as="div" v-else class="space-y-1 px-1.5" v-slot="{ open }"  :default-open="item.submodules.some(item => $page.url == '/'+item.url_name)">
 
 
-                      <!-- :class="{'bg-gray-100 text-gray-900':$page.url === '/'+item.href}" -->
                       <DisclosureButton class="group w-full flex items-center pl-2 pr-1 py-2 text-left text-sm font-medium rounded-md focus:outline-none focus:ring-2 navigation_sidebar_children_focus_ring_color navigation_sidebar_txt_color navigation_sidebar_children_active_header_bg_color" :class="{'navigation_sidebar_active_bg_color navigation_sidebar_active_txt_color':$page.url === '/'+item.href}">
-                        <!-- <component :is="item.icon" class="mr-3 h-6 w-6 flex-shrink-0 text-gray-400 group-hover:text-gray-500" aria-hidden="true" /> -->
-                        <span :class="{'text-gray-500': $page.url === '/'+item.href}" class="mr-3 h-6 w-6 flex-shrink-0 navigation_sidebar_icon_txt_color group-hover:text-gray-500"><font-awesome-icon :icon="'fa-solid '+item.icon" size="lg"/></span>
+
+                        <span :class="{'text-gray-500': $page.url === '/'+item.href}" class="mr-3 h-6 w-6 flex-shrink-0 navigation_sidebar_icon_txt_color group-hover:text-gray-500"><font-awesome-icon :icon="'fa-solid '+item.icon" size="md"/></span>
                         <span class="flex-1">{{ item.name }}</span>
                         <div v-if="item.has_children == 1">
-                          <svg :class="[open ? 'text-gray-400 rotate-90' : 'text-gray-300', 'ml-3 h-5 w-5 flex-shrink-0 transform transition-colors duration-150 ease-in-out group-hover:text-gray-400']" viewBox="0 0 20 20" aria-hidden="true">
-                              <path d="M6 6L14 10L6 14V6Z" fill="currentColor" />
-                          </svg>
+                            <ChevronRightIcon :class="[open ? 'text-gray-400 rotate-90' : 'text-gray-300', 'ml-3 h-5 w-5 flex-shrink-0 transform transition-colors duration-150 ease-in-out group-hover:text-gray-400']" />
                         </div>
                       </DisclosureButton>
                       <DisclosurePanel class="space-y-1 navigation_sidebar_children_bg_color navigation_sidebar_children_txt_color">
                         <div v-if="item.has_children == 1">
-                      <!--  <DisclosureButton v-for="subItem in item.submodules" :key="subItem.name" class="group flex w-full items-center rounded-md py-2 pl-11 pr-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900">
 
-                          <Link :href="route(subItem.href)">{{ subItem.name }}</Link>
-                        </DisclosureButton> -->
-                      <!--   <DisclosureButton @click="updateCurrentActive(subItem.id)" v-for="subItem in item.submodules" :key="subItem.name" as="a" :href="route(subItem.href)" class="group flex w-full items-center rounded-md py-2 pl-11 pr-2 text-sm" :class="[subItem.is_current == 1 ? 'font-black text-black-600 bg-gray-200 hover:bg-black-50 hover:text-black-900': 'font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900']">{{ subItem.name }}</DisclosureButton> -->
                         <Link @click="updateCurrentActive(subItem.id)" v-for="subItem in item.submodules" :key="subItem.name" :href="route(subItem.href)" class="group flex w-full items-center rounded-md py-2 pl-11 pr-2 text-sm" :class="{'font-black navigation_sidebar_active_txt_color navigation_sidebar_active_bg_color hover:bg-black-50 hover:text-black-900': $page.url === '/'+subItem.url_name}">{{ subItem.name }}</Link>
                       </div>
 
@@ -283,6 +256,8 @@
     InboxIcon,
     UsersIcon,
     XMarkIcon,
+    ChevronDownIcon,
+    ChevronRightIcon,
   } from '@heroicons/vue/24/outline'
   import { MagnifyingGlassIcon } from '@heroicons/vue/20/solid'
   import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue'
@@ -312,8 +287,8 @@ export default {
             modulecategories: [],
             autologoutenabled: false,
             themecolorsettings: [],
-           
-           
+
+
 
         }
     },
@@ -322,7 +297,7 @@ export default {
 
         async getThemeColorSelected(){
           this.themecolorsettings = (await getThemeColor()).responseData
-         
+
           document.documentElement.style.setProperty('--navigation_sidebar_bg_color', this.themecolorsettings.navigation_sidebar_bg_color)
           document.documentElement.style.setProperty('--navigation_logo_bg_color', this.themecolorsettings.navigation_logo_bg_color)
           document.documentElement.style.setProperty('--navigation_logo_header_bg_color', this.themecolorsettings.navigation_logo_header_bg_color)
@@ -340,21 +315,21 @@ export default {
           document.documentElement.style.setProperty('--navbar_txt_color', this.themecolorsettings.navbar_txt_color)
           document.documentElement.style.setProperty('--pageheader_bg_color', this.themecolorsettings.pageheader_bg_color)
           document.documentElement.style.setProperty('--pageheader_txt_color', this.themecolorsettings.pageheader_txt_color)
-          
+
 
         },
 
         getModuleCategories(){
           axios.get(route('modulecategory.getlistactive')).then(response => {
             this.modulecategories = response.data;
-        
+
           })
         },
 
         getNavigation(){
             axios.get(route('modules')).then(response => {
                 this.navigation = response.data;
-          
+
 
             })
         },
@@ -384,7 +359,7 @@ export default {
           })
         },
 
-       
+
 
 
 
@@ -406,12 +381,12 @@ export default {
      /*  axios.get('/get-permissions').then(
         response => {
           window.Laravel.jsPermissions = response.data;
-        
+
         }
       ); */
     },
 
-  
+
     created(){
       this.getModuleCategories();
         this.getNavigation();
