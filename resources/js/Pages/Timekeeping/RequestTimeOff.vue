@@ -74,6 +74,9 @@ export default {
                 this.emitter.emit('filtercolumn', this.defaultfilteredcolumns)
                 this.emitter.emit('loadingcolumns', false)
            })
+
+
+
           },
 
     },

@@ -1654,15 +1654,16 @@ export default {
         })
         .then((response) => {
           this.columns = response.data;
-          if (this.columns.length == 0) {
-          } else {
+        //   if (this.columns.length == 0) {
+        //   } else {
             this.addDatatoForm();
             this.getDataFromForeignKey();
-          }
+        //   }
         });
 
 
         this.getDepartments();
+        console.log('columnsssssssssssssss', this.pageurl);
     },
 
     editform() {
