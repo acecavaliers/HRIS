@@ -33,7 +33,6 @@ class RequestTimeOffController extends Controller
     {
 
         $arr = $request->formdata;
-
         $query = RequestTimeOff::create($arr);
     }
 

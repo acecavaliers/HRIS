@@ -333,7 +333,47 @@
                   </p>
                 </div>
               </div>
-
+              <!-- Input Date Range -->
+              <div
+                class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5"
+                v-if="column.formtypes.slug == 'input-date-range'"
+              >
+                <label
+                  :for="column.column_name"
+                  class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
+                  >{{ column.column_label }}
+                  <span v-if="column.is_required == 1" class="text-red-600"
+                    >*</span
+                  ></label
+                >
+                <div class="mt-1 sm:col-span-2 sm:mt-0">
+                  <div class="flex max-w-lg rounded-md shadow-sm">
+                    <input
+                      type="date"
+                      v-model="form[column.column_name]"
+                      :max="maxValue"
+                      :name="column.column_name"
+                      :id="column.column_name"
+                      :disabled="column.is_disabled == 1"
+                      :autocomplete="column.column_name"
+                      :class="
+                        column.is_disabled == 1
+                          ? 'block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500 disabled:ring-gray-200 sm:text-sm sm:leading-6'
+                          : 'block w-full min-w-0 flex-1 rounded-none rounded-r-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm'
+                      "
+                    />
+                  </div>
+                  <p
+                    v-if="errors['formdata.' + column.column_name]"
+                    class="mt-2 text-sm text-red-600"
+                    :id="column.column_name + '-error'"
+                  >
+                    {{
+                      errors["formdata." + column.column_name][0].replace("formdata.", "")
+                    }}
+                  </p>
+                </div>
+              </div>
               <!-- INPUT DATE -->
               <div
                 class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5"
@@ -2247,6 +2287,10 @@ export default {
   },
 
   computed: {
+    // withMaxValue() {
+    //   return this.modelname !== 'RequestTimeOff' ? this.maxValue : '';
+    // },
+
     filteredDataCollections() {
         // Get selected IDs for filtering
         const selectedDivisionIds = this.selectedMultiSelect.divisions.map(item => item.id);
