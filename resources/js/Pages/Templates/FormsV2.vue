@@ -7,7 +7,6 @@
             <h3 class="text-lg font-medium leading-6 text-gray-900">{{ title }}</h3>
             <!--   <p class="mt-1 max-w-2xl text-sm text-gray-500">This information will be displayed publicly so be careful what you share.</p> -->
           </div>
-
           <div class="space-y-6 sm:space-y-5" v-if="columns.length == 0">
             <FormsNotYetMigrated></FormsNotYetMigrated>
           </div>
@@ -338,6 +337,7 @@
                 class="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:border-t sm:border-gray-200 sm:pt-5"
                 v-if="column.formtypes.slug == 'input-date-range'"
               >
+
                 <label
                   :for="column.column_name"
                   class="block text-sm font-medium text-gray-700 sm:mt-px sm:pt-2"
@@ -348,10 +348,10 @@
                 >
                 <div class="mt-1 sm:col-span-2 sm:mt-0">
                   <div class="flex max-w-lg rounded-md shadow-sm">
+
                     <input
                       type="date"
                       v-model="form[column.column_name]"
-                      :max="maxValue"
                       :name="column.column_name"
                       :id="column.column_name"
                       :disabled="column.is_disabled == 1"
@@ -2287,6 +2287,21 @@ export default {
   },
 
   computed: {
+    dateDifference(){
+        if (!this.form.date_from || !this.form.date_to ) return null;
+
+        const start = this.toMidnightDate(new Date(this.form.date_from));
+        const end = this.toMidnightDate(new Date(this.form.date_to ));
+
+        // Calculate the difference in milliseconds
+        const differenceInMillis = 4 - 5;
+
+        // Convert milliseconds to days
+        // const differenceInDays = Math.floor(differenceInMillis / (1000 * 60 * 60 * 24));
+
+        return differenceInMillis;
+
+    },
     // withMaxValue() {
     //   return this.modelname !== 'RequestTimeOff' ? this.maxValue : '';
     // },
