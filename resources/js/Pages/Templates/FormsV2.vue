@@ -7,7 +7,8 @@
             <h3 class="text-lg font-medium leading-6 text-gray-900">{{ title }}</h3>
             <!--   <p class="mt-1 max-w-2xl text-sm text-gray-500">This information will be displayed publicly so be careful what you share.</p> -->
           </div>
-
+          {{ form.date_from }}- 
+          {{ form.date_to }}
           <div class="space-y-6 sm:space-y-5" v-if="columns.length == 0">
             <FormsNotYetMigrated></FormsNotYetMigrated>
           </div>
@@ -350,9 +351,9 @@
                 <div class="mt-1 sm:col-span-2 sm:mt-0">
                   <div class="flex max-w-lg rounded-md shadow-sm">
                     <input
+                      @mouseleave="dateDifference"
                       type="date"
                       v-model="form[column.column_name]"
-                      :max="maxValue"
                       :name="column.column_name"
                       :id="column.column_name"
                       :disabled="column.is_disabled == 1"
@@ -1469,6 +1470,24 @@ export default {
   },
 
   methods: {
+    
+    dateDifference(){
+      
+      const firstDate = new Date(this.form.date_from)
+      const secondDate = new Date(this.form.date_to)
+
+      const firstDateInMs = firstDate.getTime()
+      const secondDateInMs = secondDate.getTime()
+
+      const differenceBtwDates = secondDateInMs - firstDateInMs
+
+      const aDayInMs = 24 * 60 * 60 * 1000
+
+      const daysDiff = Math.round(differenceBtwDates / aDayInMs)
+
+      console.log('DDATTEEE',daysDiff)
+      this.form.number_of_days = daysDiff;
+    },
     switchCtoogle(data, val) {
         if (data.column_name === 'with_start_date') {
             console.log('eventeventevent', val);
