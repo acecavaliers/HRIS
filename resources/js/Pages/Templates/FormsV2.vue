@@ -1472,21 +1472,24 @@ export default {
   methods: {
     
     dateDifference(){
-      
-      const firstDate = new Date(this.form.date_from)
-      const secondDate = new Date(this.form.date_to)
+      if (this.form.date_from !== '' || this.form.date_to !== ''){
+        
+        const firstDate = new Date(this.form.date_from)
+        const secondDate = new Date(this.form.date_to)
 
-      const firstDateInMs = firstDate.getTime()
-      const secondDateInMs = secondDate.getTime()
+        const firstDateInMs = firstDate.getTime()
+        const secondDateInMs = secondDate.getTime()
 
-      const differenceBtwDates = secondDateInMs - firstDateInMs
+        const differenceBtwDates = secondDateInMs - firstDateInMs
 
-      const aDayInMs = 24 * 60 * 60 * 1000
+        const aDayInMs = 24 * 60 * 60 * 1000
 
-      const daysDiff = Math.round(differenceBtwDates / aDayInMs)
+        const daysDiff = Math.round(differenceBtwDates / aDayInMs)
 
-      console.log('DDATTEEE',daysDiff)
-      this.form.number_of_days = daysDiff;
+        console.log('DDATTEEE',daysDiff)
+        this.form.number_of_days = daysDiff;
+
+      }
     },
     switchCtoogle(data, val) {
         if (data.column_name === 'with_start_date') {
