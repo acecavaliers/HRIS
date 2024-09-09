@@ -377,8 +377,8 @@ class ComposerStaticInit484bb429eb3a64eb177fa2e82e5d8219
         ),
         'Psr\\Http\\Message\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/http-message/src',
-            1 => __DIR__ . '/..' . '/psr/http-factory/src',
+            0 => __DIR__ . '/..' . '/psr/http-factory/src',
+            1 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
         'Psr\\Http\\Client\\' => 
         array (
@@ -703,6 +703,7 @@ class ComposerStaticInit484bb429eb3a64eb177fa2e82e5d8219
         'App\\Http\\Controllers\\Recruitment\\CareerController' => __DIR__ . '/../..' . '/app/Http/Controllers/Recruitment/CareerController.php',
         'App\\Http\\Controllers\\Recruitment\\PersonnelRequisitionController' => __DIR__ . '/../..' . '/app/Http/Controllers/Recruitment/PersonnelRequisitionController.php',
         'App\\Http\\Controllers\\Recruitment\\RecruitmentDashboardController' => __DIR__ . '/../..' . '/app/Http/Controllers/Recruitment/RecruitmentDashboardController.php',
+        'App\\Http\\Controllers\\RequestTimeOffController' => __DIR__ . '/../..' . '/app/Http/Controllers/RequestTimeOffController.php',
         'App\\Http\\Controllers\\RoleController' => __DIR__ . '/../..' . '/app/Http/Controllers/RoleController.php',
         'App\\Http\\Controllers\\Settings\\PersonnelRequisitionSettingController' => __DIR__ . '/../..' . '/app/Http/Controllers/Settings/PersonnelRequisitionSettingController.php',
         'App\\Http\\Controllers\\Settings\\PersonnelRequisition\\PrfApproverSettingController' => __DIR__ . '/../..' . '/app/Http/Controllers/Settings/PersonnelRequisition/PrfApproverSettingController.php',
@@ -817,6 +818,7 @@ class ComposerStaticInit484bb429eb3a64eb177fa2e82e5d8219
         'App\\Models\\Region' => __DIR__ . '/../..' . '/app/Models/Region.php',
         'App\\Models\\Relationship' => __DIR__ . '/../..' . '/app/Models/Relationship.php',
         'App\\Models\\Religion' => __DIR__ . '/../..' . '/app/Models/Religion.php',
+        'App\\Models\\RequestTimeOff' => __DIR__ . '/../..' . '/app/Models/RequestTimeOff.php',
         'App\\Models\\Role' => __DIR__ . '/../..' . '/app/Models/Role.php',
         'App\\Models\\SalaryGrade' => __DIR__ . '/../..' . '/app/Models/SalaryGrade.php',
         'App\\Models\\SalaryGradeDetail' => __DIR__ . '/../..' . '/app/Models/SalaryGradeDetail.php',
