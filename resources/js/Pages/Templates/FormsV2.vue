@@ -7,8 +7,6 @@
             <h3 class="text-lg font-medium leading-6 text-gray-900">{{ title }}</h3>
             <!--   <p class="mt-1 max-w-2xl text-sm text-gray-500">This information will be displayed publicly so be careful what you share.</p> -->
           </div>
-          {{ form.date_from }}-
-          {{ form.date_to }}
           <div class="space-y-6 sm:space-y-5" v-if="columns.length == 0">
             <FormsNotYetMigrated></FormsNotYetMigrated>
           </div>
