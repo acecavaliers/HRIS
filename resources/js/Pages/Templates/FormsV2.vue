@@ -408,6 +408,51 @@
                       "
                     />
                   </div>
+
+                  <div class="relative flex items-start">
+                    <div class="flex h-6 items-center">
+                      <input
+
+                        id="not-applicable"
+                        aria-describedby="not-applicable-description"
+                        name="notapplicable"
+                        v-model="notapplicablecheckbox[column.column_name]"
+                        type="checkbox"
+                        class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                      />
+                    </div>
+                    <div class="ml-3 text-sm leading-6">
+                      <label for="not-applicable" class="font-medium text-gray-900"
+                        >AM</label
+                      >
+                      <!-- <p id="not-applicable-description" class="text-gray-500"></p>
+                        @change="
+                          notapplicableclick(
+                            column.column_name,
+                            notapplicablecheckbox[column.column_name]
+                          )
+                        "
+                      -->
+                    </div>
+
+                    <div class="flex h-6 items-center">
+                      <input
+
+                        id="not-applicable"
+                        aria-describedby="not-applicable-description"
+                        name="notapplicable"
+                        v-model="notapplicablecheckbox[column.column_name]"
+                        type="checkbox"
+                        class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                      />
+                    </div>
+                    <div class="ml-3 text-sm leading-6">
+                      <label for="not-applicable" class="font-medium text-gray-900"
+                        >PM</label
+                      >
+                      <!-- <p id="not-applicable-description" class="text-gray-500"></p> -->
+                    </div>
+                  </div>
                   <p
                     v-if="errors['formdata.' + column.column_name]"
                     class="mt-2 text-sm text-red-600"
