@@ -10,10 +10,11 @@ class RequestTimeOff extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $foreignKeys = ['employees' => 'employee_id'];
+    protected $foreignKeys = ['employees' => 'employee_id', 'leave_types' => 'leave_type_id',];
 
     protected $fillable = [
         'employee_id',
+        'leave_type_id',
         'date_from',
         'date_to',
         'number_of_days',
@@ -33,5 +34,10 @@ class RequestTimeOff extends Model
     public function employees()
     {
         return $this->belongsTo(Employee::class, 'employee_id');
+    }
+
+    public function leave_types()
+    {
+        return $this->belongsTo(LeaveType::class, 'leave_type_id');
     }
 }

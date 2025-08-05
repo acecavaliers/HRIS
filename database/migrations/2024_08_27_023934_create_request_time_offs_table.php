@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Employee;
+use App\Models\LeaveType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,6 +16,7 @@ return new class extends Migration
         Schema::create('request_time_offs', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Employee::class)->constrained('employees');
+            $table->foreignIdFor(LeaveType::class)->constrained('leave_types');
             $table->date('date_from');
             $table->date('date_to');
             $table->char('number_of_days', 5);
