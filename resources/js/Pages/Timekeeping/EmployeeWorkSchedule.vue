@@ -837,10 +837,14 @@
                                             days in the period</span
                                         >
                                     </label>
+<<<<<<< HEAD
                                     <label
                                         v-if="setType !== 'Edit'"
                                         class="w-full inline-flex items-center cursor-pointer pt-2 pl-2 border-t"
                                     >
+=======
+                                    <label v-if="setType !== 'Edit'" class="w-full inline-flex items-center cursor-pointer pt-2 pl-2 border-t">
+>>>>>>> b221773af9ba9160dcae5aebb365566e5695df98
                                         <input
                                             type="checkbox"
                                             @change="setToAll('emp', $event)"
@@ -1060,6 +1064,7 @@ export default {
         },
 
         setToAll(type, event) {
+<<<<<<< HEAD
             if (type === "shift") {
                 if (event.target.checked) {
                     this.saveShifts = this.emp_Shift[this.selectedDate];
@@ -1067,6 +1072,15 @@ export default {
                 } else {
                     this.saveShifts = this.emp_Shift[this.selectedDate];
                     this.periodDates = [];
+=======
+            if(type === 'shift'){
+                if(event.target.checked){
+                    // this.saveShifts = this.emp_Shift[this.selectedDate];
+                    this.periodDates = this.emp_Shift;
+                }else{
+                    // this.saveShifts = this.emp_Shift[this.selectedDate];
+                    this.periodDates =[];
+>>>>>>> b221773af9ba9160dcae5aebb365566e5695df98
                 }
             } else {
                 if (event.target.checked) {
